@@ -1,0 +1,676 @@
+{
+  "info": {
+    "name": "ESS Backend API",
+    "description": "Employee Self-Service Portal — full API collection with auto-token handling",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "ess-backend-collection-2026"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registerToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET / (root)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/", "host": ["{{baseUrl}}"], "path": [""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST create-super-admin",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Super Admin\",\n  \"email\": \"admin@ess.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/create-super-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "create-super-admin"]
+            }
+          }
+        },
+        {
+          "name": "POST login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "    console.log('Tokens saved to collection variables');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ess.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "POST get-register-token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/get-register-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "get-register-token"]
+            }
+          }
+        },
+        {
+          "name": "POST register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-register-token", "value": "{{registerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@ess.com\",\n  \"password\": \"Pass@123\",\n  \"empId\": \"EMP001\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Developer\",\n  \"role\": \"employee\",\n  \"employeeInfo\": {\n    \"employeeCode\": \"1001\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"gender\": \"Male\",\n    \"jobTitle\": \"Developer\",\n    \"status\": \"Active\",\n    \"department\": \"Engineering\",\n    \"designation\": \"Developer\",\n    \"dateOfJoining\": \"2026-01-01\",\n    \"currency\": \"AED\",\n    \"insuranceDetails\": {\n      \"insuranceType\": \"Health\",\n      \"insurancePolicyNumber\": \"POL-001-2026\",\n      \"insuranceProvider\": \"Star Health\",\n      \"coverageAmount\": 500000,\n      \"issueDate\": \"2026-01-01\",\n      \"expiryDate\": \"2027-01-01\",\n      \"insuranceStatus\": \"Active\"\n    },\n    \"administration\": {\n      \"employmentType\": \"Employee\",\n      \"birthDate\": \"1988-06-26\",\n      \"maritalStatus\": \"Married\",\n      \"nationality\": \"JO\",\n      \"nationalityName\": \"Jordan\",\n      \"language\": \"ENG\",\n      \"languageName\": \"ENGLISH\",\n      \"address\": \"Dubai_U.A.E\",\n      \"city\": \"Dubai\",\n      \"email\": \"qusai@example.com\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "POST refresh-token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "    console.log('Access token refreshed');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "refresh-token"]
+            }
+          }
+        },
+        {
+          "name": "POST verify-token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/verify-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "verify-token"]
+            }
+          }
+        },
+        {
+          "name": "POST logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "POST change-password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Admin@123\",\n  \"newPassword\": \"NewPass@456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "change-password"]
+            }
+          }
+        },
+        {
+          "name": "GET me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Leaves",
+      "item": [
+        {
+          "name": "POST apply",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"leaveType\": \"Paid\",\n  \"fromDate\": \"2026-06-01\",\n  \"toDate\": \"2026-06-03\",\n  \"reason\": \"Family function\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/apply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "apply"]
+            }
+          }
+        },
+        {
+          "name": "GET my leaves",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "my"]
+            }
+          }
+        },
+        {
+          "name": "GET all leaves",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", "all"]
+            }
+          }
+        },
+        {
+          "name": "PUT update status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Approved\",\n  \"approverRemarks\": \"OK\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leaves/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leaves", ":id", "status"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Loans",
+      "item": [
+        {
+          "name": "POST apply",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanType\": \"Salary Advance\",\n  \"amount\": 50000,\n  \"reason\": \"Medical emergency\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/apply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "apply"]
+            }
+          }
+        },
+        {
+          "name": "GET my loans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "my"]
+            }
+          }
+        },
+        {
+          "name": "GET all loans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "all"]
+            }
+          }
+        },
+        {
+          "name": "PUT update status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Approved\",\n  \"approverRemarks\": \"Approved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", ":id", "status"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Assets",
+      "item": [
+        {
+          "name": "POST apply",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assetCode\": \"LAP-001\",\n  \"assetName\": \"Dell Latitude Laptop\",\n  \"remarks\": \"For development work\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/assets/apply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assets", "apply"]
+            }
+          }
+        },
+        {
+          "name": "GET my assets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assets/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assets", "my"]
+            }
+          }
+        },
+        {
+          "name": "GET all assets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assets/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assets", "all"]
+            }
+          }
+        },
+        {
+          "name": "PUT update status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Approved\",\n  \"approverRemarks\": \"Issued\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/assets/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assets", ":id", "status"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Overtimes",
+      "item": [
+        {
+          "name": "POST apply",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-06-15\",\n  \"hoursRequested\": 3,\n  \"projectRef\": \"ESS-2026\",\n  \"justification\": \"Production release support\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/overtimes/apply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "overtimes", "apply"]
+            }
+          }
+        },
+        {
+          "name": "GET my overtimes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/overtimes/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "overtimes", "my"]
+            }
+          }
+        },
+        {
+          "name": "GET all overtimes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/overtimes/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "overtimes", "all"]
+            }
+          }
+        },
+        {
+          "name": "PUT update status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Approved\",\n  \"approverRemarks\": \"OK\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/overtimes/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "overtimes", ":id", "status"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Travels",
+      "item": [
+        {
+          "name": "POST apply",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"travelType\": \"Domestic\",\n  \"purpose\": \"Client meeting\",\n  \"fromDate\": \"2026-06-10\",\n  \"toDate\": \"2026-06-12\",\n  \"modeOfTravel\": \"Flight\",\n  \"fromLocation\": \"Hyderabad\",\n  \"toLocation\": \"Mumbai\",\n  \"estimatedCost\": 15000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/travels/apply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "travels", "apply"]
+            }
+          }
+        },
+        {
+          "name": "GET my travels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/travels/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "travels", "my"]
+            }
+          }
+        },
+        {
+          "name": "GET all travels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/travels/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "travels", "all"]
+            }
+          }
+        },
+        {
+          "name": "PUT update status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Approved\",\n  \"approverRemarks\": \"OK\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/travels/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "travels", ":id", "status"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Expenses",
+      "item": [
+        {
+          "name": "POST apply (Travel)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expenseType\": \"Travel\",\n  \"claimType\": \"Flight Ticket\",\n  \"amount\": 12500,\n  \"attachment\": \"https://example.com/receipt.pdf\",\n  \"remarks\": \"Mumbai client meeting\",\n  \"travelRef\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/apply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses", "apply"]
+            }
+          }
+        },
+        {
+          "name": "POST apply (Non-Travel)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expenseType\": \"Non-Travel\",\n  \"claimType\": \"Office Supplies\",\n  \"amount\": 1500,\n  \"attachment\": \"\",\n  \"remarks\": \"Stationery purchase\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/apply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses", "apply"]
+            }
+          }
+        },
+        {
+          "name": "GET my expenses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/my?type=Travel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses", "my"],
+              "query": [{ "key": "type", "value": "Travel" }]
+            }
+          }
+        },
+        {
+          "name": "GET all expenses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses", "all"]
+            }
+          }
+        },
+        {
+          "name": "PUT update status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Approved\",\n  \"approverRemarks\": \"Reimbursed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses", ":id", "status"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Employee Information",
+      "item": [
+        {
+          "name": "GET my employee info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-info/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employee-info", "my"]
+            }
+          }
+        },
+        {
+          "name": "POST save employee info",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeCode\": \"1001\",\n  \"firstName\": \"Qusai\",\n  \"middleName\": \"\",\n  \"lastName\": \"Alazzam\",\n  \"initials\": \"QA\",\n  \"arabicFirstName\": \"قصي\",\n  \"arabicLastName\": \"العزام\",\n  \"searchName\": \"QUSAI\",\n  \"gender\": \"Male\",\n  \"jobTitle\": \"General Manager\",\n  \"status\": \"Active\",\n  \"motherName\": \"\",\n  \"faith\": \"\",\n  \"education\": \"\",\n  \"emergencyContactNo\": \"\",\n  \"healthInsurance\": \"\",\n  \"familyInsurance\": false,\n  \"category\": \"\",\n  \"department\": \"Management\",\n  \"designation\": \"GM\",\n  \"dateOfJoining\": \"2012-04-01\",\n  \"reportingManager\": \"Bharath Viswanathan\",\n  \"grade\": \"FDM-Grade\",\n  \"employmentType\": \"Permanent\",\n  \"insuranceDetails\": {\n    \"insuranceType\": \"Health\",\n    \"insurancePolicyNumber\": \"POL-001-2026\",\n    \"insuranceProvider\": \"Star Health\",\n    \"coverageAmount\": 500000,\n    \"issueDate\": \"2026-01-01\",\n    \"expiryDate\": \"2027-01-01\",\n    \"insuranceStatus\": \"Active\"\n  },\n  \"administration\": {\n    \"employmentType\": \"Employee\",\n    \"birthDate\": \"1988-06-26\",\n    \"probationInMonths\": 1,\n    \"noticePeriodInMonths\": 1,\n    \"religion\": \"Muslim\",\n    \"maritalStatus\": \"Married\",\n    \"nationality\": \"JO\",\n    \"nationalityName\": \"Jordan\",\n    \"language\": \"ENG\",\n    \"languageName\": \"ENGLISH\",\n    \"address\": \"Dubai_U.A.E\",\n    \"city\": \"Dubai\",\n    \"email\": \"qusai@example.com\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-info/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employee-info", "my"]
+            }
+          }
+        },
+        {
+          "name": "PUT update employee info",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTitle\": \"Senior General Manager\",\n  \"grade\": \"FDM-Grade-A\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-info/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employee-info", "my"]
+            }
+          }
+        },
+        {
+          "name": "GET all employees (admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-info/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employee-info", "all"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

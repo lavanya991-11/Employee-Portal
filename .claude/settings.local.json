@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('postman/ESS_Backend_API.postman_collection.json','utf8'\\)\\); console.log\\('postman JSON valid'\\)\")",
+      "Bash(node --check server.js)",
+      "Bash(node --check models/employeeInfo.js)"
+    ]
+  }
+}
