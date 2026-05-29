@@ -103,6 +103,21 @@
         },
         {
           "name": "POST get-register-token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.registerToken) {",
+                  "    pm.collectionVariables.set('registerToken', json.registerToken);",
+                  "    console.log('Saved registerToken');",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": { "type": "noauth" },
             "method": "POST",

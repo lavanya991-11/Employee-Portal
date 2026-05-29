@@ -12,6 +12,11 @@ mongoose.set('bufferTimeoutMS', 30000);
 const connectDB = async () => {
     console.log("Connecting to MongoDB...");
 
+    if (!process.env.MONGO_URI) {
+        console.error("MONGO_URI is NOT set. Add it in the host's Environment settings.");
+        return;
+    }
+
     for (let attempt = 1; attempt <= 5; attempt++) {
         try {
             await mongoose.connect(process.env.MONGO_URI, {
@@ -22,6 +27,7 @@ const connectDB = async () => {
             console.log("MongoDB Connected");
             return;
         } catch (err) {
+            console.error(`MongoDB connect attempt ${attempt} failed: ${err.message}`);
             if (attempt < 5) {
                 await new Promise((r) => setTimeout(r, 5000));
             } else {
