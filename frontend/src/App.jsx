@@ -10,6 +10,7 @@ import EmployeeInformation from './pages/EmployeeInformation';
 import Approvals from './pages/Approvals';
 import ApplyLoan from './pages/ApplyLoan';
 import ApplyRequest from './pages/ApplyRequest';
+import Payslip from './pages/Payslip';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -88,6 +89,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <ApplyRequest />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/payslip"
+                element={
+                    <ProtectedRoute>
+                        <Payslip />
                     </ProtectedRoute>
                 }
             />
