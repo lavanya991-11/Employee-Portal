@@ -103,8 +103,62 @@ function ApplyLeave() {
     };
 
     const onDocSearch = () => {
-        // placeholder: would look up a doc by series/number
         alert(`Searching for doc ${form.docSeries} / ${form.docNumber}`);
+    };
+
+    const DRAFT_KEY = 'applyLeaveDraft';
+
+    useEffect(() => {
+        const saved = localStorage.getItem(DRAFT_KEY);
+        if (saved) {
+            try {
+                const draft = JSON.parse(saved);
+                setForm((f) => ({ ...f, ...draft }));
+                setSuccess('Loaded saved draft.');
+            } catch (e) {}
+        }
+    }, []);
+
+    const onPrint = () => window.print();
+
+    const onSuspend = () => {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
+        setSuccess('Draft suspended (saved). You can come back later.');
+    };
+
+    const onExport = () => {
+        const data = JSON.stringify({ ...form, noOfDays, assigned, available, balance }, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `leave-${form.docSeries}-${form.docNumber}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const onCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(JSON.stringify(form, null, 2));
+            setSuccess('Form copied to clipboard.');
+        } catch (e) {
+            setError('Copy failed: ' + e.message);
+        }
+    };
+
+    const onSearch = () => {
+        const q = prompt('Enter doc number to search (e.g. "2 / 9")');
+        if (q) alert(`Search: ${q}\n(connect this to your leaves list later.)`);
+    };
+
+    const onMap = () => {
+        const city = JSON.parse(localStorage.getItem('user') || '{}').address?.city
+            || 'Dubai';
+        window.open(`https://www.google.com/maps/search/${encodeURIComponent(city)}`, '_blank');
+    };
+
+    const onEInv = () => {
+        alert(`E-Invoice preview\n\nLeave Type: ${form.leaveType}\nFrom: ${form.fromDate}\nTo: ${form.toDate}\nDays: ${noOfDays}\nDoc: ${form.docSeries} / ${form.docNumber}`);
     };
 
     return (
@@ -222,14 +276,14 @@ function ApplyLeave() {
                         <aside className="erp-actions-panel">
                             <div className="erp-actions-header">Actions</div>
                             <ul className="erp-actions-list">
-                                <li>🖨️ Print</li>
-                                <li>👁️ Print Preview</li>
-                                <li>⏸️ Suspend</li>
-                                <li>📤 Export</li>
-                                <li>📋 Copy</li>
-                                <li>🔍 Search</li>
-                                <li>🗺️ Map</li>
-                                <li>📨 EInv</li>
+                                <li onClick={onPrint}>🖨️ Print</li>
+                                <li onClick={onPrint}>👁️ Print Preview</li>
+                                <li onClick={onSuspend}>⏸️ Suspend</li>
+                                <li onClick={onExport}>📤 Export</li>
+                                <li onClick={onCopy}>📋 Copy</li>
+                                <li onClick={onSearch}>🔍 Search</li>
+                                <li onClick={onMap}>🗺️ Map</li>
+                                <li onClick={onEInv}>📨 EInv</li>
                             </ul>
                             <div className="erp-side-tabs">
                                 <span>Actions</span>
