@@ -333,6 +333,7 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
     margin-top: 16px;
 }
 .attendance-buttons > div { text-align: center; }
+.btn-checkin, .btn-checkout { white-space: nowrap; padding: 8px 18px; }
 .btn-checkin { background: #ef4444; }
 .btn-checkin:hover { background: #dc2626; }
 .btn-checkout { background: #f59e0b; }
