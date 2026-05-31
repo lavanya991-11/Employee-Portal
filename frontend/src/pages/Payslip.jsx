@@ -28,6 +28,11 @@ function Payslip() {
     const [filterEmp, setFilterEmp] = useState('');
     const [costCenter, setCostCenter] = useState('Employee Master');
     const [paymentMode, setPaymentMode] = useState('All');
+    const [filterField, setFilterField] = useState('Employee');
+    const [filterOp, setFilterOp] = useState('Contains');
+    const [filterMatch, setFilterMatch] = useState('Full Text');
+    const [filterSearch, setFilterSearch] = useState('');
+    const [employeeGroupOpen, setEmployeeGroupOpen] = useState(true);
 
     const [showPreview, setShowPreview] = useState(false);
     const [status, setStatus] = useState('');
@@ -108,11 +113,17 @@ function Payslip() {
     };
 
     const filteredEmps = allEmployees.filter((e) => {
-        const t = (filterEmp || '').toLowerCase();
+        const t = (filterSearch || '').toLowerCase();
         if (!t) return true;
-        return (e.employeeCode || '').toLowerCase().includes(t)
-            || (e.firstName || '').toLowerCase().includes(t)
-            || (e.lastName || '').toLowerCase().includes(t);
+        const fields = {
+            'Employee': [e.employeeCode, e.firstName, e.lastName, e.user?.email].join(' '),
+            'Department': e.department || '',
+            'Designation': e.designation || ''
+        };
+        const haystack = (fields[filterField] || fields.Employee).toLowerCase();
+        if (filterOp === 'Equals') return haystack === t;
+        if (filterOp === 'Starts with') return haystack.startsWith(t);
+        return haystack.includes(t);
     });
 
     return (
@@ -239,13 +250,13 @@ function Payslip() {
 
                 {showFilter && (
                     <div className="erp-modal-backdrop" onClick={() => setShowFilter(false)}>
-                        <div className="erp-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="erp-modal emp-filter-modal" onClick={(e) => e.stopPropagation()}>
                             <div className="erp-modal-header">
                                 Employee Filter
                                 <button className="erp-actions-close" onClick={() => setShowFilter(false)}>×</button>
                             </div>
                             <div className="erp-modal-body">
-                                <div className="erp-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                                <div className="emp-filter-top">
                                     <div className="erp-field">
                                         <label>Select Cost Center</label>
                                         <select value={costCenter} onChange={(e) => setCostCenter(e.target.value)}>
@@ -262,25 +273,59 @@ function Payslip() {
                                             <option>Cash</option>
                                         </select>
                                     </div>
-                                    <div className="erp-field erp-field-wide">
-                                        <label>Search Employee (Code / Name)</label>
-                                        <input value={filterEmp} onChange={(e) => setFilterEmp(e.target.value)} placeholder="Type to filter…" />
-                                    </div>
                                 </div>
-                                <div style={{ marginTop: 8, maxHeight: 200, overflow: 'auto', border: '1px solid #e5e7eb', borderRadius: 4 }}>
+
+                                <div className="emp-filter-row">
+                                    <select value={filterField} onChange={(e) => setFilterField(e.target.value)}>
+                                        <option>Employee</option>
+                                        <option>Department</option>
+                                        <option>Designation</option>
+                                    </select>
+                                    <select value={filterOp} onChange={(e) => setFilterOp(e.target.value)}>
+                                        <option>Contains</option>
+                                        <option>Equals</option>
+                                        <option>Starts with</option>
+                                    </select>
+                                    <select value={filterMatch} onChange={(e) => setFilterMatch(e.target.value)}>
+                                        <option>Full Text</option>
+                                        <option>Code</option>
+                                        <option>Name</option>
+                                    </select>
+                                    <input
+                                        value={filterSearch}
+                                        onChange={(e) => setFilterSearch(e.target.value)}
+                                        placeholder="Search..."
+                                    />
+                                    <button type="button" className="emp-filter-funnel" title="Apply filter">▽</button>
+                                </div>
+
+                                <div className="emp-filter-tree">
                                     <table className="erp-table">
                                         <thead>
-                                            <tr><th>Code</th><th>ID Number</th><th>Name</th></tr>
+                                            <tr>
+                                                <th style={{ width: 160 }}>Code</th>
+                                                <th style={{ width: 120 }}>ID Number</th>
+                                                <th>Name</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                            {filteredEmps.length === 0 && (
-                                                <tr><td colSpan={3} style={{ padding: 12, color: '#888' }}>No matches.</td></tr>
+                                            <tr className="emp-tree-group" onClick={() => setEmployeeGroupOpen(!employeeGroupOpen)}>
+                                                <td>
+                                                    <span className="emp-tree-toggle">{employeeGroupOpen ? '−' : '+'}</span>
+                                                    Employee
+                                                </td>
+                                                <td></td>
+                                                <td>Employee</td>
+                                            </tr>
+                                            {employeeGroupOpen && filteredEmps.length === 0 && (
+                                                <tr><td colSpan={3} style={{ padding: 16, color: '#888' }}>No matches.</td></tr>
                                             )}
-                                            {filteredEmps.map((e) => (
+                                            {employeeGroupOpen && filteredEmps.map((e) => (
                                                 <tr key={e._id}
-                                                    onClick={() => { setFilterEmp(e.employeeCode); setShowFilter(false); }}
+                                                    className={filterEmp === e.employeeCode ? 'erp-row-selected' : ''}
+                                                    onClick={() => setFilterEmp(e.employeeCode)}
                                                     style={{ cursor: 'pointer' }}>
-                                                    <td>{e.employeeCode}</td>
+                                                    <td style={{ paddingLeft: 28 }}>{e.employeeCode}</td>
                                                     <td>{e.user?.empId || '—'}</td>
                                                     <td>{e.firstName} {e.lastName}</td>
                                                 </tr>
@@ -289,7 +334,10 @@ function Payslip() {
                                     </table>
                                 </div>
                             </div>
-                            <div className="erp-modal-footer">
+                            <div className="erp-modal-footer emp-filter-footer">
+                                <button type="button" className="emp-helpdesk-btn">📄 Help desk Service Ticket</button>
+                                <button type="button" className="emp-helpdesk-btn emp-helpdesk-btn-dark">📄 Help desk Service Ticket</button>
+                                <div style={{ flex: 1 }} />
                                 <button className="btn" onClick={() => setShowFilter(false)}>OK</button>
                                 <button className="erp-action-btn" onClick={() => { setFilterEmp(''); setShowFilter(false); }}>× Cancel</button>
                             </div>

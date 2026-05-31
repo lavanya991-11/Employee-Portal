@@ -580,6 +580,44 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
     display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;
 }
 
+/* Employee Filter modal */
+.emp-filter-modal { width: 620px; max-width: 95vw; }
+.emp-filter-top {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    padding-bottom: 12px; border-bottom: 1px solid #e5e7eb; margin-bottom: 10px;
+}
+.emp-filter-row {
+    display: flex; gap: 6px; align-items: center; margin-bottom: 10px;
+}
+.emp-filter-row select, .emp-filter-row input {
+    border: 1px solid #d1d5db; border-radius: 3px; padding: 4px 6px; font-size: 12px; background: white;
+}
+.emp-filter-row select { min-width: 90px; }
+.emp-filter-row input { flex: 1; }
+.emp-filter-funnel {
+    background: white; border: 1px solid #3b82f6; color: #3b82f6;
+    width: 28px; height: 28px; border-radius: 3px; cursor: pointer; font-size: 14px;
+}
+.emp-filter-funnel:hover { background: #eff6ff; }
+.emp-filter-tree {
+    max-height: 240px; overflow: auto;
+    border: 1px solid #e5e7eb; border-radius: 4px;
+}
+.emp-tree-group { background: #f9fafb; font-weight: 600; cursor: pointer; }
+.emp-tree-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; margin-right: 6px;
+    background: white; border: 1px solid #d1d5db; border-radius: 2px;
+    font-size: 12px; font-weight: 700; color: #374151;
+}
+.emp-filter-footer { gap: 6px; }
+.emp-helpdesk-btn {
+    background: white; border: 1px solid #d1d5db; color: #374151;
+    font-size: 12px; padding: 6px 10px; border-radius: 3px; cursor: pointer;
+}
+.emp-helpdesk-btn-dark { background: #1e3a8a; color: white; border-color: #1e3a8a; }
+.emp-helpdesk-btn:hover { opacity: 0.9; }
+
 .erp-section { background: white; border-radius: 6px; overflow: hidden; border: 1px solid #c7d2fe; }
 .erp-section-header {
     background: #3b82f6; color: white;
