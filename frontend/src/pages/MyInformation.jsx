@@ -1,22 +1,26 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { authApi, leaveApi, employeeInfoApi } from '../services/api';
 
 const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 
-function CircleStat({ label, value, total, color }) {
+function CircleStat({ label, value, total, color, addLink }) {
     const pct = total ? Math.round((value / total) * 100) : 0;
-    const circ = 2 * Math.PI * 36;
+    const circ = 2 * Math.PI * 28;
     const offset = circ - (pct / 100) * circ;
     return (
         <div className="leave-stat">
-            <div className="leave-stat-title">{label}</div>
-            <svg width="90" height="90">
-                <circle cx="45" cy="45" r="36" fill="none" stroke="#e5e7eb" strokeWidth="8" />
-                <circle cx="45" cy="45" r="36" fill="none" stroke={color} strokeWidth="8"
-                    strokeDasharray={circ} strokeDashoffset={offset} transform="rotate(-90 45 45)" />
-                <text x="45" y="48" textAnchor="middle" fontSize="20" fontWeight="700" fill="#111827">{value}</text>
-                <text x="45" y="62" textAnchor="middle" fontSize="9" fill="#6b7280">AOD</text>
+            <div className="leave-stat-title">
+                <span>{label}</span>
+                {addLink && <Link to={addLink} className="leave-add-btn" title="Apply">+</Link>}
+            </div>
+            <svg width="74" height="74">
+                <circle cx="37" cy="37" r="28" fill="none" stroke="#e5e7eb" strokeWidth="6" />
+                <circle cx="37" cy="37" r="28" fill="none" stroke={color} strokeWidth="6"
+                    strokeDasharray={circ} strokeDashoffset={offset} transform="rotate(-90 37 37)" />
+                <text x="37" y="40" textAnchor="middle" fontSize="18" fontWeight="700" fill="#111827">{value}</text>
+                <text x="37" y="54" textAnchor="middle" fontSize="8" fill="#6b7280">AOD</text>
             </svg>
             <div className="leave-stat-numbers">
                 <div><b>{total}</b><span>Assigned</span></div>
@@ -166,10 +170,17 @@ function MyInformation() {
                     </div>
 
                     <div className="info-panel leaves-panel">
-                        <h3>Leaves</h3>
+                        <div className="info-panel-header">
+                            <h3>Leaves</h3>
+                            <select className="leaves-emp-select" defaultValue={user.empId || info.employeeCode || ''}>
+                                <option value={user.empId || info.employeeCode || ''}>
+                                    {user.empId || info.employeeCode || 'FDMS0013'}
+                                </option>
+                            </select>
+                        </div>
                         <div className="leaves-stats">
-                            <CircleStat label="SickLeaves" value={sickAvailed} total={21} color="#3b82f6" />
-                            <CircleStat label="CasualLeaves" value={casualAvailed} total={12} color="#22c55e" />
+                            <CircleStat label="SickLeaves" value={sickAvailed} total={21} color="#3b82f6" addLink="/leaves/apply" />
+                            <CircleStat label="CasualLeaves" value={casualAvailed} total={12} color="#22c55e" addLink="/leaves/apply" />
                         </div>
                     </div>
 
