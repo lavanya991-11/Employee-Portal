@@ -34,6 +34,8 @@ function CircleStat({ label, value, total, color, addLink }) {
 function MyInformation() {
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
     const [employeeInfo, setEmployeeInfo] = useState(null);
+    const [allEmployees, setAllEmployees] = useState([]);
+    const [selectedEmpCode, setSelectedEmpCode] = useState('');
     const [leaves, setLeaves] = useState([]);
     const [checkInTime, setCheckInTime] = useState('--:--');
     const [checkOutTime, setCheckOutTime] = useState('--:--');
@@ -47,7 +49,13 @@ function MyInformation() {
         }).catch(() => {});
 
         employeeInfoApi.getMy().then(({ data }) => {
-            setEmployeeInfo(data.employeeInfo || null);
+            const info = data.employeeInfo || null;
+            setEmployeeInfo(info);
+            if (info?.employeeCode) setSelectedEmpCode(info.employeeCode);
+        }).catch(() => {});
+
+        employeeInfoApi.getAll().then(({ data }) => {
+            setAllEmployees(data.employees || []);
         }).catch(() => {});
 
         leaveApi.myLeaves().then(({ data }) => {
@@ -172,10 +180,21 @@ function MyInformation() {
                     <div className="info-panel leaves-panel">
                         <div className="info-panel-header">
                             <h3>Leaves</h3>
-                            <select className="leaves-emp-select" defaultValue={user.empId || info.employeeCode || ''}>
-                                <option value={user.empId || info.employeeCode || ''}>
-                                    {user.empId || info.employeeCode || 'FDMS0013'}
-                                </option>
+                            <select
+                                className="leaves-emp-select"
+                                value={selectedEmpCode || user.empId || info.employeeCode || ''}
+                                onChange={(e) => setSelectedEmpCode(e.target.value)}
+                            >
+                                {allEmployees.length === 0 && (
+                                    <option value={info.employeeCode || user.empId || ''}>
+                                        {info.employeeCode || user.empId || 'FDMS0013'}
+                                    </option>
+                                )}
+                                {allEmployees.map((emp) => (
+                                    <option key={emp._id} value={emp.employeeCode}>
+                                        {emp.employeeCode}{emp.firstName ? ` - ${emp.firstName}` : ''}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div className="leaves-stats">
