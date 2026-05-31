@@ -25,7 +25,9 @@ function ApplyLeave() {
         toDate: '',
         session: 'Full Day',
         reason: '',
-        attachment: ''
+        attachment: '',
+        docDate: today(),
+        docNo: '2 / 9'
     });
     const [availed, setAvailed] = useState(0);
     const [error, setError] = useState('');
@@ -92,12 +94,20 @@ function ApplyLeave() {
     };
 
     const onNew = () => {
-        setForm({ leaveType: initialType, fromDate: '', toDate: '', session: 'Full Day', reason: '', attachment: '' });
+        setForm({
+            leaveType: initialType, fromDate: '', toDate: '', session: 'Full Day',
+            reason: '', attachment: '', docDate: today(), docNo: '2 / 9'
+        });
         setError(''); setSuccess('');
     };
 
-    const docDate = today();
-    const docNo = useMemo(() => Math.floor(Date.now() / 1000).toString().slice(-4), []);
+    const docNoOptions = useMemo(() => {
+        const list = [];
+        for (let series = 1; series <= 3; series++) {
+            for (let n = 1; n <= 10; n++) list.push(`${series} / ${n}`);
+        }
+        return list;
+    }, []);
 
     return (
         <div className="app-layout">
@@ -193,11 +203,13 @@ function ApplyLeave() {
                                 <div className="erp-grid">
                                     <div className="erp-field">
                                         <label>Doc Date</label>
-                                        <input value={fmtDate(docDate)} readOnly className="erp-readonly" />
+                                        <input type="date" name="docDate" value={form.docDate} onChange={onChange} />
                                     </div>
                                     <div className="erp-field">
                                         <label>Doc No</label>
-                                        <input value={`2 / ${docNo}`} readOnly className="erp-readonly" />
+                                        <select name="docNo" value={form.docNo} onChange={onChange}>
+                                            {docNoOptions.map((o) => <option key={o} value={o}>{o}</option>)}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
