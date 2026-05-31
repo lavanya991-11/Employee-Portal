@@ -207,9 +207,9 @@ function ApplyLeave() {
                                         <label>Doc No</label>
                                         <div className="erp-docno">
                                             <select name="docSeries" value={form.docSeries} onChange={onChange} className="erp-docno-series">
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
+                                                {Array.from({ length: 50 }, (_, i) => i + 1).map((n) => (
+                                                    <option key={n} value={String(n)}>{n}</option>
+                                                ))}
                                             </select>
                                             <input type="number" name="docNumber" value={form.docNumber} onChange={onChange} className="erp-docno-num" min="1" />
                                             <button type="button" className="erp-docno-search" onClick={onDocSearch} title="Search">🔍</button>
