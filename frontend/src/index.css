@@ -544,7 +544,7 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 .erp-action-btn:hover { background: #f9fafb; }
 .erp-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.erp-body { display: flex; gap: 12px; align-items: flex-start; }
+.erp-body { display: flex; gap: 12px; align-items: stretch; }
 .erp-form { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
 
 .erp-section { background: white; border-radius: 6px; overflow: hidden; border: 1px solid #c7d2fe; }
@@ -603,7 +603,7 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 }
 .erp-actions-list li:hover { background: #eff6ff; }
 .erp-side-tabs {
-    position: absolute; right: -28px; top: 0;
+    position: absolute; right: -28px; top: 0; bottom: 0;
     display: flex; flex-direction: column;
     background: #3b82f6; color: white;
     border-radius: 4px;
@@ -612,7 +612,10 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
     writing-mode: vertical-rl; text-orientation: mixed;
     padding: 10px 6px; font-size: 11px; font-weight: 600;
     border-bottom: 1px solid rgba(255,255,255,0.2); cursor: pointer;
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    min-height: 60px;
 }
+.erp-side-tabs span:last-child { border-bottom: none; }
 .erp-side-tabs span:hover { background: #2563eb; }
 
 @media (max-width: 900px) {
