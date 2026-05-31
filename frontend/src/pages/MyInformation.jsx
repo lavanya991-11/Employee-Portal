@@ -179,8 +179,8 @@ function MyInformation() {
                             </select>
                         </div>
                         <div className="leaves-stats">
-                            <CircleStat label="SickLeaves" value={sickAvailed} total={21} color="#3b82f6" addLink="/leaves/apply" />
-                            <CircleStat label="CasualLeaves" value={casualAvailed} total={12} color="#22c55e" addLink="/leaves/apply" />
+                            <CircleStat label="SickLeaves" value={sickAvailed} total={21} color="#3b82f6" addLink="/leaves/apply?type=Sick" />
+                            <CircleStat label="CasualLeaves" value={casualAvailed} total={12} color="#22c55e" addLink="/leaves/apply?type=Casual" />
                         </div>
                     </div>
 
