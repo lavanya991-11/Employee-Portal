@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { leaveApi } from '../services/api';
@@ -25,11 +25,12 @@ function ApplyLeave() {
         toDate: '',
         session: 'Full Day',
         reason: '',
-        attachment: '',
+        attachment: null,
         docDate: today(),
         docSeries: '2',
         docNumber: 9
     });
+    const fileInputRef = useRef(null);
     const [availed, setAvailed] = useState(0);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -97,9 +98,55 @@ function ApplyLeave() {
     const onNew = () => {
         setForm({
             leaveType: initialType, fromDate: '', toDate: '', session: 'Full Day',
-            reason: '', attachment: '', docDate: today(), docSeries: '2', docNumber: 9
+            reason: '', attachment: null, docDate: today(), docSeries: '2', docNumber: 9
         });
         setError(''); setSuccess('');
+    };
+
+    const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024; // 5 MB
+
+    const onAttachClick = () => fileInputRef.current?.click();
+
+    const onAttachChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > MAX_ATTACHMENT_BYTES) {
+            setError(`File too large (${Math.round(file.size / 1024 / 1024)} MB). Max 5 MB.`);
+            e.target.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+            setForm((f) => ({
+                ...f,
+                attachment: { name: file.name, type: file.type, size: file.size, dataUrl: reader.result }
+            }));
+            setSuccess(`Attached: ${file.name} (${Math.round(file.size / 1024)} KB)`);
+        };
+        reader.onerror = () => setError('Could not read file.');
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    };
+
+    const onAttachView = () => {
+        if (!form.attachment) {
+            setError('No attachment to view.');
+            return;
+        }
+        const w = window.open();
+        if (!w) { setError('Popup blocked. Allow popups to view.'); return; }
+        if (form.attachment.type?.startsWith('image/')) {
+            w.document.write(`<img src="${form.attachment.dataUrl}" style="max-width:100%" />`);
+        } else {
+            w.location.href = form.attachment.dataUrl;
+        }
+    };
+
+    const onAttachDelete = () => {
+        if (!form.attachment) return;
+        if (!confirm(`Delete attachment "${form.attachment.name}"?`)) return;
+        setForm((f) => ({ ...f, attachment: null }));
+        setSuccess('Attachment deleted.');
     };
 
     const onDocSearch = () => {
@@ -240,11 +287,23 @@ function ApplyLeave() {
                                         <label>Leave Attach</label>
                                         <div className="erp-attach">
                                             <span className="erp-attach-actions">
-                                                <a href="#" onClick={(e) => e.preventDefault()}>Upload</a>{' '}
-                                                <a href="#" onClick={(e) => e.preventDefault()}>View</a>{' '}
-                                                <a href="#" onClick={(e) => e.preventDefault()}>Delete</a>
+                                                <a href="#" onClick={(e) => { e.preventDefault(); onAttachClick(); }}>Upload</a>{' '}
+                                                <a href="#" onClick={(e) => { e.preventDefault(); onAttachView(); }}>View</a>{' '}
+                                                <a href="#" onClick={(e) => { e.preventDefault(); onAttachDelete(); }}>Delete</a>
                                             </span>
-                                            <input name="attachment" value={form.attachment} onChange={onChange} placeholder="" />
+                                            <input
+                                                value={form.attachment ? `${form.attachment.name} (${Math.round(form.attachment.size / 1024)} KB)` : ''}
+                                                readOnly
+                                                placeholder="No file attached"
+                                                className="erp-readonly"
+                                            />
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*,application/pdf,.doc,.docx"
+                                                style={{ display: 'none' }}
+                                                onChange={onAttachChange}
+                                            />
                                         </div>
                                     </div>
                                 </div>
