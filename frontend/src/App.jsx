@@ -7,6 +7,7 @@ import MyLeaves from './pages/MyLeaves';
 import Profile from './pages/Profile';
 import MyInformation from './pages/MyInformation';
 import EmployeeInformation from './pages/EmployeeInformation';
+import Approvals from './pages/Approvals';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -61,6 +62,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <EmployeeInformation />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/approvals"
+                element={
+                    <ProtectedRoute>
+                        <Approvals />
                     </ProtectedRoute>
                 }
             />

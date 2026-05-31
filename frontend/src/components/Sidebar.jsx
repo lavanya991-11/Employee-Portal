@@ -39,9 +39,15 @@ function Sidebar() {
                     </>
                 )}
 
-                <Link to="/leaves/apply" className="nav-item">
+                <Link to="/leaves/my" className="nav-item">
                     <span className="nav-item-icon">📅</span> Apply Leave
                 </Link>
+
+                {['manager', 'admin', 'super-admin'].includes(user.role) && (
+                    <Link to="/approvals" className="nav-item">
+                        <span className="nav-item-icon">✅</span> Approvals
+                    </Link>
+                )}
 
                 <Link to="/loans/apply" className="nav-item">
                     <span className="nav-item-icon">💰</span> Apply Loan

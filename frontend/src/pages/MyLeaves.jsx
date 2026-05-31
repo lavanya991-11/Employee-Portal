@@ -1,18 +1,35 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { leaveApi } from '../services/api';
 
+const STATUS_LABEL = {
+    Pending: 'UnApproved',
+    Approved: 'Posted',
+    Rejected: 'Rejected'
+};
+const STATUS_COLOR = {
+    Pending: '#f59e0b',
+    Approved: '#22c55e',
+    Rejected: '#ef4444',
+    Cancelled: '#6b7280'
+};
+
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
+const docNo = (l) =>
+    `AYL-${new Date(l.createdAt || Date.now()).getFullYear()}/${(l._id || '').slice(-3).toUpperCase()}`;
+
 function MyLeaves() {
+    const navigate = useNavigate();
     const [leaves, setLeaves] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selected, setSelected] = useState(null);
 
-    useEffect(() => {
-        loadLeaves();
-    }, []);
+    useEffect(() => { load(); }, []);
 
-    const loadLeaves = async () => {
+    const load = async () => {
+        setLoading(true);
         try {
             const { data } = await leaveApi.myLeaves();
             setLeaves(data.leaves || []);
@@ -23,55 +40,113 @@ function MyLeaves() {
         }
     };
 
-    const formatDate = (d) => new Date(d).toLocaleDateString();
+    const stats = useMemo(() => {
+        const total = leaves.length;
+        const counts = leaves.reduce((acc, l) => { acc[l.status] = (acc[l.status] || 0) + 1; return acc; }, {});
+        return {
+            total,
+            items: [
+                { key: 'Pending', label: 'UnApproved', count: counts.Pending || 0, color: STATUS_COLOR.Pending },
+                { key: 'Rejected', label: 'Rejected', count: counts.Rejected || 0, color: STATUS_COLOR.Rejected },
+                { key: 'Approved', label: 'Posted', count: counts.Approved || 0, color: STATUS_COLOR.Approved }
+            ].map((s) => ({ ...s, pct: total ? Math.round((s.count / total) * 100) : 0 }))
+        };
+    }, [leaves]);
 
     return (
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
-                <div className="card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h2>My Leaves</h2>
-                        <Link to="/leaves/apply" className="btn">+ Apply Leave</Link>
+                <div className="erp-page">
+                    <div className="erp-titlebar">
+                        <div className="erp-title">Apply Leave</div>
+                        <div className="erp-titlebar-actions">
+                            <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
+                            <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
+                        </div>
                     </div>
 
-                    {error && <div className="error">{error}</div>}
-                    {loading && <p>Loading...</p>}
+                    <div className="erp-body">
+                        <div className="erp-list-card">
+                            {error && <div className="error">{error}</div>}
+                            {loading && <p style={{ padding: 16 }}>Loading…</p>}
+                            {!loading && leaves.length === 0 && (
+                                <p style={{ padding: 16, color: '#888' }}>No leave requests yet. Click <b>New</b> to apply.</p>
+                            )}
+                            {leaves.length > 0 && (
+                                <table className="erp-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Select</th>
+                                            <th>Doc Date</th>
+                                            <th>Doc No</th>
+                                            <th>Type</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Days</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {leaves.map((l) => {
+                                            const isSel = selected?._id === l._id;
+                                            return (
+                                                <tr
+                                                    key={l._id}
+                                                    className={isSel ? 'erp-row-selected' : ''}
+                                                    onClick={() => setSelected(l)}
+                                                >
+                                                    <td><input type="checkbox" checked={isSel} readOnly /></td>
+                                                    <td>{fmtDate(l.createdAt)}</td>
+                                                    <td className="erp-doc-link">{docNo(l)}</td>
+                                                    <td>{l.leaveType}</td>
+                                                    <td>{fmtDate(l.fromDate)}</td>
+                                                    <td>{fmtDate(l.toDate)}</td>
+                                                    <td>{l.totalDays}</td>
+                                                    <td>
+                                                        <span style={{ color: STATUS_COLOR[l.status] || '#374151', fontWeight: 600 }}>
+                                                            {STATUS_LABEL[l.status] || l.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
 
-                    {!loading && leaves.length === 0 && (
-                        <p style={{ marginTop: 20, color: '#888' }}>No leave requests yet.</p>
-                    )}
-
-                    {leaves.length > 0 && (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>From</th>
-                                    <th>To</th>
-                                    <th>Days</th>
-                                    <th>Reason</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {leaves.map((leave) => (
-                                    <tr key={leave._id}>
-                                        <td>{leave.leaveType}</td>
-                                        <td>{formatDate(leave.fromDate)}</td>
-                                        <td>{formatDate(leave.toDate)}</td>
-                                        <td>{leave.totalDays}</td>
-                                        <td>{leave.reason}</td>
-                                        <td>
-                                            <span className={`status-badge status-${leave.status}`}>
-                                                {leave.status}
-                                            </span>
-                                        </td>
-                                    </tr>
+                        <aside className="erp-actions-panel">
+                            <div className="erp-actions-header">
+                                <span>Document Status</span>
+                                <span style={{ color: '#1e3a8a', fontWeight: 700 }}>{stats.total}</span>
+                            </div>
+                            <div style={{ padding: 14 }}>
+                                {stats.items.map((s) => (
+                                    <div key={s.key} style={{ marginBottom: 14 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#374151', marginBottom: 4 }}>
+                                            <span>{s.label} <span style={{ color: '#9ca3af' }}>{s.pct}%</span></span>
+                                            <span style={{ fontWeight: 600 }}>{s.count}</span>
+                                        </div>
+                                        <div style={{ height: 4, background: '#e5e7eb', borderRadius: 2, overflow: 'hidden' }}>
+                                            <div style={{ height: '100%', width: `${s.pct}%`, background: s.color }} />
+                                        </div>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
-                    )}
+                                {selected && (
+                                    <div style={{ marginTop: 18, paddingTop: 12, borderTop: '1px solid #e5e7eb' }}>
+                                        <div style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: 8 }}>{docNo(selected)}</div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 4 }}>
+                                            <span>Bill Amount</span><span>0.000</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280' }}>
+                                            <span>Adjusted Amount</span><span>0.000</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </aside>
+                    </div>
                 </div>
             </main>
         </div>

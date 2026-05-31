@@ -7,13 +7,17 @@ function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
     const [recentLeaves, setRecentLeaves] = useState([]);
-    const [notificationCount] = useState(3);
+    const [notificationCount, setNotificationCount] = useState(0);
+
+    const isManager = ['manager', 'admin', 'super-admin'].includes(user.role);
 
     const handleLogout = async () => {
         try { await authApi.logout(); } catch (e) {}
         localStorage.clear();
         navigate('/login');
     };
+
+    const onBellClick = () => navigate(isManager ? '/approvals' : '/leaves/my');
 
     useEffect(() => {
         authApi.me().then(({ data }) => {
@@ -24,8 +28,17 @@ function Dashboard() {
 
         leaveApi.myLeaves().then(({ data }) => {
             setRecentLeaves((data.leaves || []).slice(0, 3));
+            if (!isManager) {
+                setNotificationCount((data.leaves || []).filter((l) => l.status === 'Pending').length);
+            }
         }).catch(() => {});
-    }, []);
+
+        if (isManager) {
+            leaveApi.allLeaves().then(({ data }) => {
+                setNotificationCount((data.leaves || []).filter((l) => l.status === 'Pending').length);
+            }).catch(() => {});
+        }
+    }, [isManager]);
 
     const hour = new Date().getHours();
     const timeOfDay = hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : 'Evening';
@@ -62,7 +75,11 @@ function Dashboard() {
                         <p>{user.designation || 'Employee'} • {user.department || 'Department'}</p>
                     </div>
                     <button className="btn btn-danger" onClick={handleLogout} style={{ marginRight: 12 }}>Logout</button>
-                    <button className="notification-bell" title="Notifications">
+                    <button
+                        className="notification-bell"
+                        title={isManager ? 'Pending approvals' : 'Your pending leaves'}
+                        onClick={onBellClick}
+                    >
                         🔔
                         {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
                     </button>
