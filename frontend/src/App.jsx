@@ -8,6 +8,8 @@ import Profile from './pages/Profile';
 import MyInformation from './pages/MyInformation';
 import EmployeeInformation from './pages/EmployeeInformation';
 import Approvals from './pages/Approvals';
+import ApplyLoan from './pages/ApplyLoan';
+import ApplyRequest from './pages/ApplyRequest';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -70,6 +72,22 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <Approvals />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/loans/apply"
+                element={
+                    <ProtectedRoute>
+                        <ApplyLoan />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/assets/apply"
+                element={
+                    <ProtectedRoute>
+                        <ApplyRequest />
                     </ProtectedRoute>
                 }
             />
