@@ -264,11 +264,11 @@ function ApplyLeave() {
                                     </div>
                                     <div className="erp-field">
                                         <label>Assigned Leaves</label>
-                                        <input type="number" name="assignedLeaves" value={form.assignedLeaves} onChange={onChange} min="0" />
+                                        <input value={form.assignedLeaves} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Available Leaves</label>
-                                        <input type="number" name="availableLeaves" value={form.availableLeaves} onChange={onChange} min="0" />
+                                        <input value={form.availableLeaves} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Leave From Date *</label>

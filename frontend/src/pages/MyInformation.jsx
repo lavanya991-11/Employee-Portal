@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { authApi, leaveApi, employeeInfoApi } from '../services/api';
@@ -73,52 +73,6 @@ function MyInformation() {
         setCheckOutTime(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
     };
 
-    const photoInputRef = useRef(null);
-    const [uploadingPhoto, setUploadingPhoto] = useState(false);
-    const [photoError, setPhotoError] = useState('');
-
-    const resizeToDataUrl = (file, maxDim = 240, quality = 0.85) => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const img = new Image();
-            img.onload = () => {
-                let { width, height } = img;
-                if (width > height && width > maxDim) { height = (height / width) * maxDim; width = maxDim; }
-                else if (height > maxDim) { width = (width / height) * maxDim; height = maxDim; }
-                const canvas = document.createElement('canvas');
-                canvas.width = width; canvas.height = height;
-                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', quality));
-            };
-            img.onerror = () => reject(new Error('Could not load image'));
-            img.src = reader.result;
-        };
-        reader.onerror = () => reject(new Error('Could not read file'));
-        reader.readAsDataURL(file);
-    });
-
-    const onPhotoPick = () => photoInputRef.current?.click();
-
-    const onPhotoChange = async (e) => {
-        const file = e.target.files?.[0];
-        e.target.value = '';
-        if (!file) return;
-        if (!file.type.startsWith('image/')) { setPhotoError('Please choose an image file.'); return; }
-        setPhotoError('');
-        setUploadingPhoto(true);
-        try {
-            const dataUrl = await resizeToDataUrl(file);
-            const { data } = await authApi.updateProfile({ profilePicture: dataUrl });
-            const fresh = data.user || { ...user, profilePicture: dataUrl };
-            setUser(fresh);
-            localStorage.setItem('user', JSON.stringify(fresh));
-        } catch (err) {
-            setPhotoError(err.response?.data?.message || err.message || 'Upload failed');
-        } finally {
-            setUploadingPhoto(false);
-        }
-    };
-
     const changeMonth = (delta) => {
         setCalendarDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
     };
@@ -189,23 +143,9 @@ function MyInformation() {
 
                 <div className="emp-banner">
                     <div className="emp-banner-avatar">
-                        <div
-                            className="avatar-circle avatar-clickable"
-                            onClick={onPhotoPick}
-                            title="Click to change photo"
-                        >
+                        <div className="avatar-circle">
                             {user.profilePicture ? <img src={user.profilePicture} alt="" /> : '👤'}
-                            {uploadingPhoto && <div className="avatar-uploading">…</div>}
-                            <span className="avatar-edit-badge">✎</span>
                         </div>
-                        <input
-                            ref={photoInputRef}
-                            type="file"
-                            accept="image/*"
-                            style={{ display: 'none' }}
-                            onChange={onPhotoChange}
-                        />
-                        {photoError && <div className="error" style={{ marginTop: 8, fontSize: 12 }}>{photoError}</div>}
                         <div className="emp-banner-name">{user.empId || info.employeeCode || 'ID'} - {displayName}</div>
                         <div className="emp-banner-designation">{displayDesignation}</div>
                     </div>
