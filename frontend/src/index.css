@@ -575,7 +575,12 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
     border-bottom: 1px solid #e5e7eb;
     display: flex; justify-content: space-between; align-items: center;
 }
-.erp-actions-header::after { content: '×'; color: #9ca3af; font-size: 18px; }
+.erp-actions-close {
+    background: none; border: none; cursor: pointer;
+    color: #9ca3af; font-size: 20px; line-height: 1; padding: 0 4px;
+}
+.erp-actions-close:hover { color: #ef4444; }
+.erp-actions-panel-collapsed { width: 28px; background: transparent; border: none; }
 .erp-actions-list { list-style: none; padding: 6px 0; margin: 0; }
 .erp-actions-list li {
     padding: 7px 14px; font-size: 12px; color: #374151;

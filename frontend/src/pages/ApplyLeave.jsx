@@ -38,6 +38,7 @@ function ApplyLeave() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [saving, setSaving] = useState(false);
+    const [actionsOpen, setActionsOpen] = useState(true);
 
     // Auto-populate Assigned/Available when leave type changes.
     useEffect(() => {
@@ -347,20 +348,33 @@ function ApplyLeave() {
                             </div>
                         </form>
 
-                        <aside className="erp-actions-panel">
-                            <div className="erp-actions-header">Actions</div>
-                            <ul className="erp-actions-list">
-                                <li onClick={onPrint}>🖨️ Print</li>
-                                <li onClick={onPrint}>👁️ Print Preview</li>
-                                <li onClick={onSuspend}>⏸️ Suspend</li>
-                                <li onClick={onExport}>📤 Export</li>
-                                <li onClick={onCopy}>📋 Copy</li>
-                                <li onClick={onSearch}>🔍 Search</li>
-                                <li onClick={onMap}>🗺️ Map</li>
-                                <li onClick={onEInv}>📨 EInv</li>
-                            </ul>
+                        <aside className={`erp-actions-panel ${actionsOpen ? '' : 'erp-actions-panel-collapsed'}`}>
+                            {actionsOpen && (
+                                <>
+                                    <div className="erp-actions-header">
+                                        <span>Actions</span>
+                                        <button
+                                            type="button"
+                                            className="erp-actions-close"
+                                            onClick={() => setActionsOpen(false)}
+                                            title="Close"
+                                            aria-label="Close Actions panel"
+                                        >×</button>
+                                    </div>
+                                    <ul className="erp-actions-list">
+                                        <li onClick={onPrint}>🖨️ Print</li>
+                                        <li onClick={onPrint}>👁️ Print Preview</li>
+                                        <li onClick={onSuspend}>⏸️ Suspend</li>
+                                        <li onClick={onExport}>📤 Export</li>
+                                        <li onClick={onCopy}>📋 Copy</li>
+                                        <li onClick={onSearch}>🔍 Search</li>
+                                        <li onClick={onMap}>🗺️ Map</li>
+                                        <li onClick={onEInv}>📨 EInv</li>
+                                    </ul>
+                                </>
+                            )}
                             <div className="erp-side-tabs">
-                                <span>Actions</span>
+                                <span onClick={() => setActionsOpen(true)} title="Open Actions">Actions</span>
                                 <span>Info</span>
                                 <span>Reports</span>
                                 <span>Shortcuts</span>
