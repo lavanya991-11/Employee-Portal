@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { leaveApi } from '../services/api';
@@ -28,38 +28,51 @@ function ApplyLeave() {
         attachment: null,
         docDate: today(),
         docSeries: '2',
-        docNumber: 9
+        docNumber: 9,
+        assignedLeaves: TYPE_LIMITS[initialType] ?? 0,
+        availableLeaves: TYPE_LIMITS[initialType] ?? 0,
+        noOfDays: 0,
+        balanceLeaves: TYPE_LIMITS[initialType] ?? 0
     });
     const fileInputRef = useRef(null);
-    const [availed, setAvailed] = useState(0);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [saving, setSaving] = useState(false);
 
+    // Auto-populate Assigned/Available when leave type changes.
     useEffect(() => {
         leaveApi.myLeaves().then(({ data }) => {
             const used = (data.leaves || [])
                 .filter((l) => l.leaveType === form.leaveType && l.status === 'Approved')
                 .reduce((s, l) => s + (l.totalDays || 0), 0);
-            setAvailed(used);
+            const assignedDefault = TYPE_LIMITS[form.leaveType] ?? 0;
+            const availableDefault = Math.max(0, assignedDefault - used);
+            setForm((f) => ({ ...f, assignedLeaves: assignedDefault, availableLeaves: availableDefault }));
         }).catch(() => {});
     }, [form.leaveType]);
 
-    const assigned = TYPE_LIMITS[form.leaveType] ?? 0;
-    const available = Math.max(0, assigned - availed);
-
-    const noOfDays = useMemo(() => {
-        if (!form.fromDate || !form.toDate) return 0;
+    // Auto-populate No Of Days when dates / session change.
+    useEffect(() => {
+        if (!form.fromDate || !form.toDate) {
+            setForm((f) => ({ ...f, noOfDays: 0 }));
+            return;
+        }
         const diff = new Date(form.toDate) - new Date(form.fromDate);
-        if (diff < 0) return 0;
+        if (diff < 0) { setForm((f) => ({ ...f, noOfDays: 0 })); return; }
         const days = Math.floor(diff / 86400000) + 1;
-        return form.session === 'Full Day' ? days : days * 0.5;
+        const computed = form.session === 'Full Day' ? days : days * 0.5;
+        setForm((f) => ({ ...f, noOfDays: computed }));
     }, [form.fromDate, form.toDate, form.session]);
 
-    const balance = Math.max(0, available - noOfDays);
+    // Auto-recalculate Balance when Available or No Of Days change.
+    useEffect(() => {
+        setForm((f) => ({ ...f, balanceLeaves: Math.max(0, Number(f.availableLeaves) - Number(f.noOfDays)) }));
+    }, [form.availableLeaves, form.noOfDays]);
 
     const onChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value, type } = e.target;
+        const next = type === 'number' ? (value === '' ? '' : Number(value)) : value;
+        setForm({ ...form, [name]: next });
         setError(''); setSuccess('');
     };
 
@@ -74,8 +87,8 @@ function ApplyLeave() {
             setError('LeaveToDate cannot be before LeaveFromDate.');
             return;
         }
-        if (noOfDays > available) {
-            setError(`Not enough balance. Available: ${available}, requested: ${noOfDays}.`);
+        if (Number(form.noOfDays) > Number(form.availableLeaves)) {
+            setError(`Not enough balance. Available: ${form.availableLeaves}, requested: ${form.noOfDays}.`);
             return;
         }
         setSaving(true);
@@ -96,9 +109,11 @@ function ApplyLeave() {
     };
 
     const onNew = () => {
+        const baseAssigned = TYPE_LIMITS[initialType] ?? 0;
         setForm({
             leaveType: initialType, fromDate: '', toDate: '', session: 'Full Day',
-            reason: '', attachment: null, docDate: today(), docSeries: '2', docNumber: 9
+            reason: '', attachment: null, docDate: today(), docSeries: '2', docNumber: 9,
+            assignedLeaves: baseAssigned, availableLeaves: baseAssigned, noOfDays: 0, balanceLeaves: baseAssigned
         });
         setError(''); setSuccess('');
     };
@@ -174,7 +189,7 @@ function ApplyLeave() {
     };
 
     const onExport = () => {
-        const data = JSON.stringify({ ...form, noOfDays, assigned, available, balance }, null, 2);
+        const data = JSON.stringify(form, null, 2);
         const blob = new Blob([data], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -205,7 +220,7 @@ function ApplyLeave() {
     };
 
     const onEInv = () => {
-        alert(`E-Invoice preview\n\nLeave Type: ${form.leaveType}\nFrom: ${form.fromDate}\nTo: ${form.toDate}\nDays: ${noOfDays}\nDoc: ${form.docSeries} / ${form.docNumber}`);
+        alert(`E-Invoice preview\n\nLeave Type: ${form.leaveType}\nFrom: ${form.fromDate}\nTo: ${form.toDate}\nDays: ${form.noOfDays}\nDoc: ${form.docSeries} / ${form.docNumber}`);
     };
 
     return (
@@ -248,11 +263,11 @@ function ApplyLeave() {
                                     </div>
                                     <div className="erp-field">
                                         <label>Assigned Leaves</label>
-                                        <input value={assigned} readOnly className="erp-readonly" />
+                                        <input type="number" name="assignedLeaves" value={form.assignedLeaves} onChange={onChange} min="0" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Available Leaves</label>
-                                        <input value={available} readOnly className="erp-readonly" />
+                                        <input type="number" name="availableLeaves" value={form.availableLeaves} onChange={onChange} min="0" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Leave From Date *</label>
@@ -272,11 +287,11 @@ function ApplyLeave() {
                                     </div>
                                     <div className="erp-field">
                                         <label>No Of Days *</label>
-                                        <input value={noOfDays} readOnly className="erp-readonly" />
+                                        <input type="number" name="noOfDays" value={form.noOfDays} onChange={onChange} min="0" step="0.5" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Balance Leaves</label>
-                                        <input value={balance} readOnly className="erp-readonly" />
+                                        <input type="number" name="balanceLeaves" value={form.balanceLeaves} onChange={onChange} min="0" />
                                     </div>
                                     <div className="erp-field erp-field-wide">
                                         <label>Reasons *</label>
