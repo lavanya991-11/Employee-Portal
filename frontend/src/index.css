@@ -586,10 +586,10 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
     position: absolute; right: -28px; top: 0;
     display: flex; flex-direction: column;
     background: #3b82f6; color: white;
-    writing-mode: vertical-rl; text-orientation: mixed;
     border-radius: 4px;
 }
 .erp-side-tabs span {
+    writing-mode: vertical-rl; text-orientation: mixed;
     padding: 10px 6px; font-size: 11px; font-weight: 600;
     border-bottom: 1px solid rgba(255,255,255,0.2); cursor: pointer;
 }
