@@ -290,6 +290,21 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 .emp-banner-avatar .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
 .emp-banner-name { font-weight: 700; font-size: 15px; }
 .emp-banner-designation { font-size: 12px; opacity: 0.9; margin-top: 2px; }
+.avatar-clickable { cursor: pointer; position: relative; }
+.avatar-clickable:hover { box-shadow: 0 0 0 4px rgba(255,255,255,0.6); }
+.avatar-edit-badge {
+    position: absolute; bottom: 6px; right: 6px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #1e3a8a; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; border: 2px solid white;
+}
+.avatar-uploading {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: rgba(0,0,0,0.45); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+}
 
 .emp-banner-fields {
     display: grid;
