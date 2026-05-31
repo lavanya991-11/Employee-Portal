@@ -27,7 +27,8 @@ function ApplyLeave() {
         reason: '',
         attachment: '',
         docDate: today(),
-        docNo: '2 / 9'
+        docSeries: '2',
+        docNumber: 9
     });
     const [availed, setAvailed] = useState(0);
     const [error, setError] = useState('');
@@ -96,18 +97,15 @@ function ApplyLeave() {
     const onNew = () => {
         setForm({
             leaveType: initialType, fromDate: '', toDate: '', session: 'Full Day',
-            reason: '', attachment: '', docDate: today(), docNo: '2 / 9'
+            reason: '', attachment: '', docDate: today(), docSeries: '2', docNumber: 9
         });
         setError(''); setSuccess('');
     };
 
-    const docNoOptions = useMemo(() => {
-        const list = [];
-        for (let series = 1; series <= 3; series++) {
-            for (let n = 1; n <= 10; n++) list.push(`${series} / ${n}`);
-        }
-        return list;
-    }, []);
+    const onDocSearch = () => {
+        // placeholder: would look up a doc by series/number
+        alert(`Searching for doc ${form.docSeries} / ${form.docNumber}`);
+    };
 
     return (
         <div className="app-layout">
@@ -207,9 +205,15 @@ function ApplyLeave() {
                                     </div>
                                     <div className="erp-field">
                                         <label>Doc No</label>
-                                        <select name="docNo" value={form.docNo} onChange={onChange}>
-                                            {docNoOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-                                        </select>
+                                        <div className="erp-docno">
+                                            <select name="docSeries" value={form.docSeries} onChange={onChange} className="erp-docno-series">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                            </select>
+                                            <input type="number" name="docNumber" value={form.docNumber} onChange={onChange} className="erp-docno-num" min="1" />
+                                            <button type="button" className="erp-docno-search" onClick={onDocSearch} title="Search">🔍</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

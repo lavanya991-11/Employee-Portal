@@ -550,6 +550,15 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 }
 .erp-readonly { background: #f9fafb !important; color: #6b7280; }
 .erp-required { border-color: #ef4444 !important; box-shadow: 0 0 0 1px #fecaca; }
+.erp-docno { display: flex; align-items: stretch; gap: 4px; }
+.erp-docno-series { width: 50px; padding-right: 4px !important; }
+.erp-docno-num { width: 60px; }
+.erp-docno-search {
+    background: #eff6ff; border: 1px solid #3b82f6; color: #1e3a8a;
+    width: 30px; border-radius: 3px; cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+}
+.erp-docno-search:hover { background: #dbeafe; }
 .erp-attach { display: flex; flex-direction: column; gap: 4px; }
 .erp-attach-actions { font-size: 11px; color: #3b82f6; }
 .erp-attach-actions a { color: #3b82f6; text-decoration: none; margin-right: 8px; cursor: pointer; }
