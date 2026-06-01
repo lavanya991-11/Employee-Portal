@@ -11,6 +11,7 @@ import Approvals from './pages/Approvals';
 import ApplyLoan from './pages/ApplyLoan';
 import ApplyRequest from './pages/ApplyRequest';
 import Payslip from './pages/Payslip';
+import TravelRequest from './pages/TravelRequest';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -97,6 +98,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <Payslip />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/travels/apply"
+                element={
+                    <ProtectedRoute>
+                        <TravelRequest />
                     </ProtectedRoute>
                 }
             />

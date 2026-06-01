@@ -64,6 +64,18 @@ function Sidebar() {
                     </>
                 )}
 
+                <div className="nav-item" onClick={() => toggle('travel')}>
+                    <span className="nav-item-icon">✈️</span> Travel
+                    <span className="nav-item-caret">{openMenu === 'travel' ? '▼' : '▶'}</span>
+                </div>
+                {openMenu === 'travel' && (
+                    <>
+                        <Link to="/travels/apply" className="nav-subitem">Travel Request</Link>
+                        <Link to="/expenses" className="nav-subitem">Travel Expenses</Link>
+                        <Link to="/expenses" className="nav-subitem">Non-Travel Expenses</Link>
+                    </>
+                )}
+
                 <div className="nav-item" onClick={() => toggle('tax')}>
                     <span className="nav-item-icon">📊</span> Income Tax
                     <span className="nav-item-caret">{openMenu === 'tax' ? '▼' : '▶'}</span>
