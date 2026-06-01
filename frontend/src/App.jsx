@@ -16,6 +16,7 @@ import TravelRequests from './pages/TravelRequests';
 import TravelExpenses from './pages/TravelExpenses';
 import NonTravelExpenses from './pages/NonTravelExpenses';
 import ExpensesList from './pages/ExpensesList';
+import OvertimeRequest from './pages/OvertimeRequest';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -150,6 +151,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <NonTravelExpenses />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/overtimes/apply"
+                element={
+                    <ProtectedRoute>
+                        <OvertimeRequest />
                     </ProtectedRoute>
                 }
             />
