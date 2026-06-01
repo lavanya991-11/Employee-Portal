@@ -14,6 +14,7 @@ import Payslip from './pages/Payslip';
 import TravelRequest from './pages/TravelRequest';
 import TravelRequests from './pages/TravelRequests';
 import TravelExpenses from './pages/TravelExpenses';
+import ExpensesList from './pages/ExpensesList';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -121,6 +122,30 @@ function App() {
             />
             <Route
                 path="/expenses/travel"
+                element={
+                    <ProtectedRoute>
+                        <ExpensesList />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/expenses/travel/new"
+                element={
+                    <ProtectedRoute>
+                        <TravelExpenses />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/expenses/non-travel"
+                element={
+                    <ProtectedRoute>
+                        <ExpensesList />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/expenses/non-travel/new"
                 element={
                     <ProtectedRoute>
                         <TravelExpenses />
