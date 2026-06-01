@@ -23,10 +23,6 @@ function Sidebar() {
                     <span className="nav-item-icon">🏠</span> Dashboard
                 </Link>
 
-                <Link to="/employee-information" className="nav-item">
-                    <span className="nav-item-icon">👨‍💼</span> Employee Information
-                </Link>
-
                 <div className="nav-item" onClick={() => toggle('payroll')}>
                     <span className="nav-item-icon">💼</span> Payroll
                     <span className="nav-item-caret">{openMenu === 'payroll' ? '▼' : '▶'}</span>
