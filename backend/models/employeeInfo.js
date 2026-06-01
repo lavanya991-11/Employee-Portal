@@ -50,24 +50,6 @@ const employeeInfoSchema = new mongoose.Schema({
     employeeUserMapping: { type: String, default: '' },
     resourceNo: { type: String, default: '' },
 
-    insuranceDetails: {
-        insuranceType: {
-            type: String,
-            enum: ['Health', 'Life', 'Vehicle', 'Travel', 'Property', 'Other'],
-            default: 'Health'
-        },
-        insurancePolicyNumber: { type: String, default: '' },
-        insuranceProvider: { type: String, default: '' },
-        coverageAmount: { type: Number, default: 0 },
-        issueDate: { type: Date },
-        expiryDate: { type: Date },
-        insuranceStatus: {
-            type: String,
-            enum: ['Active', 'Inactive', 'Expired', 'Cancelled'],
-            default: 'Active'
-        }
-    },
-
     administration: {
         employmentType: {
             type: String,

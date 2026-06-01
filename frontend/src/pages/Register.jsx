@@ -20,14 +20,6 @@ function Register() {
         gender: 'Male',
         jobTitle: '',
         dateOfJoining: '',
-        // insurance details
-        insuranceType: 'Health',
-        insurancePolicyNumber: '',
-        insuranceProvider: '',
-        coverageAmount: 0,
-        issueDate: '',
-        expiryDate: '',
-        insuranceStatus: 'Active',
         // administration
         administration: {
             employmentType: 'Employee',
@@ -87,18 +79,9 @@ function Register() {
                 gender: form.gender,
                 jobTitle: form.jobTitle || form.designation,
                 department: form.department,
-                designation: form.designation,
-                insuranceDetails: {
-                    insuranceType: form.insuranceType,
-                    insurancePolicyNumber: form.insurancePolicyNumber,
-                    insuranceProvider: form.insuranceProvider,
-                    coverageAmount: Number(form.coverageAmount) || 0,
-                    insuranceStatus: form.insuranceStatus
-                }
+                designation: form.designation
             };
             if (form.dateOfJoining) employeeInfo.dateOfJoining = form.dateOfJoining;
-            if (form.issueDate) employeeInfo.insuranceDetails.issueDate = form.issueDate;
-            if (form.expiryDate) employeeInfo.insuranceDetails.expiryDate = form.expiryDate;
 
             const adm = form.administration;
             const administration = {
@@ -216,48 +199,6 @@ function Register() {
                     <div className="form-group">
                         <label>Date of Joining</label>
                         <input type="date" name="dateOfJoining" value={form.dateOfJoining} onChange={handleChange} />
-                    </div>
-
-                    <div className="form-section-title" style={{ marginTop: 16 }}>INSURANCE DETAILS</div>
-                    <div className="form-group">
-                        <label>Insurance Type</label>
-                        <select name="insuranceType" value={form.insuranceType} onChange={handleChange}>
-                            <option>Health</option>
-                            <option>Life</option>
-                            <option>Vehicle</option>
-                            <option>Travel</option>
-                            <option>Property</option>
-                            <option>Other</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label>Insurance Policy Number</label>
-                        <input name="insurancePolicyNumber" value={form.insurancePolicyNumber} onChange={handleChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>Insurance Provider</label>
-                        <input name="insuranceProvider" value={form.insuranceProvider} onChange={handleChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>Coverage Amount</label>
-                        <input type="number" name="coverageAmount" value={form.coverageAmount} onChange={handleChange} step="0.01" />
-                    </div>
-                    <div className="form-group">
-                        <label>Issue Date</label>
-                        <input type="date" name="issueDate" value={form.issueDate} onChange={handleChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>Expiry Date</label>
-                        <input type="date" name="expiryDate" value={form.expiryDate} onChange={handleChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>Insurance Status</label>
-                        <select name="insuranceStatus" value={form.insuranceStatus} onChange={handleChange}>
-                            <option>Active</option>
-                            <option>Inactive</option>
-                            <option>Expired</option>
-                            <option>Cancelled</option>
-                        </select>
                     </div>
 
                     <div className="form-section-title" style={{ marginTop: 16 }}>ADMINISTRATION</div>

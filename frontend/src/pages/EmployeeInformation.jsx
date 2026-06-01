@@ -18,15 +18,6 @@ const emptyForm = {
     currency: 'AED', annualBalanceCalculationCutoff: '', leaveBalance: 0,
     jobNumber: '',
     employeeUserMapping: '', resourceNo: '',
-    insuranceDetails: {
-        insuranceType: 'Health',
-        insurancePolicyNumber: '',
-        insuranceProvider: '',
-        coverageAmount: 0,
-        issueDate: '',
-        expiryDate: '',
-        insuranceStatus: 'Active'
-    },
     administration: {
         employmentType: 'Employee',
         birthDate: '',
@@ -109,12 +100,6 @@ function EmployeeInformation() {
                         expiryDate: toDateInput(info.expiryDate),
                         dateOfJoining: toDateInput(info.dateOfJoining),
                         annualBalanceCalculationCutoff: toDateInput(info.annualBalanceCalculationCutoff),
-                        insuranceDetails: {
-                            ...emptyForm.insuranceDetails,
-                            ...(info.insuranceDetails || {}),
-                            issueDate: toDateInput(info.insuranceDetails?.issueDate),
-                            expiryDate: toDateInput(info.insuranceDetails?.expiryDate)
-                        },
                         administration: {
                             ...emptyForm.administration,
                             ...(info.administration || {}),
@@ -142,13 +127,6 @@ function EmployeeInformation() {
         const { name, value, type, checked } = e.target;
         const next = type === 'checkbox' ? checked : type === 'number' ? Number(value) : value;
         setForm({ ...form, [name]: next });
-        setSuccess('');
-    };
-
-    const onInsuranceChange = (e) => {
-        const { name, value, type } = e.target;
-        const next = type === 'number' ? Number(value) : value;
-        setForm({ ...form, insuranceDetails: { ...form.insuranceDetails, [name]: next } });
         setSuccess('');
     };
 
@@ -266,21 +244,6 @@ function EmployeeInformation() {
                                 <Field label="Resource No." name="resourceNo" value={form.resourceNo} onChange={onChange} />
                             </div>
                             <div className="emp-col"></div>
-                        </div>
-
-                        <div className="form-section-title" style={{ marginTop: 24 }}>INSURANCE DETAILS</div>
-                        <div className="emp-grid">
-                            <div className="emp-col">
-                                <Field label="Insurance Type" name="insuranceType" value={form.insuranceDetails.insuranceType} onChange={onInsuranceChange} options={['Health','Life','Vehicle','Travel','Property','Other']} />
-                                <Field label="Insurance Policy Number" name="insurancePolicyNumber" value={form.insuranceDetails.insurancePolicyNumber} onChange={onInsuranceChange} />
-                                <Field label="Insurance Provider" name="insuranceProvider" value={form.insuranceDetails.insuranceProvider} onChange={onInsuranceChange} />
-                                <Field label="Coverage Amount" name="coverageAmount" value={form.insuranceDetails.coverageAmount} onChange={onInsuranceChange} type="number" />
-                            </div>
-                            <div className="emp-col">
-                                <Field label="Issue Date" name="issueDate" value={form.insuranceDetails.issueDate} onChange={onInsuranceChange} type="date" />
-                                <Field label="Expiry Date" name="expiryDate" value={form.insuranceDetails.expiryDate} onChange={onInsuranceChange} type="date" />
-                                <Field label="Insurance Status" name="insuranceStatus" value={form.insuranceDetails.insuranceStatus} onChange={onInsuranceChange} options={['Active','Inactive','Expired','Cancelled']} />
-                            </div>
                         </div>
 
                         <div className="form-section-title" style={{ marginTop: 24 }}>ADMINISTRATION</div>
