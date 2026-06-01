@@ -34,8 +34,22 @@ function TravelRequest() {
     const [saving, setSaving] = useState(false);
 
     const [showAddTravel, setShowAddTravel] = useState(false);
-    const [newLegMode, setNewLegMode] = useState('');
-    const [newLegLocation, setNewLegLocation] = useState('');
+    const [newLeg, setNewLeg] = useState({
+        mode: '',
+        fromLocation: '',
+        toLocation: '',
+        departureOn: today(),
+        departureTime: '09:00',
+        remarks: '',
+        classOfTravel: 'Economy',
+        preferredAirlines: '',
+        seating: 'Window',
+        meal: 'Veg',
+        frequentFlyerNo: '',
+        issueDate: today(),
+        validUpto: today(),
+        location: ''
+    });
 
     useEffect(() => {
         employeeInfoApi.getMy().then(({ data }) => setInfo(data.employeeInfo || null)).catch(() => {});
@@ -65,19 +79,44 @@ function TravelRequest() {
     const removeLeg = (id) => setLegs(legs.length > 1 ? legs.filter((l) => l.id !== id) : legs);
 
     const openAddTravel = () => {
-        setNewLegMode('');
-        setNewLegLocation(adm.location || adm.city || '');
+        const loc = adm.location || adm.city || '';
+        setNewLeg({
+            mode: '', fromLocation: loc, toLocation: '',
+            departureOn: today(), departureTime: '09:00', remarks: '',
+            classOfTravel: 'Economy', preferredAirlines: '', seating: 'Window', meal: 'Veg',
+            frequentFlyerNo: '', issueDate: today(), validUpto: today(), location: loc
+        });
         setShowAddTravel(true);
     };
 
+    const onNewLegChange = (e) => {
+        setNewLeg({ ...newLeg, [e.target.name]: e.target.value });
+    };
+
     const confirmAddTravel = () => {
-        if (!newLegMode) { setError('Pick a Mode of Travel first.'); return; }
+        if (!newLeg.mode) { setError('Pick a Mode of Travel first.'); return; }
+        if (!newLeg.fromLocation || !newLeg.toLocation) {
+            setError('From Location and To Location are required.');
+            return;
+        }
+        const extras = [
+            newLeg.classOfTravel && `Class: ${newLeg.classOfTravel}`,
+            newLeg.preferredAirlines && `Airline: ${newLeg.preferredAirlines}`,
+            newLeg.seating && `Seat: ${newLeg.seating}`,
+            newLeg.meal && `Meal: ${newLeg.meal}`,
+            newLeg.frequentFlyerNo && `FF#: ${newLeg.frequentFlyerNo}`,
+            newLeg.departureTime && `Dep: ${newLeg.departureTime}`,
+            newLeg.remarks && `Notes: ${newLeg.remarks}`
+        ].filter(Boolean).join(' | ');
         const fresh = {
-            ...emptyLeg(),
-            modeOfTravel: newLegMode,
-            fromLocation: newLegLocation || ''
+            id: Math.random().toString(36).slice(2),
+            modeOfTravel: newLeg.mode,
+            fromLocation: newLeg.fromLocation,
+            toLocation: newLeg.toLocation,
+            fromDate: newLeg.departureOn,
+            toDate: newLeg.validUpto || newLeg.departureOn,
+            remarks: extras
         };
-        // If the table has only an empty default row, replace it; else append.
         const onlyEmpty = legs.length === 1 && !legs[0].fromLocation && !legs[0].toLocation;
         setLegs(onlyEmpty ? [fresh] : [...legs, fresh]);
         setShowAddTravel(false);
@@ -321,16 +360,17 @@ function TravelRequest() {
 
                 {showAddTravel && (
                     <div className="erp-modal-backdrop" onClick={() => setShowAddTravel(false)}>
-                        <div className="erp-modal" style={{ width: 480 }} onClick={(e) => e.stopPropagation()}>
+                        <div className="erp-modal" style={{ width: 720 }} onClick={(e) => e.stopPropagation()}>
                             <div className="erp-modal-header">
                                 Add Travel
                                 <button className="erp-actions-close" onClick={() => setShowAddTravel(false)}>×</button>
                             </div>
                             <div className="erp-modal-body">
-                                <div className="erp-grid" style={{ gridTemplateColumns: '1fr' }}>
-                                    <div className="erp-field">
+                                {error && <div className="error" style={{ marginBottom: 10 }}>{error}</div>}
+                                <div className="erp-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr 1fr' }}>
+                                    <div className="erp-field erp-field-wide">
                                         <label>Mode of Travel</label>
-                                        <select value={newLegMode} onChange={(e) => setNewLegMode(e.target.value)}>
+                                        <select name="mode" value={newLeg.mode} onChange={onNewLegChange}>
                                             <option value="">— Select —</option>
                                             <option>Flight</option>
                                             <option>Train</option>
@@ -339,15 +379,107 @@ function TravelRequest() {
                                             <option>Other</option>
                                         </select>
                                     </div>
+                                    <div className="erp-field erp-field-wide"></div>
+
+                                    <div className="erp-field erp-field-wide">
+                                        <label>From Location</label>
+                                        <input name="fromLocation" value={newLeg.fromLocation} onChange={onNewLegChange} list="travel-locations" />
+                                    </div>
+                                    <div className="erp-field erp-field-wide">
+                                        <label>To Location</label>
+                                        <input name="toLocation" value={newLeg.toLocation} onChange={onNewLegChange} list="travel-locations" />
+                                    </div>
+                                    <datalist id="travel-locations">
+                                        <option value="Dubai" />
+                                        <option value="Abu Dhabi" />
+                                        <option value="Sharjah" />
+                                        <option value="Chennai" />
+                                        <option value="Bangalore" />
+                                        <option value="Mumbai" />
+                                        <option value="Delhi" />
+                                        <option value="London" />
+                                        <option value="Singapore" />
+                                        <option value="G N Chetty Road" />
+                                    </datalist>
+
+                                    <div className="erp-field erp-field-wide">
+                                        <label>Departure On</label>
+                                        <input type="date" name="departureOn" value={newLeg.departureOn} onChange={onNewLegChange} />
+                                    </div>
+                                    <div className="erp-field erp-field-wide">
+                                        <label>Departure Time</label>
+                                        <input type="time" name="departureTime" value={newLeg.departureTime} onChange={onNewLegChange} />
+                                    </div>
+
+                                    <div className="erp-field" style={{ gridColumn: 'span 4' }}>
+                                        <label>Remarks</label>
+                                        <input name="remarks" value={newLeg.remarks} onChange={onNewLegChange} />
+                                    </div>
+
                                     <div className="erp-field">
+                                        <label>Class Of Travel</label>
+                                        <select name="classOfTravel" value={newLeg.classOfTravel} onChange={onNewLegChange}>
+                                            <option>Economy</option>
+                                            <option>Premium Economy</option>
+                                            <option>Business</option>
+                                            <option>First</option>
+                                        </select>
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Preferred Airlines</label>
+                                        <select name="preferredAirlines" value={newLeg.preferredAirlines} onChange={onNewLegChange}>
+                                            <option value="">— Select —</option>
+                                            <option>Emirates</option>
+                                            <option>Etihad</option>
+                                            <option>Air India</option>
+                                            <option>IndiGo</option>
+                                            <option>British Airways</option>
+                                            <option>Singapore Airlines</option>
+                                        </select>
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Seating</label>
+                                        <select name="seating" value={newLeg.seating} onChange={onNewLegChange}>
+                                            <option>Window</option>
+                                            <option>Aisle</option>
+                                            <option>Middle</option>
+                                            <option>No Preference</option>
+                                        </select>
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Meal</label>
+                                        <select name="meal" value={newLeg.meal} onChange={onNewLegChange}>
+                                            <option>Veg</option>
+                                            <option>Non-Veg</option>
+                                            <option>Vegan</option>
+                                            <option>None</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="erp-field">
+                                        <label>Frequent Flyer No</label>
+                                        <input name="frequentFlyerNo" value={newLeg.frequentFlyerNo} onChange={onNewLegChange} />
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Issue Date</label>
+                                        <input type="date" name="issueDate" value={newLeg.issueDate} onChange={onNewLegChange} />
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Valid Upto</label>
+                                        <input type="date" name="validUpto" value={newLeg.validUpto} onChange={onNewLegChange} />
+                                    </div>
+                                    <div className="erp-field"></div>
+
+                                    <div className="erp-field erp-field-wide">
                                         <label>Location</label>
-                                        <input value={newLegLocation} onChange={(e) => setNewLegLocation(e.target.value)} />
+                                        <input name="location" value={newLeg.location} onChange={onNewLegChange} className="erp-readonly" readOnly />
                                     </div>
                                 </div>
                             </div>
                             <div className="erp-modal-footer">
+                                <div style={{ flex: 1 }} />
                                 <button type="button" className="erp-action-btn" onClick={() => setShowAddTravel(false)}>Close</button>
-                                <button type="button" className="btn" onClick={confirmAddTravel}>OK</button>
+                                <button type="button" className="btn" onClick={confirmAddTravel}>📅 OK</button>
                             </div>
                         </div>
                     </div>
