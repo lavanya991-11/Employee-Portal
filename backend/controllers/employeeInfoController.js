@@ -1,4 +1,15 @@
 const EmployeeInfo = require('../models/employeeInfo');
+const { findEmployeeSystemId, bcConfigured } = require('../services/bcClient');
+
+const lookupBcSystemId = async (employeeCode) => {
+    if (!bcConfigured() || !employeeCode) return { systemId: null, error: null };
+    try {
+        const systemId = await findEmployeeSystemId(employeeCode);
+        return { systemId, error: null };
+    } catch (err) {
+        return { systemId: null, error: err.message };
+    }
+};
 
 exports.getMyInfo = async (req, res) => {
     try {
@@ -20,10 +31,15 @@ exports.saveMyInfo = async (req, res) => {
         if (existing) {
             Object.assign(existing, data);
             await existing.save();
+            const bc = await lookupBcSystemId(existing.employeeCode);
             return res.json({
                 success: true,
-                message: "Employee information updated",
-                employeeInfo: existing
+                message: bc.systemId
+                    ? `Employee information updated. BC systemId: ${bc.systemId}`
+                    : 'Employee information updated',
+                employeeInfo: existing,
+                bcSystemId: bc.systemId,
+                bcError: bc.error
             });
         }
 
@@ -37,10 +53,15 @@ exports.saveMyInfo = async (req, res) => {
         }
 
         const created = await EmployeeInfo.create({ ...data, user: req.user.id });
+        const bc = await lookupBcSystemId(created.employeeCode);
         res.status(201).json({
             success: true,
-            message: "Employee information created",
-            employeeInfo: created
+            message: bc.systemId
+                ? `Employee information created. BC systemId: ${bc.systemId}`
+                : 'Employee information created',
+            employeeInfo: created,
+            bcSystemId: bc.systemId,
+            bcError: bc.error
         });
     } catch (err) {
         res.status(500).json({ success: false, message: "Server error", error: err.message });

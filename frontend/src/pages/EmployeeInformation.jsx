@@ -137,7 +137,10 @@ function EmployeeInformation() {
         setError(''); setSuccess(''); setSaving(true);
         try {
             const { data } = await employeeInfoApi.save(form);
-            setSuccess(data.message || 'Saved');
+            const parts = [data.message || 'Saved'];
+            if (data.bcSystemId) parts.push(`BC systemId: ${data.bcSystemId}`);
+            else if (data.bcError) parts.push(`BC lookup failed: ${data.bcError}`);
+            setSuccess(parts.join(' — '));
         } catch (err) {
             setError(err.response?.data?.message || 'Save failed');
         } finally {
