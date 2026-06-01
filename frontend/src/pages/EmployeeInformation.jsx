@@ -9,15 +9,13 @@ const emptyForm = {
     firstName: '', middleName: '', lastName: '', initials: '',
     arabicFirstName: '', arabicMiddleName: '', arabicLastName: '', searchName: '',
     gender: 'Male', jobTitle: '', status: 'Active',
-    creditCard: '', motherName: '', faith: '', education: '',
     emergencyContactNo: '',
-    category: '', issueDate: '', expiryDate: '',
     department: '', designation: '', dateOfJoining: '',
     reportingManager: '', grade: '', employmentType: '',
     bankId: '', bankAccountNo: '', iban: '', branch: '', swiftCode: '', companyBank: '',
-    currency: 'AED', annualBalanceCalculationCutoff: '', leaveBalance: 0,
+    currency: 'AED',
     jobNumber: '',
-    employeeUserMapping: '', resourceNo: '',
+    resourceNo: '',
     administration: {
         employmentType: 'Employee',
         birthDate: '',
@@ -96,10 +94,7 @@ function EmployeeInformation() {
                     setForm({
                         ...emptyForm,
                         ...info,
-                        issueDate: toDateInput(info.issueDate),
-                        expiryDate: toDateInput(info.expiryDate),
                         dateOfJoining: toDateInput(info.dateOfJoining),
-                        annualBalanceCalculationCutoff: toDateInput(info.annualBalanceCalculationCutoff),
                         administration: {
                             ...emptyForm.administration,
                             ...(info.administration || {}),
@@ -178,14 +173,7 @@ function EmployeeInformation() {
                                 <Field label="Arabic Last Name" name="arabicLastName" value={form.arabicLastName} onChange={onChange} />
                                 <Field label="Search Name" name="searchName" value={form.searchName} onChange={onChange} />
                                 <Field label="Status" name="status" value={form.status} onChange={onChange} options={['Active','Inactive','Suspended']} />
-                                <Field label="Credit Card" name="creditCard" value={form.creditCard} onChange={onChange} />
-                                <Field label="Mother Name" name="motherName" value={form.motherName} onChange={onChange} />
-                                <Field label="Faith" name="faith" value={form.faith} onChange={onChange} />
-                                <Field label="Education" name="education" value={form.education} onChange={onChange} />
                                 <Field label="Emergency Contact No." name="emergencyContactNo" value={form.emergencyContactNo} onChange={onChange} />
-                                <Field label="Category" name="category" value={form.category} onChange={onChange} />
-                                <Field label="Issue Date" name="issueDate" value={form.issueDate} onChange={onChange} type="date" />
-                                <Field label="Expiry Date" name="expiryDate" value={form.expiryDate} onChange={onChange} type="date" />
                             </div>
                         </div>
 
@@ -221,8 +209,6 @@ function EmployeeInformation() {
                         <div className="emp-grid">
                             <div className="emp-col">
                                 <Field label="Currency" name="currency" value={form.currency} onChange={onChange} options={['AED','USD','INR','EUR','GBP']} />
-                                <Field label="Annual Balance Cutoff" name="annualBalanceCalculationCutoff" value={form.annualBalanceCalculationCutoff} onChange={onChange} type="date" />
-                                <Field label="Leave Balance" name="leaveBalance" value={form.leaveBalance} onChange={onChange} type="number" />
                             </div>
                             <div className="emp-col">
                                 <Field label="Job Number" name="jobNumber" value={form.jobNumber} onChange={onChange} />
@@ -232,7 +218,6 @@ function EmployeeInformation() {
                         <div className="form-section-title" style={{ marginTop: 24 }}>EMPLOYEE MAPPING</div>
                         <div className="emp-grid">
                             <div className="emp-col">
-                                <Field label="Employee User Mapping" name="employeeUserMapping" value={form.employeeUserMapping} onChange={onChange} />
                                 <Field label="Resource No." name="resourceNo" value={form.resourceNo} onChange={onChange} />
                             </div>
                             <div className="emp-col"></div>

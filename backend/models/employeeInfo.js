@@ -17,14 +17,7 @@ const employeeInfoSchema = new mongoose.Schema({
     jobTitle: { type: String, default: '' },
     status: { type: String, enum: ['Active', 'Inactive', 'Suspended', ''], default: 'Active' },
 
-    creditCard: { type: String, default: '' },
-    motherName: { type: String, default: '' },
-    faith: { type: String, default: '' },
-    education: { type: String, default: '' },
     emergencyContactNo: { type: String, default: '' },
-    category: { type: String, default: '' },
-    issueDate: { type: Date },
-    expiryDate: { type: Date },
 
     department: { type: String, default: '' },
     designation: { type: String, default: '' },
@@ -41,11 +34,8 @@ const employeeInfoSchema = new mongoose.Schema({
     companyBank: { type: String, default: '' },
 
     currency: { type: String, default: 'AED' },
-    annualBalanceCalculationCutoff: { type: Date },
-    leaveBalance: { type: Number, default: 0 },
     jobNumber: { type: String, default: '' },
 
-    employeeUserMapping: { type: String, default: '' },
     resourceNo: { type: String, default: '' },
 
     administration: {
