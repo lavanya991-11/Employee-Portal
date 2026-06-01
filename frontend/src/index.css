@@ -646,6 +646,28 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
     color: rgba(255,255,255,0.6); border-right: 1px solid rgba(255,255,255,0.2);
 }
 .erp-tab-active { color: white; background: rgba(255,255,255,0.1); text-decoration: underline; }
+
+/* Employee code+name split field */
+.erp-emp-split { display: flex; gap: 4px; }
+.erp-emp-split input { flex: 1; }
+.erp-emp-code { max-width: 90px; }
+
+/* Travel leg cards */
+.erp-leg-cards {
+    display: flex; flex-wrap: wrap; gap: 12px; padding: 14px;
+}
+.erp-leg-empty { color: #888; padding: 6px; font-size: 13px; }
+.erp-leg-card {
+    width: 180px; border: 1px solid #c7d2fe; border-radius: 6px;
+    background: #f9fafb; padding: 10px; cursor: default;
+    display: flex; flex-direction: column; gap: 6px;
+}
+.erp-leg-card-top { display: flex; justify-content: space-between; align-items: center; }
+.erp-leg-icon { font-size: 22px; color: #3b82f6; }
+.erp-leg-delete { background: none; border: none; cursor: pointer; color: #ef4444; font-size: 14px; }
+.erp-leg-mode { font-weight: 700; color: #1e3a8a; font-size: 13px; }
+.erp-leg-date { color: #374151; font-size: 12px; }
+.erp-leg-route { color: #6b7280; font-size: 11px; }
 .erp-docno { display: flex; align-items: stretch; gap: 4px; }
 .erp-docno-series { width: 50px; padding-right: 4px !important; }
 .erp-docno-num { width: 60px; }

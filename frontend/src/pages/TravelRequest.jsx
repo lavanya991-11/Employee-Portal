@@ -5,6 +5,7 @@ import { employeeInfoApi, travelApi } from '../services/api';
 const today = () => new Date().toISOString().slice(0, 10);
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 const STATUS_COLOR = { Pending: '#f59e0b', Approved: '#22c55e', Rejected: '#ef4444' };
+const MODE_ICON = { Flight: '✈️', Train: '🚆', Bus: '🚌', Car: '🚗', Other: '🧭' };
 
 const emptyLeg = () => ({
     id: Math.random().toString(36).slice(2),
@@ -25,6 +26,8 @@ function TravelRequest() {
         purpose: 'Business Meeting',
         isBillable: 'YES',
         estimatedExpenses: 0,
+        clientName: '',
+        travelDesk: '',
         extraNotes: ''
     });
     const [legs, setLegs] = useState([emptyLeg()]);
@@ -158,7 +161,10 @@ function TravelRequest() {
     };
 
     const onNew = () => {
-        setForm({ travelType: 'Domestic', purpose: 'Business Meeting', isBillable: 'YES', estimatedExpenses: 0, extraNotes: '' });
+        setForm({
+            travelType: 'Domestic', purpose: 'Business Meeting', isBillable: 'YES',
+            estimatedExpenses: 0, clientName: '', travelDesk: '', extraNotes: ''
+        });
         setLegs([emptyLeg()]);
         setError(''); setSuccess('');
     };
@@ -199,12 +205,15 @@ function TravelRequest() {
                                     <div className="erp-grid">
                                         <div className="erp-field">
                                             <label>Employee *</label>
-                                            <input value={`${info?.employeeCode || user.empId || ''} - ${info?.firstName || user.name || ''}`.trim().replace(/^- /, '')}
-                                                readOnly className="erp-required-display" />
+                                            <div className="erp-emp-split">
+                                                <input value={info?.employeeCode || user.empId || ''} readOnly className="erp-readonly erp-emp-code" />
+                                                <input value={`${info?.firstName || ''}${info?.lastName ? '.' + info.lastName.charAt(0) : ''}` || user.name || ''}
+                                                    readOnly className="erp-readonly" />
+                                            </div>
                                         </div>
                                         <div className="erp-field">
                                             <label>Emp. Reporting Manager</label>
-                                            <input value={info?.reportingManager || ''} readOnly className="erp-required-display" />
+                                            <input value={info?.reportingManager || ''} readOnly className="erp-readonly" />
                                         </div>
                                         <div className="erp-field">
                                             <label>Emp. Location</label>
@@ -216,7 +225,19 @@ function TravelRequest() {
                                         </div>
                                         <div className="erp-field">
                                             <label>Emp. Designation</label>
-                                            <input value={info?.designation || info?.jobTitle || user.designation || ''} readOnly className="erp-required-display" />
+                                            <input value={info?.designation || info?.jobTitle || user.designation || ''} readOnly className="erp-readonly" />
+                                        </div>
+                                        <div className="erp-field">
+                                            <label>Client Name *</label>
+                                            <select name="clientName" value={form.clientName} onChange={onChange}
+                                                className={form.clientName ? '' : 'erp-required'}>
+                                                <option value="">— Select —</option>
+                                                <option>Internal</option>
+                                                <option>Client A</option>
+                                                <option>Client B</option>
+                                                <option>External</option>
+                                                <option>Other</option>
+                                            </select>
                                         </div>
                                         <div className="erp-field">
                                             <label>Travel Type *</label>
@@ -234,6 +255,16 @@ function TravelRequest() {
                                                 <option>Conference</option>
                                                 <option>Site Inspection</option>
                                                 <option>Other</option>
+                                            </select>
+                                        </div>
+                                        <div className="erp-field">
+                                            <label>Travel Desk</label>
+                                            <select name="travelDesk" value={form.travelDesk} onChange={onChange}>
+                                                <option value="">— Select —</option>
+                                                <option>Self Booked</option>
+                                                <option>Travel Agent A</option>
+                                                <option>Travel Agent B</option>
+                                                <option>Corporate Travel</option>
                                             </select>
                                         </div>
                                         <div className="erp-field">
@@ -272,42 +303,24 @@ function TravelRequest() {
                                             style={{ background: 'white', color: '#1e3a8a', border: 'none', borderRadius: 3, padding: '2px 8px' }}>⛶</button>
                                     </span>
                                 </div>
-                                <table className="erp-table">
-                                    <thead>
-                                        <tr>
-                                            <th style={{ width: 30 }}>#</th>
-                                            <th>From Date</th>
-                                            <th>To Date</th>
-                                            <th>Mode</th>
-                                            <th>From Location</th>
-                                            <th>To Location</th>
-                                            <th style={{ width: 50 }}></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {legs.map((l, i) => (
-                                            <tr key={l.id}>
-                                                <td>{i + 1}</td>
-                                                <td><input type="date" value={l.fromDate} onChange={(e) => onLegChange(l.id, 'fromDate', e.target.value)} style={{ width: '100%', border: 'none', padding: 4 }} /></td>
-                                                <td><input type="date" value={l.toDate} onChange={(e) => onLegChange(l.id, 'toDate', e.target.value)} style={{ width: '100%', border: 'none', padding: 4 }} /></td>
-                                                <td>
-                                                    <select value={l.modeOfTravel} onChange={(e) => onLegChange(l.id, 'modeOfTravel', e.target.value)} style={{ width: '100%', border: 'none', padding: 4 }}>
-                                                        <option>Flight</option>
-                                                        <option>Train</option>
-                                                        <option>Bus</option>
-                                                        <option>Car</option>
-                                                        <option>Other</option>
-                                                    </select>
-                                                </td>
-                                                <td><input value={l.fromLocation} onChange={(e) => onLegChange(l.id, 'fromLocation', e.target.value)} style={{ width: '100%', border: 'none', padding: 4 }} /></td>
-                                                <td><input value={l.toLocation} onChange={(e) => onLegChange(l.id, 'toLocation', e.target.value)} style={{ width: '100%', border: 'none', padding: 4 }} /></td>
-                                                <td>
-                                                    <button type="button" onClick={() => removeLeg(l.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>✕</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                <div className="erp-leg-cards">
+                                    {legs.filter((l) => l.fromLocation || l.toLocation).length === 0 && (
+                                        <div className="erp-leg-empty">No travel legs yet. Click <b>+</b> to add one.</div>
+                                    )}
+                                    {legs.filter((l) => l.fromLocation || l.toLocation).map((l) => (
+                                        <div className="erp-leg-card" key={l.id} title={`${l.fromLocation} → ${l.toLocation}${l.remarks ? '\n' + l.remarks : ''}`}>
+                                            <div className="erp-leg-card-top">
+                                                <span className="erp-leg-icon">{MODE_ICON[l.modeOfTravel] || '✈️'}</span>
+                                                <button type="button" onClick={() => removeLeg(l.id)} className="erp-leg-delete" title="Remove">🗑️</button>
+                                            </div>
+                                            <div className="erp-leg-card-body">
+                                                <div className="erp-leg-mode">{l.modeOfTravel}</div>
+                                                <div className="erp-leg-date">{fmtDate(l.fromDate)}</div>
+                                                <div className="erp-leg-route">{l.fromLocation} → {l.toLocation || '—'}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                                 <div style={{ padding: 10, textAlign: 'right', background: '#a7f3d0', fontWeight: 600 }}>
                                     Net Total : {totalLegs}
                                 </div>
