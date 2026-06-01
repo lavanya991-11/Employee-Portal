@@ -13,6 +13,7 @@ import ApplyRequest from './pages/ApplyRequest';
 import Payslip from './pages/Payslip';
 import TravelRequest from './pages/TravelRequest';
 import TravelRequests from './pages/TravelRequests';
+import TravelExpenses from './pages/TravelExpenses';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -115,6 +116,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <TravelRequests />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/expenses/travel"
+                element={
+                    <ProtectedRoute>
+                        <TravelExpenses />
                     </ProtectedRoute>
                 }
             />

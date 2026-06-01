@@ -71,8 +71,8 @@ function Sidebar() {
                 {openMenu === 'travel' && (
                     <>
                         <Link to="/travels" className="nav-subitem">Travel Request</Link>
-                        <Link to="/expenses" className="nav-subitem">Travel Expenses</Link>
-                        <Link to="/expenses" className="nav-subitem">Non-Travel Expenses</Link>
+                        <Link to="/expenses/travel" className="nav-subitem">Travel Expenses</Link>
+                        <Link to="/expenses/non-travel" className="nav-subitem">Non-Travel Expenses</Link>
                     </>
                 )}
 
