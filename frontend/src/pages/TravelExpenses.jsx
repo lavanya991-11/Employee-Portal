@@ -10,11 +10,14 @@ const CLAIM_TYPES = ['Lodging', 'Meals', 'Local Transport', 'Air Fare', 'Train/B
 
 const emptyItem = () => ({
     id: Math.random().toString(36).slice(2),
-    claimType: 'Lodging',
+    claimType: '',
     amount: 0,
-    receipt: '',
-    remarks: ''
+    attachment: '',
+    remarks: '',
+    refNo: ''
 });
+
+const initialItems = () => Array.from({ length: 5 }, () => emptyItem());
 
 function TravelExpenses() {
     const user = useMemo(() => JSON.parse(localStorage.getItem('user') || '{}'), []);
@@ -29,9 +32,12 @@ function TravelExpenses() {
         clientName: '',
         travelType: 'Domestic',
         purpose: 'Business Meeting',
+        travelDesk: '',
+        isBillable: 'YES',
+        estimatedExpenses: 0,
         travelRef: ''
     });
-    const [items, setItems] = useState([emptyItem()]);
+    const [items, setItems] = useState(initialItems());
     const [expenses, setExpenses] = useState([]);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -82,15 +88,22 @@ function TravelExpenses() {
                 form.narration && `Narration: ${form.narration}`,
                 form.clientName && `Client: ${form.clientName}`,
                 form.travelType && `Type: ${form.travelType}`,
-                form.purpose && `Purpose: ${form.purpose}`
+                form.purpose && `Purpose: ${form.purpose}`,
+                form.travelDesk && `Desk: ${form.travelDesk}`,
+                form.isBillable && `Billable: ${form.isBillable}`,
+                form.estimatedExpenses && `Est: ${form.estimatedExpenses}`
             ].filter(Boolean).join(' | ');
             await Promise.all(
                 valid.map((it) => expenseApi.apply({
                     expenseType: 'Travel',
                     claimType: it.claimType,
                     amount: Number(it.amount),
-                    attachment: it.receipt,
-                    remarks: [it.remarks, baseRemarks].filter(Boolean).join(' || '),
+                    attachment: it.attachment,
+                    remarks: [
+                        it.remarks,
+                        it.refNo && `RefNO: ${it.refNo}`,
+                        baseRemarks
+                    ].filter(Boolean).join(' || '),
                     travelRef: form.travelRef || undefined
                 }))
             );
@@ -107,9 +120,10 @@ function TravelExpenses() {
     const onNew = () => {
         setForm({
             docDate: today(), docSeries: 'FDM/24', docNumber: 1, narration: '',
-            clientName: '', travelType: 'Domestic', purpose: 'Business Meeting', travelRef: ''
+            clientName: '', travelType: 'Domestic', purpose: 'Business Meeting',
+            travelDesk: '', isBillable: 'YES', estimatedExpenses: 0, travelRef: ''
         });
-        setItems([emptyItem()]);
+        setItems(initialItems());
         setError(''); setSuccess('');
     };
 
@@ -212,6 +226,27 @@ function TravelExpenses() {
                                         </select>
                                     </div>
                                     <div className="erp-field">
+                                        <label>Travel Desk</label>
+                                        <select name="travelDesk" value={form.travelDesk} onChange={onChange}>
+                                            <option value="">— Select —</option>
+                                            <option>Self Booked</option>
+                                            <option>Travel Agent A</option>
+                                            <option>Travel Agent B</option>
+                                            <option>Corporate Travel</option>
+                                        </select>
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Is Billable *</label>
+                                        <select name="isBillable" value={form.isBillable} onChange={onChange}>
+                                            <option>YES</option>
+                                            <option>NO</option>
+                                        </select>
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Estimated Travel Expenses</label>
+                                        <input type="number" name="estimatedExpenses" value={form.estimatedExpenses} onChange={onChange} min="0" step="0.01" />
+                                    </div>
+                                    <div className="erp-field">
                                         <label>Travel Reference (optional)</label>
                                         <select name="travelRef" value={form.travelRef} onChange={onChange}>
                                             <option value="">— None —</option>
@@ -227,18 +262,23 @@ function TravelExpenses() {
 
                             <div className="erp-section">
                                 <div className="erp-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span>Expense Items</span>
-                                    <button type="button" onClick={addItem}
-                                        style={{ background: 'white', color: '#1e3a8a', border: 'none', borderRadius: 3, padding: '2px 8px', cursor: 'pointer', fontWeight: 700 }}>+</button>
+                                    <span>Details</span>
+                                    <span style={{ display: 'flex', gap: 6 }}>
+                                        <button type="button" onClick={addItem} title="Add row"
+                                            style={{ background: 'white', color: '#1e3a8a', border: 'none', borderRadius: 3, padding: '2px 8px', cursor: 'pointer', fontWeight: 700 }}>+</button>
+                                        <button type="button" title="Expand" disabled
+                                            style={{ background: 'white', color: '#1e3a8a', border: 'none', borderRadius: 3, padding: '2px 8px' }}>⛶</button>
+                                    </span>
                                 </div>
                                 <table className="erp-table">
                                     <thead>
                                         <tr>
                                             <th style={{ width: 30 }}>#</th>
                                             <th>Claim Type</th>
-                                            <th>Amount</th>
-                                            <th>Receipt / URL</th>
+                                            <th style={{ width: 100 }}>Amount</th>
+                                            <th>Attachment</th>
                                             <th>Remarks</th>
+                                            <th style={{ width: 120 }}>RefNO</th>
                                             <th style={{ width: 40 }}></th>
                                         </tr>
                                     </thead>
@@ -249,20 +289,26 @@ function TravelExpenses() {
                                                 <td>
                                                     <select value={it.claimType} onChange={(e) => onItemChange(it.id, 'claimType', e.target.value)}
                                                         style={{ width: '100%', border: 'none', padding: 4 }}>
+                                                        <option value="">— Select —</option>
                                                         {CLAIM_TYPES.map((c) => <option key={c}>{c}</option>)}
                                                     </select>
                                                 </td>
                                                 <td>
                                                     <input type="number" value={it.amount} onChange={(e) => onItemChange(it.id, 'amount', e.target.value)}
-                                                        style={{ width: '100%', border: 'none', padding: 4 }} min="0" step="0.01" />
+                                                        style={{ width: '100%', border: 'none', padding: 4, textAlign: 'right' }} min="0" step="0.01" />
                                                 </td>
                                                 <td>
-                                                    <input value={it.receipt} onChange={(e) => onItemChange(it.id, 'receipt', e.target.value)}
-                                                        placeholder="paste URL or note"
+                                                    <input value={it.attachment} onChange={(e) => onItemChange(it.id, 'attachment', e.target.value)}
+                                                        placeholder="URL / file ref"
                                                         style={{ width: '100%', border: 'none', padding: 4 }} />
                                                 </td>
                                                 <td>
                                                     <input value={it.remarks} onChange={(e) => onItemChange(it.id, 'remarks', e.target.value)}
+                                                        style={{ width: '100%', border: 'none', padding: 4 }} />
+                                                </td>
+                                                <td>
+                                                    <input value={it.refNo} onChange={(e) => onItemChange(it.id, 'refNo', e.target.value)}
+                                                        placeholder="REF-…"
                                                         style={{ width: '100%', border: 'none', padding: 4 }} />
                                                 </td>
                                                 <td>
