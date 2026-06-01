@@ -14,6 +14,7 @@ import Payslip from './pages/Payslip';
 import TravelRequest from './pages/TravelRequest';
 import TravelRequests from './pages/TravelRequests';
 import TravelExpenses from './pages/TravelExpenses';
+import NonTravelExpenses from './pages/NonTravelExpenses';
 import ExpensesList from './pages/ExpensesList';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -148,7 +149,7 @@ function App() {
                 path="/expenses/non-travel/new"
                 element={
                     <ProtectedRoute>
-                        <TravelExpenses />
+                        <NonTravelExpenses />
                     </ProtectedRoute>
                 }
             />
