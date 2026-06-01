@@ -33,6 +33,10 @@ function TravelRequest() {
     const [success, setSuccess] = useState('');
     const [saving, setSaving] = useState(false);
 
+    const [showAddTravel, setShowAddTravel] = useState(false);
+    const [newLegMode, setNewLegMode] = useState('');
+    const [newLegLocation, setNewLegLocation] = useState('');
+
     useEffect(() => {
         employeeInfoApi.getMy().then(({ data }) => setInfo(data.employeeInfo || null)).catch(() => {});
         load();
@@ -58,8 +62,27 @@ function TravelRequest() {
     const onLegChange = (id, field, value) => {
         setLegs(legs.map((l) => (l.id === id ? { ...l, [field]: value } : l)));
     };
-    const addLeg = () => setLegs([...legs, emptyLeg()]);
     const removeLeg = (id) => setLegs(legs.length > 1 ? legs.filter((l) => l.id !== id) : legs);
+
+    const openAddTravel = () => {
+        setNewLegMode('');
+        setNewLegLocation(adm.location || adm.city || '');
+        setShowAddTravel(true);
+    };
+
+    const confirmAddTravel = () => {
+        if (!newLegMode) { setError('Pick a Mode of Travel first.'); return; }
+        const fresh = {
+            ...emptyLeg(),
+            modeOfTravel: newLegMode,
+            fromLocation: newLegLocation || ''
+        };
+        // If the table has only an empty default row, replace it; else append.
+        const onlyEmpty = legs.length === 1 && !legs[0].fromLocation && !legs[0].toLocation;
+        setLegs(onlyEmpty ? [fresh] : [...legs, fresh]);
+        setShowAddTravel(false);
+        setError('');
+    };
 
     const totalLegs = legs.filter((l) => l.fromLocation && l.toLocation).length;
 
@@ -202,7 +225,7 @@ function TravelRequest() {
                                 <div className="erp-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span>Travel Details</span>
                                     <span style={{ display: 'flex', gap: 6 }}>
-                                        <button type="button" onClick={addLeg} title="Add row"
+                                        <button type="button" onClick={openAddTravel} title="Add Travel"
                                             style={{ background: 'white', color: '#1e3a8a', border: 'none', borderRadius: 3, padding: '2px 8px', cursor: 'pointer', fontWeight: 700 }}>+</button>
                                         <button type="button" title="Grid" disabled
                                             style={{ background: 'white', color: '#1e3a8a', border: 'none', borderRadius: 3, padding: '2px 8px' }}>▦</button>
@@ -286,7 +309,7 @@ function TravelRequest() {
                             <div className="erp-actions-header"><span>Actions</span></div>
                             <ul className="erp-actions-list">
                                 <li onClick={() => window.print()}>🖨️ Print</li>
-                                <li onClick={addLeg}>➕ Add Leg</li>
+                                <li onClick={openAddTravel}>➕ Add Travel</li>
                                 <li onClick={load}>🔄 Refresh</li>
                             </ul>
                             <div className="erp-side-tabs">
@@ -295,6 +318,40 @@ function TravelRequest() {
                         </aside>
                     </div>
                 </div>
+
+                {showAddTravel && (
+                    <div className="erp-modal-backdrop" onClick={() => setShowAddTravel(false)}>
+                        <div className="erp-modal" style={{ width: 480 }} onClick={(e) => e.stopPropagation()}>
+                            <div className="erp-modal-header">
+                                Add Travel
+                                <button className="erp-actions-close" onClick={() => setShowAddTravel(false)}>×</button>
+                            </div>
+                            <div className="erp-modal-body">
+                                <div className="erp-grid" style={{ gridTemplateColumns: '1fr' }}>
+                                    <div className="erp-field">
+                                        <label>Mode of Travel</label>
+                                        <select value={newLegMode} onChange={(e) => setNewLegMode(e.target.value)}>
+                                            <option value="">— Select —</option>
+                                            <option>Flight</option>
+                                            <option>Train</option>
+                                            <option>Bus</option>
+                                            <option>Car</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Location</label>
+                                        <input value={newLegLocation} onChange={(e) => setNewLegLocation(e.target.value)} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="erp-modal-footer">
+                                <button type="button" className="erp-action-btn" onClick={() => setShowAddTravel(false)}>Close</button>
+                                <button type="button" className="btn" onClick={confirmAddTravel}>OK</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );
