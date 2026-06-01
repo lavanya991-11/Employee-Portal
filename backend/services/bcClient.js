@@ -57,6 +57,32 @@ const baseCompanyUrl = () =>
     `/${process.env.BC_ENVIRONMENT}/${process.env.BC_API_PATH}` +
     `/companies(${process.env.BC_COMPANY_ID})`;
 
+const updateEmployee = async (systemId, payload) => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+    if (!systemId) throw new Error('systemId is required.');
+
+    const token = await getAccessToken();
+    const url = `${baseCompanyUrl()}/employees(${systemId})`;
+
+    const res = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'If-Match': '*'
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`BC employee PATCH failed: ${res.status} ${text}`);
+    }
+
+    return res.json().catch(() => ({}));
+};
+
 const findEmployeeSystemId = async (employeeCode) => {
     if (!bcConfigured()) {
         throw new Error('BC not configured (set BC_* env vars).');
@@ -84,4 +110,4 @@ const findEmployeeSystemId = async (employeeCode) => {
     return rows[0].systemId || rows[0].SystemId || null;
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId };
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee };
