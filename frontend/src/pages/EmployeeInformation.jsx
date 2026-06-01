@@ -10,7 +10,7 @@ const emptyForm = {
     arabicFirstName: '', arabicMiddleName: '', arabicLastName: '', searchName: '',
     gender: 'Male', jobTitle: '', status: 'Active',
     creditCard: '', motherName: '', faith: '', education: '',
-    emergencyContactNo: '', healthInsurance: '', familyInsurance: false,
+    emergencyContactNo: '',
     category: '', issueDate: '', expiryDate: '',
     department: '', designation: '', dateOfJoining: '',
     reportingManager: '', grade: '', employmentType: '',
@@ -183,14 +183,6 @@ function EmployeeInformation() {
                                 <Field label="Faith" name="faith" value={form.faith} onChange={onChange} />
                                 <Field label="Education" name="education" value={form.education} onChange={onChange} />
                                 <Field label="Emergency Contact No." name="emergencyContactNo" value={form.emergencyContactNo} onChange={onChange} />
-                                <Field label="Health Insurance" name="healthInsurance" value={form.healthInsurance} onChange={onChange} />
-                                <div className="emp-field-row">
-                                    <label>Family Insurance</label>
-                                    <label className="toggle">
-                                        <input type="checkbox" name="familyInsurance" checked={form.familyInsurance} onChange={onChange} />
-                                        <span className="slider"></span>
-                                    </label>
-                                </div>
                                 <Field label="Category" name="category" value={form.category} onChange={onChange} />
                                 <Field label="Issue Date" name="issueDate" value={form.issueDate} onChange={onChange} type="date" />
                                 <Field label="Expiry Date" name="expiryDate" value={form.expiryDate} onChange={onChange} type="date" />

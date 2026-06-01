@@ -22,8 +22,6 @@ const employeeInfoSchema = new mongoose.Schema({
     faith: { type: String, default: '' },
     education: { type: String, default: '' },
     emergencyContactNo: { type: String, default: '' },
-    healthInsurance: { type: String, default: '' },
-    familyInsurance: { type: Boolean, default: false },
     category: { type: String, default: '' },
     issueDate: { type: Date },
     expiryDate: { type: Date },

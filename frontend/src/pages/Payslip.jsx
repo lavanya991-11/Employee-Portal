@@ -59,9 +59,8 @@ function Payslip() {
         const other = 500;
         const gross = basic + hra + transport + other;
         const tax = Math.round(gross * 0.05);
-        const insurance = 250;
         const pf = Math.round(basic * 0.12);
-        const totalDeductions = tax + insurance + pf;
+        const totalDeductions = tax + pf;
         const net = gross - totalDeductions;
         return {
             earnings: [
@@ -72,7 +71,6 @@ function Payslip() {
             ],
             deductions: [
                 { label: 'Income Tax', amount: tax },
-                { label: 'Insurance', amount: insurance },
                 { label: 'Provident Fund', amount: pf }
             ],
             gross, totalDeductions, net
