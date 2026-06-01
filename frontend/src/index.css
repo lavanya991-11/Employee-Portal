@@ -668,6 +668,20 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 .erp-leg-mode { font-weight: 700; color: #1e3a8a; font-size: 13px; }
 .erp-leg-date { color: #374151; font-size: 12px; }
 .erp-leg-route { color: #6b7280; font-size: 11px; }
+
+/* List pagination footer */
+.erp-pagination {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px; border-top: 1px solid #e5e7eb;
+    background: #f9fafb; font-size: 12px; color: #6b7280;
+}
+.erp-pager { display: flex; align-items: center; gap: 4px; }
+.erp-pager button {
+    background: white; border: 1px solid #d1d5db; color: #1e3a8a;
+    width: 28px; height: 24px; border-radius: 3px; cursor: pointer; font-size: 12px;
+}
+.erp-pager button:disabled { opacity: 0.4; cursor: not-allowed; }
+.erp-pager button:hover:not(:disabled) { background: #eff6ff; }
 .erp-docno { display: flex; align-items: stretch; gap: 4px; }
 .erp-docno-series { width: 50px; padding-right: 4px !important; }
 .erp-docno-num { width: 60px; }
