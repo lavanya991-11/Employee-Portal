@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { authApi, leaveApi } from '../services/api';
+import { authApi, leaveApi, employeeInfoApi } from '../services/api';
 
 function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
+    const [info, setInfo] = useState(null);
     const [recentLeaves, setRecentLeaves] = useState([]);
     const [notificationCount, setNotificationCount] = useState(0);
 
@@ -25,6 +26,10 @@ function Dashboard() {
             setUser(fresh);
             localStorage.setItem('user', JSON.stringify(fresh));
         }).catch(() => {});
+
+        employeeInfoApi.getMy()
+            .then(({ data }) => setInfo(data.employeeInfo || null))
+            .catch(() => {});
 
         leaveApi.myLeaves().then(({ data }) => {
             setRecentLeaves((data.leaves || []).slice(0, 3));
@@ -62,17 +67,23 @@ function Dashboard() {
     const pendingLeaves = recentLeaves.filter((l) => l.status === 'Pending').length;
     const approvedLeaves = recentLeaves.filter((l) => l.status === 'Approved').length;
 
+    const displayName = [info?.firstName, info?.middleName, info?.lastName].filter(Boolean).join(' ')
+        || user.name || 'Employee';
+    const displayDesignation = info?.jobTitle || info?.designation || user.designation || 'Employee';
+    const displayDepartment = info?.department || user.department || 'Department';
+    const avatarInitial = (displayName?.[0] || 'U').toUpperCase();
+
     return (
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
                 <div className="dashboard-header">
                     <div className="avatar">
-                        {user.profilePicture ? <img src={user.profilePicture} alt="" /> : (user.name?.[0] || 'U').toUpperCase()}
+                        {user.profilePicture ? <img src={user.profilePicture} alt="" /> : avatarInitial}
                     </div>
                     <div className="greeting">
-                        <h2>Good {timeOfDay}, {user.name || 'Employee'} 👋</h2>
-                        <p>{user.designation || 'Employee'} • {user.department || 'Department'}</p>
+                        <h2>Good {timeOfDay}, {displayName} 👋</h2>
+                        <p>{displayDesignation} • {displayDepartment}</p>
                     </div>
                     <button className="btn btn-danger" onClick={handleLogout} style={{ marginRight: 12 }}>Logout</button>
                     <button

@@ -1,11 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { employeeInfoApi } from '../services/api';
 
 function Sidebar() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const [info, setInfo] = useState(null);
     const [openMenu, setOpenMenu] = useState('');
 
+    useEffect(() => {
+        employeeInfoApi.getMy()
+            .then(({ data }) => setInfo(data.employeeInfo || null))
+            .catch(() => {});
+    }, []);
+
     const toggle = (name) => setOpenMenu(openMenu === name ? '' : name);
+
+    const displayName = [info?.firstName, info?.middleName, info?.lastName].filter(Boolean).join(' ')
+        || user.name || 'User';
+    const displayCode = info?.employeeCode || user.empId;
 
     return (
         <aside className="sidebar">
@@ -14,7 +26,7 @@ function Sidebar() {
                     {user.profilePicture ? <img src={user.profilePicture} alt="" /> : '👤'}
                 </div>
                 <div className="user-id">
-                    {user.empId ? `${user.empId} - ${user.name || ''}` : user.name || 'User'}
+                    {displayCode ? `${displayCode} - ${displayName}` : displayName}
                 </div>
             </div>
 
