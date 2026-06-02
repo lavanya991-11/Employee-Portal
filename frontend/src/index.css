@@ -384,12 +384,33 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 /* Holidays */
 .holidays-panel { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
 .holidays-panel h3 { color: white; }
-.holiday-content { display: flex; align-items: center; gap: 16px; }
-.holiday-date { text-align: center; }
-.holiday-day { font-size: 48px; font-weight: 700; line-height: 1; }
-.holiday-month { font-size: 14px; margin-top: 4px; }
-.holiday-weekday { font-size: 11px; opacity: 0.9; }
-.holiday-name { font-size: 14px; font-weight: 500; flex: 1; }
+.holiday-content { display: flex; align-items: center; gap: 12px; }
+.holiday-date { text-align: center; min-width: 60px; }
+.holiday-day { font-size: 36px; font-weight: 700; line-height: 1; }
+.holiday-month { font-size: 12px; margin-top: 2px; }
+.holiday-weekday { font-size: 10px; opacity: 0.9; }
+.holiday-name { font-size: 13px; font-weight: 500; flex: 1; line-height: 1.3; }
+
+/* Compact holidays card */
+.holidays-compact { padding: 12px 14px; }
+.holidays-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+}
+.holidays-header h3 { font-size: 13px; margin: 0; }
+.holidays-nav { display: flex; gap: 4px; }
+.holidays-nav button {
+    background: rgba(255, 255, 255, 0.18); color: white;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    width: 24px; height: 22px; border-radius: 3px;
+    font-size: 12px; line-height: 1; cursor: pointer;
+}
+.holidays-nav button:hover { background: rgba(255, 255, 255, 0.3); }
+.holiday-divider {
+    width: 1px; align-self: stretch;
+    background: rgba(255, 255, 255, 0.45);
+    margin: 4px 4px;
+}
 
 /* Calendar */
 .calendar-week {

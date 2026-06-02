@@ -40,6 +40,15 @@ function MyInformation() {
     const [checkInTime, setCheckInTime] = useState('--:--');
     const [checkOutTime, setCheckOutTime] = useState('--:--');
     const [calendarDate, setCalendarDate] = useState(new Date());
+    const [holidayIndex, setHolidayIndex] = useState(0);
+
+    const holidays = [
+        { day: '11', month: 'Oct', weekday: 'Fri', year: '2024', name: 'Saraswathi Pooja, Ayutha Pooja' },
+        { day: '12', month: 'Oct', weekday: 'Sat', year: '2024', name: 'Vijayadashami' },
+        { day: '01', month: 'Nov', weekday: 'Fri', year: '2024', name: 'Diwali' },
+        { day: '25', month: 'Dec', weekday: 'Wed', year: '2024', name: 'Christmas' },
+        { day: '01', month: 'Jan', weekday: 'Wed', year: '2025', name: 'New Year' }
+    ];
 
     useEffect(() => {
         authApi.me().then(({ data }) => {
@@ -203,15 +212,23 @@ function MyInformation() {
                         </div>
                     </div>
 
-                    <div className="info-panel holidays-panel">
-                        <h3>Upcoming Holidays</h3>
+                    <div className="info-panel holidays-panel holidays-compact">
+                        <div className="holidays-header">
+                            <h3>Upcoming Holidays</h3>
+                            <div className="holidays-nav">
+                                <button type="button" title="Grid view" onClick={() => setHolidayIndex(0)}>⊞</button>
+                                <button type="button" title="Previous" onClick={() => setHolidayIndex((i) => (i - 1 + holidays.length) % holidays.length)}>‹</button>
+                                <button type="button" title="Next" onClick={() => setHolidayIndex((i) => (i + 1) % holidays.length)}>›</button>
+                            </div>
+                        </div>
                         <div className="holiday-content">
                             <div className="holiday-date">
-                                <div className="holiday-day">11</div>
-                                <div className="holiday-month">Oct</div>
-                                <div className="holiday-weekday">Fri | 2024</div>
+                                <div className="holiday-day">{holidays[holidayIndex].day}</div>
+                                <div className="holiday-month">{holidays[holidayIndex].month}</div>
+                                <div className="holiday-weekday">{holidays[holidayIndex].weekday} | {holidays[holidayIndex].year}</div>
                             </div>
-                            <div className="holiday-name">Saraswathi Pooja, Ayutha Pooja</div>
+                            <div className="holiday-divider" />
+                            <div className="holiday-name">{holidays[holidayIndex].name}</div>
                         </div>
                     </div>
                 </div>
