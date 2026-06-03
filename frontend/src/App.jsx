@@ -19,6 +19,8 @@ import ExpensesList from './pages/ExpensesList';
 import OvertimeRequest from './pages/OvertimeRequest';
 import FinElements from './pages/FinElements';
 import FinElementForm from './pages/FinElementForm';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
+import AdminCollection from './pages/AdminCollection';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -185,6 +187,22 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <FinElementForm />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin"
+                element={
+                    <ProtectedRoute>
+                        <SuperAdminDashboard />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/:collection"
+                element={
+                    <ProtectedRoute>
+                        <AdminCollection />
                     </ProtectedRoute>
                 }
             />

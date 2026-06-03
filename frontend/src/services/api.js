@@ -97,4 +97,17 @@ export const finElementApi = {
     remove: (id) => api.delete(`/fin-elements/${id}`)
 };
 
+export const adminApi = {
+    stats: () => api.get('/users/admin/stats'),
+    users: () => api.get('/users'),
+    employees: () => api.get('/employee-info/all'),
+    leaves: () => api.get('/leaves/all'),
+    loans: () => api.get('/loans/all'),
+    assets: () => api.get('/assets/all'),
+    overtimes: () => api.get('/overtimes/all'),
+    travels: () => api.get('/travels/all'),
+    expenses: () => api.get('/expenses/all'),
+    finElements: () => api.get('/fin-elements')
+};
+
 export default api;

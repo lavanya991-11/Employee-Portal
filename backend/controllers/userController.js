@@ -1,6 +1,54 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const EmployeeInfo = require('../models/employeeInfo');
+const Leave = require('../models/leave');
+const Loan = require('../models/loan');
+const Asset = require('../models/asset');
+const Overtime = require('../models/overtime');
+const Travel = require('../models/travel');
+const Expense = require('../models/expense');
+const FinElement = require('../models/finElement');
+
+exports.listAll = async (req, res) => {
+    try {
+        const users = await User.find().select('-password -refreshToken').sort({ createdAt: -1 });
+        res.json({ success: true, count: users.length, users });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
+
+exports.adminStats = async (req, res) => {
+    try {
+        const [users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements] = await Promise.all([
+            User.countDocuments(),
+            EmployeeInfo.countDocuments(),
+            Leave.countDocuments(),
+            Loan.countDocuments(),
+            Asset.countDocuments(),
+            Overtime.countDocuments(),
+            Travel.countDocuments(),
+            Expense.countDocuments(),
+            FinElement.countDocuments()
+        ]);
+        const [pendingLeaves, pendingLoans, pendingTravels, pendingExpenses, pendingAssets, pendingOvertimes] = await Promise.all([
+            Leave.countDocuments({ status: 'Pending' }),
+            Loan.countDocuments({ status: 'Pending' }),
+            Travel.countDocuments({ status: 'Pending' }),
+            Expense.countDocuments({ status: 'Pending' }),
+            Asset.countDocuments({ status: 'Pending' }),
+            Overtime.countDocuments({ status: 'Pending' })
+        ]);
+        res.json({
+            success: true,
+            totals: { users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements },
+            pending: { leaves: pendingLeaves, loans: pendingLoans, travels: pendingTravels, expenses: pendingExpenses, assets: pendingAssets, overtimes: pendingOvertimes }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
 
 exports.register = async (req, res) => {
     try {

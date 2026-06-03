@@ -18,7 +18,7 @@ function Login() {
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
             localStorage.setItem('user', JSON.stringify(data.user));
-            navigate('/dashboard');
+            navigate(data.user?.role === 'super-admin' ? '/admin' : '/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
         } finally {
