@@ -1,4 +1,6 @@
 const Leave = require('../models/leave');
+const EmployeeInfo = require('../models/employeeInfo');
+const { checkLeaveBalance, bcConfigured } = require('../services/bcClient');
 
 const calculateDays = (from, to) => {
     const diff = new Date(to) - new Date(from);
@@ -31,6 +33,26 @@ exports.applyLeave = async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err.message });
+    }
+};
+
+exports.bcLeaveBalance = async (req, res) => {
+    try {
+        if (!bcConfigured()) {
+            return res.status(400).json({ success: false, message: 'BC not configured (set BC_* env vars on the backend).' });
+        }
+        const { finId, asOfDate } = req.query;
+        if (finId == null || finId === '') {
+            return res.status(400).json({ success: false, message: 'finId is required' });
+        }
+        const info = await EmployeeInfo.findOne({ user: req.user.id });
+        if (!info || !info.employeeCode) {
+            return res.status(400).json({ success: false, message: 'Your Employee Information has no employeeCode. Set it on the Employee Information page first.' });
+        }
+        const result = await checkLeaveBalance(info.employeeCode, finId, asOfDate);
+        res.json({ success: true, employeeCode: info.employeeCode, finId: Number(finId), result });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'BC leave balance check failed', error: err.message });
     }
 };
 

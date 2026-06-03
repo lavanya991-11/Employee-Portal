@@ -45,7 +45,8 @@ export const leaveApi = {
     apply: (data) => api.post('/leaves/apply', data),
     myLeaves: () => api.get('/leaves/my'),
     allLeaves: () => api.get('/leaves/all'),
-    updateStatus: (id, data) => api.put(`/leaves/${id}/status`, data)
+    updateStatus: (id, data) => api.put(`/leaves/${id}/status`, data),
+    bcBalance: (finId, asOfDate) => api.get('/leaves/bc-balance', { params: { finId, asOfDate } })
 };
 
 export const loanApi = {

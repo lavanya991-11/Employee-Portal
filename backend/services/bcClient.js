@@ -10,6 +10,7 @@
 //   BC_ENVIRONMENT     (e.g. Production, Sandbox, Delivery_App)
 //   BC_COMPANY_ID      (BC company GUID)
 //   BC_API_PATH        (custom AL API path, e.g. api/Novasoft/Novasoft/v2.0)
+//   BC_PAYROLL_API_PATH (payroll AL API path, e.g. api/novasoft/novapay/v1.0)
 
 const tokenCache = { value: null, expiresAt: 0 };
 
@@ -55,6 +56,11 @@ const getAccessToken = async () => {
 const baseCompanyUrl = () =>
     `https://api.businesscentral.dynamics.com/v2.0/${process.env.BC_TENANT_ID}` +
     `/${process.env.BC_ENVIRONMENT}/${process.env.BC_API_PATH}` +
+    `/companies(${process.env.BC_COMPANY_ID})`;
+
+const basePayrollCompanyUrl = () =>
+    `https://api.businesscentral.dynamics.com/v2.0/${process.env.BC_TENANT_ID}` +
+    `/${process.env.BC_ENVIRONMENT}/${process.env.BC_PAYROLL_API_PATH || 'api/novasoft/novapay/v1.0'}` +
     `/companies(${process.env.BC_COMPANY_ID})`;
 
 const updateEmployee = async (systemId, payload) => {
@@ -129,4 +135,39 @@ const getAllFinMasters = async () => {
     return data.value || [];
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters };
+const checkLeaveBalance = async (employeeCode, finId, asOfDate) => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+    if (!employeeCode) throw new Error('employeeCode is required.');
+    if (finId == null) throw new Error('finId is required.');
+
+    const token = await getAccessToken();
+    const safeCode = String(employeeCode).replace(/'/g, "''");
+    const url = `${basePayrollCompanyUrl()}/employeeLeaveBalancesByPayCode('${safeCode}')/Microsoft.NAV.checkLeaveBalance`;
+
+    const body = { finId: Number(finId), asOfDate: asOfDate || new Date().toISOString().slice(0, 10) };
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`BC checkLeaveBalance failed: ${res.status} ${text}`);
+    }
+
+    const data = await res.json();
+    // BC returns { value: "<stringified-json>" } — parse it.
+    let parsed = data.value;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { /* leave as-is */ }
+    }
+    return parsed;
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance };

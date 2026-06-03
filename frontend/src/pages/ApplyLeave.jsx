@@ -48,18 +48,23 @@ function ApplyLeave() {
         }).catch(() => {});
     }, []);
 
-    // Auto-populate Assigned/Available when leave type changes.
+    // Fetch leave balance from BC whenever the selected leave type changes.
     useEffect(() => {
-        if (!form.leaveType) return;
-        leaveApi.myLeaves().then(({ data }) => {
-            const used = (data.leaves || [])
-                .filter((l) => l.leaveType === form.leaveType && l.status === 'Approved')
-                .reduce((s, l) => s + (l.totalDays || 0), 0);
-            const assignedDefault = 0;
-            const availableDefault = Math.max(0, assignedDefault - used);
-            setForm((f) => ({ ...f, assignedLeaves: assignedDefault, availableLeaves: availableDefault }));
-        }).catch(() => {});
-    }, [form.leaveType]);
+        if (!form.leaveFinId) return;
+        leaveApi.bcBalance(form.leaveFinId, form.docDate).then(({ data }) => {
+            const r = data.result || {};
+            const entitlement = Number(r.entitlement) || 0;
+            const balance = Number(r.balance) || 0;
+            setForm((f) => ({
+                ...f,
+                assignedLeaves: entitlement,
+                availableLeaves: balance,
+                balanceLeaves: Math.max(0, balance - Number(f.noOfDays || 0))
+            }));
+        }).catch((err) => {
+            setError(err.response?.data?.message || 'Could not fetch balance from BC');
+        });
+    }, [form.leaveFinId, form.docDate]);
 
     // Auto-populate No Of Days when dates / session change.
     useEffect(() => {
