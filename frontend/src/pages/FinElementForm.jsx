@@ -214,7 +214,7 @@ function FinElementForm() {
                                 <Field label="Element Of Payslip" name="elementOfPayslip" value={form.elementOfPayslip} onChange={onChange} type="checkbox" />
                             </Section>
 
-                            <Section title="Equations" open={false}>
+                            <Section title="Equations">
                                 <Field label="Is Equation" name="isEquation" value={form.isEquation} onChange={onChange} type="checkbox" />
                                 <div className="erp-field" />
                                 <Field label="Standard Equation" name="standardEquation" value={form.standardEquation} onChange={onChange} span={2} />
@@ -225,7 +225,7 @@ function FinElementForm() {
                                 <Field label="Late Working Days Equation" name="lateWorkingDaysEquation" value={form.lateWorkingDaysEquation} onChange={onChange} span={2} />
                             </Section>
 
-                            <Section title="Leave Configuration" open={false}>
+                            <Section title="Leave Configuration">
                                 <Field label="Leave Period Based" name="leavePeriodBased" value={form.leavePeriodBased} onChange={onChange} options={ENUMS.leavePeriodBased} />
                                 <Field label="Leave Period Reference" name="leavePeriodReference" value={form.leavePeriodReference} onChange={onChange} options={ENUMS.leavePeriodReference} />
                                 <Field label="Hourly Leave" name="hourlyLeave" value={form.hourlyLeave} onChange={onChange} type="checkbox" />
@@ -241,7 +241,7 @@ function FinElementForm() {
                                 <Field label="Leave Calc Reference" name="leaveCalcReference" value={form.leaveCalcReference} onChange={onChange} type="number" />
                             </Section>
 
-                            <Section title="Leave Behaviour Flags" open={false}>
+                            <Section title="Leave Behaviour Flags">
                                 <Field label="Deduct From Yearly Leave Bal." name="deductFromYearlyLeaveBal" value={form.deductFromYearlyLeaveBal} onChange={onChange} type="checkbox" />
                                 <Field label="Permit Paid More Actual" name="permitPaidMoreActual" value={form.permitPaidMoreActual} onChange={onChange} type="checkbox" />
                                 <Field label="Stop Salary If Not Return" name="stopSalaryIfNotReturn" value={form.stopSalaryIfNotReturn} onChange={onChange} type="checkbox" />
@@ -270,18 +270,18 @@ function FinElementForm() {
                                 <Field label="UnAuthorized Absense" name="unAuthorizedAbsense" value={form.unAuthorizedAbsense} onChange={onChange} type="checkbox" />
                             </Section>
 
-                            <Section title="Exam Leave" open={false}>
+                            <Section title="Exam Leave">
                                 <Field label="Exam Leave" name="examLeave" value={form.examLeave} onChange={onChange} type="checkbox" />
                                 <Field label="Leave Days Prior Exam" name="leaveDaysPriorExam" value={form.leaveDaysPriorExam} onChange={onChange} type="number" />
                                 <Field label="Include Exam Day In Leave Days" name="includeExamDayInLeaveDays" value={form.includeExamDayInLeaveDays} onChange={onChange} type="checkbox" />
                             </Section>
 
-                            <Section title="Experience" open={false}>
+                            <Section title="Experience">
                                 <Field label="Deducted From Experience" name="deductedFromExperience" value={form.deductedFromExperience} onChange={onChange} type="checkbox" />
                                 <Field label="Days To Affect Exp" name="daysToAffectExp" value={form.daysToAffectExp} onChange={onChange} type="number" />
                             </Section>
 
-                            <Section title="Expense / Reimbursement" open={false}>
+                            <Section title="Expense / Reimbursement">
                                 <Field label="Is Expense" name="isExpense" value={form.isExpense} onChange={onChange} type="checkbox" />
                                 <Field label="Expense SubLedger" name="expenseSubLedger" value={form.expenseSubLedger} onChange={onChange} options={ENUMS.expenseSubLedger} />
                                 <Field label="Is Reimbursement" name="isReimbursement" value={form.isReimbursement} onChange={onChange} type="checkbox" />
@@ -293,13 +293,13 @@ function FinElementForm() {
                                 <Field label="Is Job Related" name="isJobRelated" value={form.isJobRelated} onChange={onChange} type="checkbox" />
                             </Section>
 
-                            <Section title="Loan" open={false}>
+                            <Section title="Loan">
                                 <Field label="Is Loan" name="isLoan" value={form.isLoan} onChange={onChange} type="checkbox" />
                                 <Field label="Maximum Installment Period" name="maximumInstallmentPeriod" value={form.maximumInstallmentPeriod} onChange={onChange} type="number" />
                                 <Field label="Leave Salary Loan Code" name="leaveSalaryLoanCode" value={form.leaveSalaryLoanCode} onChange={onChange} type="number" />
                             </Section>
 
-                            <Section title="Deduction Details" open={false}>
+                            <Section title="Deduction Details">
                                 <Field label="Deduction Type" name="deductionType" value={form.deductionType} onChange={onChange} options={ENUMS.deductionType} />
                                 <Field label="Related Deduction" name="relatedDeduction" value={form.relatedDeduction} onChange={onChange} type="number" />
                                 <Field label="Social Security" name="socialSecurity" value={form.socialSecurity} onChange={onChange} type="number" />
@@ -309,7 +309,7 @@ function FinElementForm() {
                                 <Field label="Pension Company Contribution" name="pensionCompanyContribution" value={form.pensionCompanyContribution} onChange={onChange} type="number" />
                             </Section>
 
-                            <Section title="ESOL / EOS" open={false}>
+                            <Section title="ESOL / EOS">
                                 <Field label="ESOL Deduct Full Amt In MOJ" name="esolDeductFullAmtInMOJ" value={form.esolDeductFullAmtInMOJ} onChange={onChange} type="checkbox" />
                                 <Field label="ESOL Deduct Full Amt In Last M" name="esolDeductFullAmtInLastM" value={form.esolDeductFullAmtInLastM} onChange={onChange} type="checkbox" />
                                 <Field label="ESOL Calculate On Pro Rata" name="esolCalculateOnProRata" value={form.esolCalculateOnProRata} onChange={onChange} type="checkbox" />
@@ -322,7 +322,7 @@ function FinElementForm() {
                                 <Field label="Is Valid For EOS Manual Entry" name="isValidForEOSManualEntry" value={form.isValidForEOSManualEntry} onChange={onChange} type="checkbox" />
                             </Section>
 
-                            <Section title="Tax / Social Insurance" open={false}>
+                            <Section title="Tax / Social Insurance">
                                 <Field label="Used In Tax Calc" name="usedInTaxCalc" value={form.usedInTaxCalc} onChange={onChange} type="checkbox" />
                                 <Field label="Used In Social Calc" name="usedInSocialCalc" value={form.usedInSocialCalc} onChange={onChange} type="checkbox" />
                                 <Field label="Is Tax Deduction" name="isTaxDeduction" value={form.isTaxDeduction} onChange={onChange} type="checkbox" />
@@ -332,7 +332,7 @@ function FinElementForm() {
                                 <Field label="Tax Calculation As" name="taxCalculationAs" value={form.taxCalculationAs} onChange={onChange} options={ENUMS.taxCalculationAs} />
                             </Section>
 
-                            <Section title="Transaction History" open={false}>
+                            <Section title="Transaction History">
                                 <Field label="Post To Employee Trans. Hist" name="postToEmployeeTransHist" value={form.postToEmployeeTransHist} onChange={onChange} type="checkbox" />
                                 <div className="erp-field" />
                                 <Field label="Transaction Description" name="transactionDescription" value={form.transactionDescription} onChange={onChange} span={2} />
@@ -342,7 +342,7 @@ function FinElementForm() {
                             </Section>
 
                             {!isNew && (
-                                <Section title="BC Sync (read-only)" open={false}>
+                                <Section title="BC Sync (read-only)">
                                     <Field label="BC System Id" name="bcSystemId" value={form.bcSystemId || ''} onChange={onChange} readOnly span={2} />
                                     <Field label="BC Created At" name="bcSystemCreatedAt" value={form.bcSystemCreatedAt ? new Date(form.bcSystemCreatedAt).toLocaleString() : ''} onChange={onChange} readOnly />
                                     <Field label="BC Modified At" name="bcSystemModifiedAt" value={form.bcSystemModifiedAt ? new Date(form.bcSystemModifiedAt).toLocaleString() : ''} onChange={onChange} readOnly />

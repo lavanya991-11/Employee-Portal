@@ -510,6 +510,11 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
     text-decoration: none;
 }
 .admin-quick-link:hover { background: #eff6ff; border-color: #3b82f6; }
+
+/* FIN Elements wide table */
+.fin-table { font-size: 11px; white-space: nowrap; }
+.fin-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; padding: 6px 8px; }
+.fin-table td { padding: 5px 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
 .cal-legend-item { display: flex; align-items: center; gap: 5px; }
 .cal-legend-count {
     color: white; font-weight: 700; font-size: 11px;
