@@ -84,7 +84,8 @@ function ApplyLeave() {
             return;
         }
         const days = Math.round((to - from) / 86400000) + 1; // inclusive
-        const computed = form.session === 'Full Day' ? days : 0.5;
+        // Full Day = N. Half Day session = N - 0.5 (one day in the range is a half).
+        const computed = form.session === 'Full Day' ? days : Math.max(0.5, days - 0.5);
         setError('');
         setForm((f) => ({ ...f, noOfDays: computed }));
     }, [form.fromDate, form.toDate, form.session]);
