@@ -17,6 +17,8 @@ import TravelExpenses from './pages/TravelExpenses';
 import NonTravelExpenses from './pages/NonTravelExpenses';
 import ExpensesList from './pages/ExpensesList';
 import OvertimeRequest from './pages/OvertimeRequest';
+import FinElements from './pages/FinElements';
+import FinElementForm from './pages/FinElementForm';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -159,6 +161,30 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <OvertimeRequest />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/fin-elements"
+                element={
+                    <ProtectedRoute>
+                        <FinElements />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/fin-elements/new"
+                element={
+                    <ProtectedRoute>
+                        <FinElementForm />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/fin-elements/:id"
+                element={
+                    <ProtectedRoute>
+                        <FinElementForm />
                     </ProtectedRoute>
                 }
             />

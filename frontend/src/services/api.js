@@ -89,4 +89,12 @@ export const employeeInfoApi = {
     getAll: () => api.get('/employee-info/all')
 };
 
+export const finElementApi = {
+    list: (params) => api.get('/fin-elements', { params }),
+    getOne: (id) => api.get(`/fin-elements/${id}`),
+    create: (data) => api.post('/fin-elements', data),
+    update: (id, data) => api.put(`/fin-elements/${id}`, data),
+    remove: (id) => api.delete(`/fin-elements/${id}`)
+};
+
 export default api;

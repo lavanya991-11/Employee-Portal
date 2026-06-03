@@ -102,6 +102,12 @@ function Sidebar() {
                 <Link to="/my-information" className="nav-item">
                     <span className="nav-item-icon">🪪</span> My Information
                 </Link>
+
+                {['manager', 'admin', 'super-admin'].includes(user.role) && (
+                    <Link to="/fin-elements" className="nav-item">
+                        <span className="nav-item-icon">⚙️</span> FIN Elements
+                    </Link>
+                )}
             </nav>
         </aside>
     );
