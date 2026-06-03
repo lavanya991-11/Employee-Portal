@@ -207,6 +207,7 @@ function FinElements() {
                     <div className="erp-titlebar">
                         <div className="erp-title">FIN Elements <span style={{ fontSize: 12, color: '#6b7280' }}>▼</span></div>
                         <div className="erp-titlebar-actions">
+                            <button className="erp-action-btn" onClick={() => navigate('/admin')}>↵ Admin Home</button>
                             <button className="erp-action-btn" onClick={onScanFromBC}>📡 Scan from BC</button>
                             <button className="erp-action-btn" onClick={() => selected && onDelete(selected._id)} disabled={!selected}>🗑️ Delete</button>
                         </div>
