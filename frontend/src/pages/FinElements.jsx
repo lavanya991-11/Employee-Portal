@@ -183,6 +183,21 @@ function FinElements() {
         }
     };
 
+    const onScanFromVCD = async () => {
+        setError(''); setSuccess('');
+        // Placeholder: scan/import FIN elements from VCD source.
+        // Hook this up to a real backend endpoint when VCD details are confirmed.
+        setSuccess('Scan from VCD started…');
+        try {
+            // Example future call: const { data } = await finElementApi.scanFromVCD();
+            // For now we just reload from MongoDB so the list reflects whatever was synced.
+            await load();
+            setSuccess('Scan from VCD complete. (Connect to real VCD source to import records.)');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Scan failed');
+        }
+    };
+
     return (
         <div className="app-layout">
             <Sidebar />
@@ -191,9 +206,7 @@ function FinElements() {
                     <div className="erp-titlebar">
                         <div className="erp-title">FIN Elements <span style={{ fontSize: 12, color: '#6b7280' }}>▼</span></div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate('/fin-elements/new')}>📄 New</button>
-                            <button className="erp-action-btn" onClick={() => selected && navigate(`/fin-elements/${selected._id}`)}>✎ Edit</button>
-                            <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
+                            <button className="erp-action-btn" onClick={onScanFromVCD}>📡 Scan from VCD</button>
                             <button className="erp-action-btn" onClick={() => selected && onDelete(selected._id)} disabled={!selected}>🗑️ Delete</button>
                         </div>
                     </div>
