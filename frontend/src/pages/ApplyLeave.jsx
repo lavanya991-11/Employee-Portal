@@ -1,15 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { leaveApi } from '../services/api';
-
-const TYPE_LIMITS = {
-    Sick: 21,
-    Casual: 12,
-    Paid: 18,
-    Unpaid: 0,
-    Earned: 15
-};
+import { leaveApi, finElementApi } from '../services/api';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
@@ -17,10 +9,13 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 function ApplyLeave() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const initialType = searchParams.get('type') || 'Casual';
+    const initialType = searchParams.get('type') || '';
+
+    const [leaveOptions, setLeaveOptions] = useState([]); // [{ finId, description }, ...]
 
     const [form, setForm] = useState({
         leaveType: initialType,
+        leaveFinId: null,
         fromDate: '',
         toDate: '',
         session: 'Full Day',
@@ -29,10 +24,10 @@ function ApplyLeave() {
         docDate: today(),
         docSeries: '2',
         docNumber: 9,
-        assignedLeaves: TYPE_LIMITS[initialType] ?? 0,
-        availableLeaves: TYPE_LIMITS[initialType] ?? 0,
+        assignedLeaves: 0,
+        availableLeaves: 0,
         noOfDays: 0,
-        balanceLeaves: TYPE_LIMITS[initialType] ?? 0
+        balanceLeaves: 0
     });
     const fileInputRef = useRef(null);
     const [error, setError] = useState('');
@@ -40,13 +35,27 @@ function ApplyLeave() {
     const [saving, setSaving] = useState(false);
     const [actionsOpen, setActionsOpen] = useState(true);
 
+    // Load leave-type FIN elements (PaidLeave + UnPaidLeave) from MongoDB.
+    useEffect(() => {
+        finElementApi.list().then(({ data }) => {
+            const items = (data.items || [])
+                .filter((it) => ['PaidLeave', 'UnPaidLeave'].includes(it.finType))
+                .map((it) => ({ finId: it.finId, description: it.description || `FIN ${it.finId}` }));
+            setLeaveOptions(items);
+            if (items.length && !form.leaveType) {
+                setForm((f) => ({ ...f, leaveType: items[0].description, leaveFinId: items[0].finId }));
+            }
+        }).catch(() => {});
+    }, []);
+
     // Auto-populate Assigned/Available when leave type changes.
     useEffect(() => {
+        if (!form.leaveType) return;
         leaveApi.myLeaves().then(({ data }) => {
             const used = (data.leaves || [])
                 .filter((l) => l.leaveType === form.leaveType && l.status === 'Approved')
                 .reduce((s, l) => s + (l.totalDays || 0), 0);
-            const assignedDefault = TYPE_LIMITS[form.leaveType] ?? 0;
+            const assignedDefault = 0;
             const availableDefault = Math.max(0, assignedDefault - used);
             setForm((f) => ({ ...f, assignedLeaves: assignedDefault, availableLeaves: availableDefault }));
         }).catch(() => {});
@@ -96,6 +105,7 @@ function ApplyLeave() {
         try {
             await leaveApi.apply({
                 leaveType: form.leaveType,
+                leaveFinId: form.leaveFinId,
                 fromDate: form.fromDate,
                 toDate: form.toDate,
                 reason: form.reason
@@ -110,11 +120,12 @@ function ApplyLeave() {
     };
 
     const onNew = () => {
-        const baseAssigned = TYPE_LIMITS[initialType] ?? 0;
+        const first = leaveOptions[0];
         setForm({
-            leaveType: initialType, fromDate: '', toDate: '', session: 'Full Day',
+            leaveType: first?.description || '', leaveFinId: first?.finId || null,
+            fromDate: '', toDate: '', session: 'Full Day',
             reason: '', attachment: null, docDate: today(), docSeries: '2', docNumber: 9,
-            assignedLeaves: baseAssigned, availableLeaves: baseAssigned, noOfDays: 0, balanceLeaves: baseAssigned
+            assignedLeaves: 0, availableLeaves: 0, noOfDays: 0, balanceLeaves: 0
         });
         setError(''); setSuccess('');
     };
@@ -254,12 +265,20 @@ function ApplyLeave() {
                                 <div className="erp-grid">
                                     <div className="erp-field">
                                         <label>Leave Types *</label>
-                                        <select name="leaveType" value={form.leaveType} onChange={onChange}>
-                                            <option>Sick</option>
-                                            <option>Casual</option>
-                                            <option>Paid</option>
-                                            <option>Unpaid</option>
-                                            <option>Earned</option>
+                                        <select
+                                            name="leaveType"
+                                            value={form.leaveFinId ?? ''}
+                                            onChange={(e) => {
+                                                const finId = Number(e.target.value);
+                                                const opt = leaveOptions.find((o) => o.finId === finId);
+                                                setForm({ ...form, leaveFinId: finId, leaveType: opt?.description || '' });
+                                                setError(''); setSuccess('');
+                                            }}
+                                        >
+                                            {leaveOptions.length === 0 && <option value="">No leave types — import from BC first</option>}
+                                            {leaveOptions.map((o) => (
+                                                <option key={o.finId} value={o.finId}>{o.finId} - {o.description}</option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="erp-field">

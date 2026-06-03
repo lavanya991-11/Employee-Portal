@@ -7,7 +7,7 @@ const calculateDays = (from, to) => {
 
 exports.applyLeave = async (req, res) => {
     try {
-        const { leaveType, fromDate, toDate, reason } = req.body;
+        const { leaveType, leaveFinId, fromDate, toDate, reason } = req.body;
 
         if (new Date(toDate) < new Date(fromDate)) {
             return res.status(400).json({ message: "toDate cannot be before fromDate" });
@@ -18,6 +18,7 @@ exports.applyLeave = async (req, res) => {
         const leave = await Leave.create({
             employee: req.user.id,
             leaveType,
+            leaveFinId: leaveFinId ?? null,
             fromDate,
             toDate,
             totalDays,
