@@ -234,21 +234,21 @@ function MyInformation() {
                 </div>
 
                 <div className="info-panel">
-                    <div className="info-panel-header">
+                    <div className="info-panel-header calendar-header-row">
                         <h3>My Calendar</h3>
+                        <div className="calendar-legend">
+                            {legend.map((l) => (
+                                <div className="cal-legend-item" key={l.key}>
+                                    <span className="cal-legend-count" style={{ background: l.color }}>{l.count}</span>
+                                    {l.label}
+                                </div>
+                            ))}
+                        </div>
                         <div className="cal-nav">
                             <button type="button" onClick={() => changeMonth(-1)}>‹</button>
                             <span>{monthLabel}</span>
                             <button type="button" onClick={() => changeMonth(1)}>›</button>
                         </div>
-                    </div>
-                    <div className="calendar-legend">
-                        {legend.map((l) => (
-                            <div className="cal-legend-item" key={l.key}>
-                                <span className="cal-legend-count" style={{ background: l.color }}>{l.count}</span>
-                                {l.label}
-                            </div>
-                        ))}
                     </div>
                     <div className="calendar-month">
                         {monthDays.map((d) => (
