@@ -5,15 +5,26 @@ const MODEL_FIELDS = Object.keys(FinElement.schema.paths).filter(
     (k) => !['_id', '__v', 'createdAt', 'updatedAt'].includes(k)
 );
 
+const ENUM_FIELDS = MODEL_FIELDS.filter(
+    (k) => FinElement.schema.paths[k].instance === 'String' && FinElement.schema.paths[k].enumValues?.length > 0
+);
+
 const mapBcToModel = (bc) => {
     const out = {};
     for (const k of MODEL_FIELDS) {
-        if (bc[k] !== undefined && bc[k] !== null) out[k] = bc[k];
+        const v = bc[k];
+        if (v === undefined || v === null) continue;
+        // Skip enum fields with values not in the allowed list (BC sometimes returns "" or different spellings).
+        if (ENUM_FIELDS.includes(k)) {
+            const allowed = FinElement.schema.paths[k].enumValues;
+            if (!allowed.includes(v)) continue;
+        }
+        out[k] = v;
     }
     if (bc.systemId) out.bcSystemId = bc.systemId;
-    if (bc.systemCreatedAt) out.bcSystemCreatedAt = bc.systemCreatedAt;
+    if (bc.systemCreatedAt && bc.systemCreatedAt !== '0001-01-01T00:00:00Z') out.bcSystemCreatedAt = bc.systemCreatedAt;
     if (bc.systemCreatedBy) out.bcSystemCreatedBy = bc.systemCreatedBy;
-    if (bc.systemModifiedAt) out.bcSystemModifiedAt = bc.systemModifiedAt;
+    if (bc.systemModifiedAt && bc.systemModifiedAt !== '0001-01-01T00:00:00Z') out.bcSystemModifiedAt = bc.systemModifiedAt;
     if (bc.systemModifiedBy) out.bcSystemModifiedBy = bc.systemModifiedBy;
     return out;
 };
@@ -80,21 +91,23 @@ exports.scanFromBc = async (req, res) => {
         const rows = await getAllFinMasters();
         let upserted = 0;
         let skipped = 0;
+        const errors = [];
         for (const row of rows) {
-            if (row.finId == null) { skipped++; continue; }
+            if (row.finId == null) { skipped++; if (errors.length < 5) errors.push({ finId: null, reason: 'missing finId' }); continue; }
             const payload = mapBcToModel(row);
             try {
                 await FinElement.findOneAndUpdate(
                     { finId: row.finId },
                     { $set: payload },
-                    { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true }
+                    { upsert: true, new: true, setDefaultsOnInsert: true }
                 );
                 upserted++;
             } catch (e) {
                 skipped++;
+                if (errors.length < 5) errors.push({ finId: row.finId, reason: e.message });
             }
         }
-        res.json({ success: true, message: `Imported ${upserted} FIN element(s) from BC (${skipped} skipped).`, fetched: rows.length, upserted, skipped });
+        res.json({ success: true, message: `Imported ${upserted} FIN element(s) from BC (${skipped} skipped).`, fetched: rows.length, upserted, skipped, errors });
     } catch (err) {
         res.status(500).json({ success: false, message: 'BC scan failed', error: err.message });
     }

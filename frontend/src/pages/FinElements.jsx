@@ -190,6 +190,10 @@ function FinElements() {
             const { data } = await finElementApi.scanFromBc();
             await load();
             setSuccess(data.message || `Imported ${data.upserted} record(s) from BC.`);
+            if (data.errors && data.errors.length > 0) {
+                const lines = data.errors.map((e) => `finId=${e.finId}: ${e.reason}`).join(' | ');
+                setError(`First errors: ${lines}`);
+            }
         } catch (err) {
             setError(err.response?.data?.message || err.response?.data?.error || 'Scan failed');
         }
