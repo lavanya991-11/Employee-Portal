@@ -66,16 +66,26 @@ function ApplyLeave() {
         });
     }, [form.leaveFinId, form.docDate]);
 
-    // Auto-populate No Of Days when dates / session change.
+    // Auto-calculate No Of Days when dates / session change.
     useEffect(() => {
         if (!form.fromDate || !form.toDate) {
             setForm((f) => ({ ...f, noOfDays: 0 }));
             return;
         }
-        const diff = new Date(form.toDate) - new Date(form.fromDate);
-        if (diff < 0) { setForm((f) => ({ ...f, noOfDays: 0 })); return; }
-        const days = Math.floor(diff / 86400000) + 1;
-        const computed = form.session === 'Full Day' ? days : days * 0.5;
+        const from = new Date(form.fromDate);
+        const to = new Date(form.toDate);
+        if (isNaN(from) || isNaN(to)) {
+            setForm((f) => ({ ...f, noOfDays: 0 }));
+            return;
+        }
+        if (to < from) {
+            setError('Leave To Date cannot be before Leave From Date.');
+            setForm((f) => ({ ...f, noOfDays: 0 }));
+            return;
+        }
+        const days = Math.round((to - from) / 86400000) + 1; // inclusive
+        const computed = form.session === 'Full Day' ? days : 0.5;
+        setError('');
         setForm((f) => ({ ...f, noOfDays: computed }));
     }, [form.fromDate, form.toDate, form.session]);
 
@@ -312,11 +322,11 @@ function ApplyLeave() {
                                     </div>
                                     <div className="erp-field">
                                         <label>No Of Days *</label>
-                                        <input type="number" name="noOfDays" value={form.noOfDays} onChange={onChange} min="0" step="0.5" />
+                                        <input type="number" name="noOfDays" value={form.noOfDays} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Balance Leaves</label>
-                                        <input type="number" name="balanceLeaves" value={form.balanceLeaves} onChange={onChange} min="0" />
+                                        <input type="number" name="balanceLeaves" value={form.balanceLeaves} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field erp-field-wide">
                                         <label>Reasons *</label>
