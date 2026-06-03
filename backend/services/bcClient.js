@@ -110,4 +110,23 @@ const findEmployeeSystemId = async (employeeCode) => {
     return rows[0].systemId || rows[0].SystemId || null;
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee };
+const getAllFinMasters = async () => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    const url = `${baseCompanyUrl()}/finMasters`;
+
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`BC finMasters GET failed: ${res.status} ${text}`);
+    }
+
+    const data = await res.json();
+    return data.value || [];
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters };

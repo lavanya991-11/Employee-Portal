@@ -94,7 +94,8 @@ export const finElementApi = {
     getOne: (id) => api.get(`/fin-elements/${id}`),
     create: (data) => api.post('/fin-elements', data),
     update: (id, data) => api.put(`/fin-elements/${id}`, data),
-    remove: (id) => api.delete(`/fin-elements/${id}`)
+    remove: (id) => api.delete(`/fin-elements/${id}`),
+    scanFromBc: () => api.post('/fin-elements/scan-from-bc')
 };
 
 export const adminApi = {

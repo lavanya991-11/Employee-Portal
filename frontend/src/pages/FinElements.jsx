@@ -185,16 +185,13 @@ function FinElements() {
 
     const onScanFromBC = async () => {
         setError(''); setSuccess('');
-        // Placeholder: scan/import FIN elements from Business Central.
-        // Hook this up to a real backend endpoint when ready.
         setSuccess('Scan from BC started…');
         try {
-            // Example future call: const { data } = await finElementApi.scanFromBC();
-            // For now we just reload from MongoDB so the list reflects whatever was synced.
+            const { data } = await finElementApi.scanFromBc();
             await load();
-            setSuccess('Scan from BC complete. (Connect to real BC source to import records.)');
+            setSuccess(data.message || `Imported ${data.upserted} record(s) from BC.`);
         } catch (err) {
-            setError(err.response?.data?.message || 'Scan failed');
+            setError(err.response?.data?.message || err.response?.data?.error || 'Scan failed');
         }
     };
 

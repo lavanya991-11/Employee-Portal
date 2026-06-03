@@ -1,4 +1,22 @@
 const FinElement = require('../models/finElement');
+const { getAllFinMasters, bcConfigured } = require('../services/bcClient');
+
+const MODEL_FIELDS = Object.keys(FinElement.schema.paths).filter(
+    (k) => !['_id', '__v', 'createdAt', 'updatedAt'].includes(k)
+);
+
+const mapBcToModel = (bc) => {
+    const out = {};
+    for (const k of MODEL_FIELDS) {
+        if (bc[k] !== undefined && bc[k] !== null) out[k] = bc[k];
+    }
+    if (bc.systemId) out.bcSystemId = bc.systemId;
+    if (bc.systemCreatedAt) out.bcSystemCreatedAt = bc.systemCreatedAt;
+    if (bc.systemCreatedBy) out.bcSystemCreatedBy = bc.systemCreatedBy;
+    if (bc.systemModifiedAt) out.bcSystemModifiedAt = bc.systemModifiedAt;
+    if (bc.systemModifiedBy) out.bcSystemModifiedBy = bc.systemModifiedBy;
+    return out;
+};
 
 exports.list = async (req, res) => {
     try {
@@ -51,6 +69,34 @@ exports.update = async (req, res) => {
         res.json({ success: true, message: 'FIN element updated', item });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
+
+exports.scanFromBc = async (req, res) => {
+    try {
+        if (!bcConfigured()) {
+            return res.status(400).json({ success: false, message: 'BC not configured (set BC_* env vars on the backend).' });
+        }
+        const rows = await getAllFinMasters();
+        let upserted = 0;
+        let skipped = 0;
+        for (const row of rows) {
+            if (row.finId == null) { skipped++; continue; }
+            const payload = mapBcToModel(row);
+            try {
+                await FinElement.findOneAndUpdate(
+                    { finId: row.finId },
+                    { $set: payload },
+                    { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true }
+                );
+                upserted++;
+            } catch (e) {
+                skipped++;
+            }
+        }
+        res.json({ success: true, message: `Imported ${upserted} FIN element(s) from BC (${skipped} skipped).`, fetched: rows.length, upserted, skipped });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'BC scan failed', error: err.message });
     }
 };
 
