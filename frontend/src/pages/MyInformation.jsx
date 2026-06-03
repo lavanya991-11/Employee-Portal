@@ -86,7 +86,8 @@ function MyInformation() {
         setCalendarDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
     };
 
-    const monthLabel = calendarDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    const monthLabel = calendarDate.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }).replace(' ', '/');
+    const loginTime = useMemo(() => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), []);
 
     const monthDays = useMemo(() => {
         const year = calendarDate.getFullYear();
@@ -236,6 +237,22 @@ function MyInformation() {
                 <div className="info-panel">
                     <div className="info-panel-header calendar-header-row">
                         <h3>My Calendar</h3>
+                        <select
+                            className="leaves-emp-select"
+                            value={selectedEmpCode || user.empId || info.employeeCode || ''}
+                            onChange={(e) => setSelectedEmpCode(e.target.value)}
+                        >
+                            {allEmployees.length === 0 && (
+                                <option value={info.employeeCode || user.empId || ''}>
+                                    {info.employeeCode || user.empId || 'FDMS0013'}
+                                </option>
+                            )}
+                            {allEmployees.map((emp) => (
+                                <option key={emp._id} value={emp.employeeCode}>
+                                    {emp.employeeCode}{emp.firstName ? ` - ${emp.firstName}` : ''}
+                                </option>
+                            ))}
+                        </select>
                         <div className="calendar-legend">
                             {legend.map((l) => (
                                 <div className="cal-legend-item" key={l.key}>
@@ -243,11 +260,6 @@ function MyInformation() {
                                     {l.label}
                                 </div>
                             ))}
-                        </div>
-                        <div className="cal-nav">
-                            <button type="button" onClick={() => changeMonth(-1)}>‹</button>
-                            <span>{monthLabel}</span>
-                            <button type="button" onClick={() => changeMonth(1)}>›</button>
                         </div>
                     </div>
                     <div className="calendar-month">
@@ -259,6 +271,16 @@ function MyInformation() {
                                 {d.time && <div className="cal-day-time">{d.time}</div>}
                             </div>
                         ))}
+                    </div>
+                    <div className="calendar-footer">
+                        <span><b>Company Name:</b> SRM</span>
+                        <span><b>Accounting Date:</b> {new Date().toLocaleDateString('en-GB')}</span>
+                        <span><b>Business Entity:</b> Fourth Dimension Media Solutions Private Limited</span>
+                        <span><b>Location:</b> {adm.location || adm.city || 'G N Chetty Road'}</span>
+                        <span><b>Version:</b> 24.2.0</span>
+                        <span><b>Payroll Month:</b> {monthLabel}</span>
+                        <span><b>Login Time:</b> {loginTime}</span>
+                        <span><b>Approvals:</b> 0</span>
                     </div>
                 </div>
             </main>
