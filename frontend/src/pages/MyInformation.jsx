@@ -251,7 +251,7 @@ function MyInformation() {
                                 ))}
                             </select>
                         </div>
-                        <div className="leaves-stats" style={{ justifyContent: 'center' }}>
+                        <div className="leaves-stats">
                             <CircleStat
                                 options={leaveOptions}
                                 selected={leftFinId}
@@ -260,6 +260,15 @@ function MyInformation() {
                                 balance={leftBal.balance}
                                 availed={availedFor(leftFinId)}
                                 color="#3b82f6"
+                            />
+                            <CircleStat
+                                options={leaveOptions}
+                                selected={rightFinId}
+                                onChange={setRightFinId}
+                                assigned={rightBal.entitlement}
+                                balance={rightBal.balance}
+                                availed={availedFor(rightFinId)}
+                                color="#22c55e"
                             />
                         </div>
                     </div>
