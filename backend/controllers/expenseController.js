@@ -64,9 +64,6 @@ exports.getAllExpenses = async (req, res) => {
 
 exports.updateExpenseStatus = async (req, res) => {
     try {
-        if (req.user.role !== 'super-admin') {
-            return res.status(403).json({ message: "Only Super Admin can approve or reject requests." });
-        }
         const { id } = req.params;
         const { status, approverRemarks } = req.body;
 
