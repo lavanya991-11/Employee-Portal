@@ -9,6 +9,8 @@ function Dashboard() {
     const [info, setInfo] = useState(null);
     const [recentLeaves, setRecentLeaves] = useState([]);
     const [notificationCount, setNotificationCount] = useState(0);
+    const [notifications, setNotifications] = useState([]);
+    const [bellOpen, setBellOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
 
     const isManager = ['manager', 'admin', 'super-admin'].includes(user.role);
@@ -19,7 +21,7 @@ function Dashboard() {
         navigate('/login');
     };
 
-    const onBellClick = () => navigate(isManager ? '/approvals' : '/leaves/my');
+    const onBellClick = () => setBellOpen((v) => !v);
 
     useEffect(() => {
         authApi.me().then(({ data }) => {
@@ -35,13 +37,27 @@ function Dashboard() {
         leaveApi.myLeaves().then(({ data }) => {
             setRecentLeaves((data.leaves || []).slice(0, 3));
             if (!isManager) {
-                setNotificationCount((data.leaves || []).filter((l) => l.status === 'Pending').length);
+                const pending = (data.leaves || []).filter((l) => l.status === 'Pending');
+                setNotificationCount(pending.length);
+                setNotifications(pending.map((l) => ({
+                    id: l._id,
+                    title: `${l.leaveType || 'Leave'} - Pending`,
+                    subtitle: `${new Date(l.fromDate).toLocaleDateString('en-GB')} → ${new Date(l.toDate).toLocaleDateString('en-GB')} (${l.totalDays} day${l.totalDays > 1 ? 's' : ''})`,
+                    link: '/leaves/my'
+                })));
             }
         }).catch(() => {});
 
         if (isManager) {
             leaveApi.allLeaves().then(({ data }) => {
-                setNotificationCount((data.leaves || []).filter((l) => l.status === 'Pending').length);
+                const pending = (data.leaves || []).filter((l) => l.status === 'Pending');
+                setNotificationCount(pending.length);
+                setNotifications(pending.map((l) => ({
+                    id: l._id,
+                    title: `${l.employee?.name || 'Employee'} requested ${l.leaveType || 'leave'}`,
+                    subtitle: `${new Date(l.fromDate).toLocaleDateString('en-GB')} → ${new Date(l.toDate).toLocaleDateString('en-GB')} (${l.totalDays} day${l.totalDays > 1 ? 's' : ''})`,
+                    link: '/approvals'
+                })));
             }).catch(() => {});
         }
     }, [isManager]);
@@ -86,15 +102,59 @@ function Dashboard() {
                         <h2>Good {timeOfDay}, {displayName} 👋</h2>
                         <p>{displayDesignation} • {displayDepartment}</p>
                     </div>
-                    <button
-                        className="notification-bell"
-                        title={isManager ? 'Pending approvals' : 'Your pending leaves'}
-                        onClick={onBellClick}
-                        style={{ marginRight: 16 }}
-                    >
-                        🔔
-                        {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
-                    </button>
+                    <div style={{ position: 'relative', marginRight: 16 }}>
+                        <button
+                            className="notification-bell"
+                            title={isManager ? 'Pending approvals' : 'Your pending leaves'}
+                            onClick={onBellClick}
+                        >
+                            🔔
+                            {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
+                        </button>
+                        {bellOpen && (
+                            <div style={{
+                                position: 'absolute', top: '100%', right: 0, marginTop: 6,
+                                background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8,
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.08)', minWidth: 320, maxWidth: 380,
+                                maxHeight: 400, overflowY: 'auto', zIndex: 50
+                            }}>
+                                <div style={{ padding: '10px 14px', borderBottom: '1px solid #f3f4f6', fontWeight: 600, color: '#111827' }}>
+                                    Notifications {notificationCount > 0 && <span style={{ color: '#6b7280', fontWeight: 400, fontSize: 12 }}>({notificationCount})</span>}
+                                </div>
+                                {notifications.length === 0 ? (
+                                    <div style={{ padding: '20px 14px', textAlign: 'center', color: '#6b7280', fontSize: 13 }}>
+                                        No new notifications
+                                    </div>
+                                ) : (
+                                    notifications.map((n) => (
+                                        <button
+                                            key={n.id}
+                                            type="button"
+                                            onClick={() => { setBellOpen(false); navigate(n.link); }}
+                                            style={{
+                                                display: 'block', width: '100%', textAlign: 'left',
+                                                padding: '10px 14px', background: 'transparent',
+                                                border: 'none', borderBottom: '1px solid #f3f4f6',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            <div style={{ fontWeight: 600, color: '#111827', fontSize: 13 }}>{n.title}</div>
+                                            <div style={{ color: '#6b7280', fontSize: 12, marginTop: 2 }}>{n.subtitle}</div>
+                                        </button>
+                                    ))
+                                )}
+                                {notifications.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => { setBellOpen(false); navigate(isManager ? '/approvals' : '/leaves/my'); }}
+                                        style={{ display: 'block', width: '100%', padding: '10px 14px', background: '#f9fafb', border: 'none', cursor: 'pointer', color: '#3b82f6', fontWeight: 600, fontSize: 13 }}
+                                    >
+                                        View all →
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
                     <div style={{ position: 'relative' }}>
                         <button
                             type="button"
