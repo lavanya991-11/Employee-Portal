@@ -166,7 +166,7 @@ function ApplyLeave() {
         }
         setSaving(true);
         try {
-            await leaveApi.apply({
+            const { data } = await leaveApi.apply({
                 leaveType: form.leaveType,
                 leaveFinId: form.leaveFinId,
                 payType: form.payType,
@@ -174,8 +174,14 @@ function ApplyLeave() {
                 toDate: form.toDate,
                 reason: form.reason
             });
-            setSuccess('Leave application submitted.');
-            setTimeout(() => navigate('/leaves/my'), 1200);
+            if (data?.bc?.ok) {
+                setSuccess('Leave submitted and pushed to Business Central.');
+            } else if (data?.bc?.error) {
+                setSuccess(`Leave submitted. BC sync failed: ${data.bc.error}`);
+            } else {
+                setSuccess('Leave application submitted.');
+            }
+            setTimeout(() => navigate('/leaves/my'), 1500);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to apply leave');
         } finally {

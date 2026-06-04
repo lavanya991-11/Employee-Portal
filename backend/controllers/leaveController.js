@@ -1,6 +1,12 @@
 const Leave = require('../models/leave');
 const EmployeeInfo = require('../models/employeeInfo');
-const { checkLeaveBalance, bcConfigured } = require('../services/bcClient');
+const { checkLeaveBalance, createEmployeeLeave, bcConfigured } = require('../services/bcClient');
+
+const toBcPayType = (p) => {
+    if (p === 'Unpaid') return 'UnPaidLeave';
+    return 'PaidLeave'; // Paid + Half Paid both go in as PaidLeave
+};
+const toBcDate = (d) => new Date(d).toISOString().slice(0, 10);
 
 const calculateDays = (from, to) => {
     const diff = new Date(to) - new Date(from);
@@ -43,9 +49,32 @@ exports.applyLeave = async (req, res) => {
             reason
         });
 
+        // Also push the leave into Business Central (best-effort).
+        let bcResult = null;
+        let bcError = null;
+        if (bcConfigured() && leaveFinId != null) {
+            try {
+                const info = await EmployeeInfo.findOne({ user: req.user.id });
+                if (info?.employeeCode) {
+                    bcResult = await createEmployeeLeave({
+                        employeeNumber: info.employeeCode,
+                        payCode: leaveFinId,
+                        leaveStartDate: toBcDate(fromDate),
+                        leaveEndDate: toBcDate(toDate),
+                        payType: toBcPayType(payType || 'Paid')
+                    });
+                } else {
+                    bcError = 'EmployeeInfo missing employeeCode — BC not called.';
+                }
+            } catch (e) {
+                bcError = e.message;
+            }
+        }
+
         res.status(201).json({
             message: "Leave application submitted",
-            leave
+            leave,
+            bc: bcResult ? { ok: true, result: bcResult } : (bcError ? { ok: false, error: bcError } : null)
         });
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err.message });

@@ -170,4 +170,38 @@ const checkLeaveBalance = async (employeeCode, finId, asOfDate) => {
     return parsed;
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance };
+const createEmployeeLeave = async ({ employeeNumber, payCode, leaveStartDate, leaveEndDate, payType }) => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+    if (!employeeNumber) throw new Error('employeeNumber is required.');
+    if (payCode == null) throw new Error('payCode is required.');
+
+    const token = await getAccessToken();
+    const url = `${basePayrollCompanyUrl()}/employeeLeaves`;
+
+    const body = {
+        employeeNumber: String(employeeNumber),
+        payCode: Number(payCode),
+        leaveStartDate,
+        leaveEndDate,
+        payType
+    };
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`BC createEmployeeLeave failed: ${res.status} ${text}`);
+    }
+
+    return res.json().catch(() => ({}));
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave };
