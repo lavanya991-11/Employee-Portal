@@ -14,6 +14,11 @@ const leaveSchema = new mongoose.Schema({
         type: Number,
         default: null
     },
+    payType: {
+        type: String,
+        enum: ['Paid', 'Unpaid', 'Half Paid'],
+        default: 'Paid'
+    },
     fromDate: {
         type: Date,
         required: true

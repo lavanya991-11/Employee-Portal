@@ -16,6 +16,8 @@ function ApplyLeave() {
     const [form, setForm] = useState({
         leaveType: initialType,
         leaveFinId: null,
+        payType: 'Paid',
+        payTypeManual: false,
         fromDate: '',
         toDate: '',
         session: 'Full Day',
@@ -90,6 +92,19 @@ function ApplyLeave() {
         setForm((f) => ({ ...f, noOfDays: computed }));
     }, [form.fromDate, form.toDate, form.session]);
 
+    // Auto-set Pay Type from available balance (skip if user manually overrode).
+    useEffect(() => {
+        setForm((f) => {
+            if (f.payTypeManual) return f;
+            const avail = Number(f.availableLeaves) || 0;
+            const days = Number(f.noOfDays) || 0;
+            let next = 'Paid';
+            if (avail <= 0) next = 'Unpaid';
+            else if (days > avail) next = 'Half Paid';
+            return { ...f, payType: next };
+        });
+    }, [form.availableLeaves, form.noOfDays]);
+
     // Auto-recalculate Balance when Available or No Of Days change.
     useEffect(() => {
         setForm((f) => ({ ...f, balanceLeaves: Math.max(0, Number(f.availableLeaves) - Number(f.noOfDays)) }));
@@ -122,6 +137,7 @@ function ApplyLeave() {
             await leaveApi.apply({
                 leaveType: form.leaveType,
                 leaveFinId: form.leaveFinId,
+                payType: form.payType,
                 fromDate: form.fromDate,
                 toDate: form.toDate,
                 reason: form.reason
@@ -139,6 +155,7 @@ function ApplyLeave() {
         const first = leaveOptions[0];
         setForm({
             leaveType: first?.description || '', leaveFinId: first?.finId || null,
+            payType: 'Paid', payTypeManual: false,
             fromDate: '', toDate: '', session: 'Full Day',
             reason: '', attachment: null, docDate: today(), docSeries: '2', docNumber: 9,
             assignedLeaves: 0, availableLeaves: 0, noOfDays: 0, balanceLeaves: 0
@@ -328,6 +345,21 @@ function ApplyLeave() {
                                     <div className="erp-field">
                                         <label>Balance Leaves</label>
                                         <input type="number" name="balanceLeaves" value={form.balanceLeaves} readOnly className="erp-readonly" />
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Pay Type *</label>
+                                        <select
+                                            name="payType"
+                                            value={form.payType}
+                                            onChange={(e) => {
+                                                setForm({ ...form, payType: e.target.value, payTypeManual: true });
+                                                setError(''); setSuccess('');
+                                            }}
+                                        >
+                                            <option value="Paid">Paid</option>
+                                            <option value="Unpaid">Unpaid</option>
+                                            <option value="Half Paid">Half Paid</option>
+                                        </select>
                                     </div>
                                     <div className="erp-field erp-field-wide">
                                         <label>Reasons *</label>
