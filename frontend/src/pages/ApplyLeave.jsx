@@ -93,17 +93,15 @@ function ApplyLeave() {
     }, [form.fromDate, form.toDate, form.session]);
 
     // Auto-set Pay Type from available balance (skip if user manually overrode).
+    //   balance > 0  → Paid
+    //   balance <= 0 → Unpaid
     useEffect(() => {
         setForm((f) => {
             if (f.payTypeManual) return f;
             const avail = Number(f.availableLeaves) || 0;
-            const days = Number(f.noOfDays) || 0;
-            let next = 'Paid';
-            if (avail <= 0) next = 'Unpaid';
-            else if (days > avail) next = 'Half Paid';
-            return { ...f, payType: next };
+            return { ...f, payType: avail > 0 ? 'Paid' : 'Unpaid' };
         });
-    }, [form.availableLeaves, form.noOfDays]);
+    }, [form.availableLeaves]);
 
     // Auto-recalculate Balance when Available or No Of Days change.
     useEffect(() => {
