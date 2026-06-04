@@ -1,19 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { authApi, leaveApi, employeeInfoApi } from '../services/api';
+import { authApi, leaveApi, employeeInfoApi, finElementApi } from '../services/api';
 
 const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 
-function CircleStat({ label, value, total, color, addLink }) {
+function CircleStat({ options, selected, onChange, assigned, balance, availed, color }) {
+    const total = Number(assigned) || 0;
+    const value = Number(availed) || 0;
     const pct = total ? Math.round((value / total) * 100) : 0;
     const circ = 2 * Math.PI * 28;
     const offset = circ - (pct / 100) * circ;
     return (
         <div className="leave-stat">
             <div className="leave-stat-title">
-                <span>{label}</span>
-                {addLink && <Link to={addLink} className="leave-add-btn" title="Apply">+</Link>}
+                <select
+                    value={selected ?? ''}
+                    onChange={(e) => onChange(Number(e.target.value))}
+                    style={{ fontSize: 12, padding: '2px 6px', border: '1px solid #d1d5db', borderRadius: 4, fontWeight: 600 }}
+                >
+                    {options.length === 0 && <option value="">No leave types</option>}
+                    {options.map((o) => (
+                        <option key={o.finId} value={o.finId}>{o.finId} - {o.description}</option>
+                    ))}
+                </select>
             </div>
             <svg width="74" height="74">
                 <circle cx="37" cy="37" r="28" fill="none" stroke="#e5e7eb" strokeWidth="6" />
@@ -24,7 +34,7 @@ function CircleStat({ label, value, total, color, addLink }) {
             </svg>
             <div className="leave-stat-numbers">
                 <div><b>{total}</b><span>Assigned</span></div>
-                <div><b>{total - value}</b><span>Bal</span></div>
+                <div><b>{Number(balance) || 0}</b><span>Bal</span></div>
                 <div><b>{value}</b><span>Availed</span></div>
             </div>
         </div>
@@ -37,6 +47,11 @@ function MyInformation() {
     const [allEmployees, setAllEmployees] = useState([]);
     const [selectedEmpCode, setSelectedEmpCode] = useState('');
     const [leaves, setLeaves] = useState([]);
+    const [leaveOptions, setLeaveOptions] = useState([]); // [{ finId, description }]
+    const [leftFinId, setLeftFinId] = useState(null);
+    const [rightFinId, setRightFinId] = useState(null);
+    const [leftBal, setLeftBal] = useState({ entitlement: 0, taken: 0, balance: 0 });
+    const [rightBal, setRightBal] = useState({ entitlement: 0, taken: 0, balance: 0 });
     const [checkInTime, setCheckInTime] = useState('--:--');
     const [checkOutTime, setCheckOutTime] = useState('--:--');
     const [calendarDate, setCalendarDate] = useState(new Date());
@@ -70,7 +85,35 @@ function MyInformation() {
         leaveApi.myLeaves().then(({ data }) => {
             setLeaves(data.leaves || []);
         }).catch(() => {});
+
+        finElementApi.list().then(({ data }) => {
+            const items = (data.items || [])
+                .filter((it) => ['PaidLeave', 'UnPaidLeave'].includes(it.finType))
+                .map((it) => ({ finId: it.finId, description: it.description || `FIN ${it.finId}` }));
+            setLeaveOptions(items);
+            if (items[0]) setLeftFinId(items[0].finId);
+            if (items[1]) setRightFinId(items[1].finId);
+            else if (items[0]) setRightFinId(items[0].finId);
+        }).catch(() => {});
     }, []);
+
+    // Fetch BC balance for the LEFT card whenever the selected leave type changes.
+    useEffect(() => {
+        if (!leftFinId) return;
+        leaveApi.bcBalance(leftFinId).then(({ data }) => {
+            const r = data.result || {};
+            setLeftBal({ entitlement: Number(r.entitlement) || 0, taken: Number(r.taken) || 0, balance: Number(r.balance) || 0 });
+        }).catch(() => setLeftBal({ entitlement: 0, taken: 0, balance: 0 }));
+    }, [leftFinId]);
+
+    // Fetch BC balance for the RIGHT card whenever the selected leave type changes.
+    useEffect(() => {
+        if (!rightFinId) return;
+        leaveApi.bcBalance(rightFinId).then(({ data }) => {
+            const r = data.result || {};
+            setRightBal({ entitlement: Number(r.entitlement) || 0, taken: Number(r.taken) || 0, balance: Number(r.balance) || 0 });
+        }).catch(() => setRightBal({ entitlement: 0, taken: 0, balance: 0 }));
+    }, [rightFinId]);
 
     const sickAvailed = leaves.filter((l) => l.leaveType === 'Sick' && l.status === 'Approved').reduce((s, l) => s + (l.totalDays || 0), 0);
     const casualAvailed = leaves.filter((l) => l.leaveType === 'Casual' && l.status === 'Approved').reduce((s, l) => s + (l.totalDays || 0), 0);
@@ -208,8 +251,24 @@ function MyInformation() {
                             </select>
                         </div>
                         <div className="leaves-stats">
-                            <CircleStat label="SickLeaves" value={sickAvailed} total={21} color="#3b82f6" addLink="/leaves/apply?type=Sick" />
-                            <CircleStat label="CasualLeaves" value={casualAvailed} total={12} color="#22c55e" addLink="/leaves/apply?type=Casual" />
+                            <CircleStat
+                                options={leaveOptions}
+                                selected={leftFinId}
+                                onChange={setLeftFinId}
+                                assigned={leftBal.entitlement}
+                                balance={leftBal.balance}
+                                availed={leftBal.taken}
+                                color="#3b82f6"
+                            />
+                            <CircleStat
+                                options={leaveOptions}
+                                selected={rightFinId}
+                                onChange={setRightFinId}
+                                assigned={rightBal.entitlement}
+                                balance={rightBal.balance}
+                                availed={rightBal.taken}
+                                color="#22c55e"
+                            />
                         </div>
                     </div>
 
