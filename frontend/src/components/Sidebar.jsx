@@ -53,12 +53,12 @@ function Sidebar() {
                     </>
                 )}
 
-                <Link to="/leaves/my" className="nav-item">
-                    <span className="nav-item-icon">📅</span> Apply Leave
-                </Link>
-
                 <Link to="/employee-information" className="nav-item">
                     <span className="nav-item-icon">👨‍💼</span> Employee Information
+                </Link>
+
+                <Link to="/leaves/my" className="nav-item">
+                    <span className="nav-item-icon">📅</span> Apply Leave
                 </Link>
 
                 {['manager', 'admin', 'super-admin'].includes(user.role) && (
