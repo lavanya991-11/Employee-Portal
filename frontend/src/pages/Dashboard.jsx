@@ -9,6 +9,7 @@ function Dashboard() {
     const [info, setInfo] = useState(null);
     const [recentLeaves, setRecentLeaves] = useState([]);
     const [notificationCount, setNotificationCount] = useState(0);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
 
     const isManager = ['manager', 'admin', 'super-admin'].includes(user.role);
 
@@ -89,16 +90,52 @@ function Dashboard() {
                         className="notification-bell"
                         title={isManager ? 'Pending approvals' : 'Your pending leaves'}
                         onClick={onBellClick}
-                        style={{ marginRight: 12 }}
+                        style={{ marginRight: 16 }}
                     >
                         🔔
                         {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
                     </button>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginRight: 12, fontSize: 12, lineHeight: 1.3 }}>
-                        <span style={{ fontWeight: 600, color: '#111827' }}>{user.name || displayName}</span>
-                        <span style={{ color: '#6b7280' }}>{user.email || ''}</span>
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            type="button"
+                            onClick={() => setUserMenuOpen((v) => !v)}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 10,
+                                background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px 8px'
+                            }}
+                        >
+                            <span style={{
+                                width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: '#fff',
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700
+                            }}>{avatarInitial}</span>
+                            <span style={{ fontWeight: 600, color: '#111827' }}>{user.name || displayName}</span>
+                        </button>
+                        {userMenuOpen && (
+                            <div style={{
+                                position: 'absolute', top: '100%', right: 0, marginTop: 6,
+                                background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8,
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.08)', minWidth: 180, zIndex: 50, overflow: 'hidden'
+                            }}>
+                                <div style={{ padding: '10px 14px', borderBottom: '1px solid #f3f4f6', fontSize: 12, color: '#6b7280' }}>
+                                    {user.email || ''}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => { setUserMenuOpen(false); navigate('/profile'); }}
+                                    style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', color: '#111827' }}
+                                >
+                                    <span>👤</span> My Profile
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { setUserMenuOpen(false); handleLogout(); }}
+                                    style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', color: '#dc2626', fontWeight: 600 }}
+                                >
+                                    <span>↪</span> Logout
+                                </button>
+                            </div>
+                        )}
                     </div>
-                    <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
                 </div>
 
                 <div className="dashboard-grid">
