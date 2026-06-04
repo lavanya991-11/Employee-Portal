@@ -12,6 +12,7 @@ function ApplyLeave() {
     const initialType = searchParams.get('type') || '';
 
     const [leaveOptions, setLeaveOptions] = useState([]); // [{ finId, description }, ...]
+    const [existingLeaves, setExistingLeaves] = useState([]); // user's pending/approved leaves
 
     const [form, setForm] = useState({
         leaveType: initialType,
@@ -36,6 +37,14 @@ function ApplyLeave() {
     const [success, setSuccess] = useState('');
     const [saving, setSaving] = useState(false);
     const [actionsOpen, setActionsOpen] = useState(true);
+
+    // Load user's existing leaves once so we can warn about duplicates.
+    useEffect(() => {
+        leaveApi.myLeaves().then(({ data }) => {
+            const active = (data.leaves || []).filter((l) => ['Pending', 'Approved'].includes(l.status));
+            setExistingLeaves(active);
+        }).catch(() => {});
+    }, []);
 
     // Load leave-type FIN elements (PaidLeave + UnPaidLeave) from MongoDB.
     useEffect(() => {
@@ -68,6 +77,18 @@ function ApplyLeave() {
         });
     }, [form.leaveFinId, form.docDate]);
 
+    // Find an overlapping existing leave (if any).
+    const findOverlap = (fromStr, toStr) => {
+        if (!fromStr || !toStr) return null;
+        const from = new Date(fromStr);
+        const to = new Date(toStr);
+        return existingLeaves.find((l) => {
+            const lf = new Date(l.fromDate);
+            const lt = new Date(l.toDate);
+            return lf <= to && lt >= from;
+        }) || null;
+    };
+
     // Auto-calculate No Of Days when dates / session change.
     useEffect(() => {
         if (!form.fromDate || !form.toDate) {
@@ -84,6 +105,12 @@ function ApplyLeave() {
             setError('Leave To Date cannot be before Leave From Date.');
             setForm((f) => ({ ...f, noOfDays: 0 }));
             return;
+        }
+        const dup = findOverlap(form.fromDate, form.toDate);
+        if (dup) {
+            const f1 = new Date(dup.fromDate).toLocaleDateString('en-GB');
+            const t1 = new Date(dup.toDate).toLocaleDateString('en-GB');
+            setError(`You already have a ${dup.status.toLowerCase()} ${dup.leaveType} leave from ${f1} to ${t1}. Cannot apply on the same date.`);
         }
         const days = Math.round((to - from) / 86400000) + 1; // inclusive
         // Full Day = N. Half Day session = N - 0.5 (one day in the range is a half).
@@ -124,6 +151,13 @@ function ApplyLeave() {
         }
         if (new Date(form.toDate) < new Date(form.fromDate)) {
             setError('LeaveToDate cannot be before LeaveFromDate.');
+            return;
+        }
+        const dup = findOverlap(form.fromDate, form.toDate);
+        if (dup) {
+            const f1 = new Date(dup.fromDate).toLocaleDateString('en-GB');
+            const t1 = new Date(dup.toDate).toLocaleDateString('en-GB');
+            setError(`You already have a ${dup.status.toLowerCase()} ${dup.leaveType} leave from ${f1} to ${t1}. Cannot apply on the same date.`);
             return;
         }
         if (Number(form.noOfDays) > Number(form.availableLeaves)) {

@@ -15,6 +15,21 @@ exports.applyLeave = async (req, res) => {
             return res.status(400).json({ message: "toDate cannot be before fromDate" });
         }
 
+        // Block duplicate / overlapping leave for this employee.
+        const overlap = await Leave.findOne({
+            employee: req.user.id,
+            status: { $in: ['Pending', 'Approved'] },
+            fromDate: { $lte: new Date(toDate) },
+            toDate: { $gte: new Date(fromDate) }
+        });
+        if (overlap) {
+            const f = new Date(overlap.fromDate).toLocaleDateString('en-GB');
+            const t = new Date(overlap.toDate).toLocaleDateString('en-GB');
+            return res.status(400).json({
+                message: `You already have a ${overlap.status.toLowerCase()} ${overlap.leaveType} leave from ${f} to ${t}. Cannot create another leave on the same date.`
+            });
+        }
+
         const totalDays = calculateDays(fromDate, toDate);
 
         const leave = await Leave.create({
