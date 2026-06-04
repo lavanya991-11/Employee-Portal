@@ -42,6 +42,9 @@ exports.getAllAssets = async (req, res) => {
 
 exports.updateAssetStatus = async (req, res) => {
     try {
+        if (req.user.role !== 'super-admin') {
+            return res.status(403).json({ message: "Only Super Admin can approve or reject requests." });
+        }
         const { id } = req.params;
         const { status, approverRemarks } = req.body;
 

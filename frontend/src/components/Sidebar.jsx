@@ -65,7 +65,7 @@ function Sidebar() {
                     </>
                 )}
 
-                {['manager', 'admin', 'super-admin'].includes(user.role) && (
+                {user.role === 'super-admin' && (
                     <Link to="/approvals" className="nav-item">
                         <span className="nav-item-icon">✅</span> Approvals
                     </Link>
