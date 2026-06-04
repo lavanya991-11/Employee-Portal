@@ -261,15 +261,6 @@ function MyInformation() {
                                 availed={availedFor(leftFinId)}
                                 color="#3b82f6"
                             />
-                            <CircleStat
-                                options={leaveOptions}
-                                selected={rightFinId}
-                                onChange={setRightFinId}
-                                assigned={rightBal.entitlement}
-                                balance={rightBal.balance}
-                                availed={availedFor(rightFinId)}
-                                color="#22c55e"
-                            />
                         </div>
                     </div>
 
