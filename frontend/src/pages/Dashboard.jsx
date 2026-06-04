@@ -85,15 +85,20 @@ function Dashboard() {
                         <h2>Good {timeOfDay}, {displayName} 👋</h2>
                         <p>{displayDesignation} • {displayDepartment}</p>
                     </div>
-                    <button className="btn btn-danger" onClick={handleLogout} style={{ marginRight: 12 }}>Logout</button>
                     <button
                         className="notification-bell"
                         title={isManager ? 'Pending approvals' : 'Your pending leaves'}
                         onClick={onBellClick}
+                        style={{ marginRight: 12 }}
                     >
                         🔔
                         {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
                     </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginRight: 12, fontSize: 12, lineHeight: 1.3 }}>
+                        <span style={{ fontWeight: 600, color: '#111827' }}>{user.name || displayName}</span>
+                        <span style={{ color: '#6b7280' }}>{user.email || ''}</span>
+                    </div>
+                    <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
                 </div>
 
                 <div className="dashboard-grid">
