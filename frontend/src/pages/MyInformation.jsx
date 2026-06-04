@@ -115,8 +115,9 @@ function MyInformation() {
         }).catch(() => setRightBal({ entitlement: 0, taken: 0, balance: 0 }));
     }, [rightFinId]);
 
-    const sickAvailed = leaves.filter((l) => l.leaveType === 'Sick' && l.status === 'Approved').reduce((s, l) => s + (l.totalDays || 0), 0);
-    const casualAvailed = leaves.filter((l) => l.leaveType === 'Casual' && l.status === 'Approved').reduce((s, l) => s + (l.totalDays || 0), 0);
+    const availedFor = (finId) => leaves
+        .filter((l) => l.leaveFinId === finId && l.status === 'Approved')
+        .reduce((s, l) => s + (l.totalDays || 0), 0);
 
     const handleCheckIn = () => {
         setCheckInTime(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
@@ -257,7 +258,7 @@ function MyInformation() {
                                 onChange={setLeftFinId}
                                 assigned={leftBal.entitlement}
                                 balance={leftBal.balance}
-                                availed={leftBal.taken}
+                                availed={availedFor(leftFinId)}
                                 color="#3b82f6"
                             />
                             <CircleStat
@@ -266,7 +267,7 @@ function MyInformation() {
                                 onChange={setRightFinId}
                                 assigned={rightBal.entitlement}
                                 balance={rightBal.balance}
-                                availed={rightBal.taken}
+                                availed={availedFor(rightFinId)}
                                 color="#22c55e"
                             />
                         </div>
