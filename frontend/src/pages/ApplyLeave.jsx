@@ -198,14 +198,11 @@ function ApplyLeave() {
             const { data } = editId
                 ? await leaveApi.update(editId, payload)
                 : await leaveApi.apply(payload);
-            const bcResults = Array.isArray(data?.bc) ? data.bc : [];
-            const bcOk = bcResults.length > 0 && bcResults.every((r) => r.ok);
-            const bcFails = bcResults.filter((r) => !r.ok);
             let msg = data?.message || 'Leave application submitted.';
-            if (bcOk) msg += ` ${bcResults.length === 1 ? 'Pushed to Business Central.' : `${bcResults.length} lines pushed to Business Central.`}`;
-            else if (bcFails.length > 0) msg += ` BC sync failed for ${bcFails.length} line(s): ${bcFails.map((f) => f.error).join(' | ')}`;
+            if (data?.bc?.ok) msg += ' Pushed to Business Central.';
+            else if (data?.bc?.error) msg += ` BC sync failed: ${data.bc.error}`;
             setSuccess(msg);
-            setTimeout(() => navigate('/leaves/my'), 1800);
+            setTimeout(() => navigate('/leaves/my'), 1500);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to apply leave');
         } finally {
