@@ -170,7 +170,7 @@ const checkLeaveBalance = async (employeeCode, finId, asOfDate) => {
     return parsed;
 };
 
-const createEmployeeLeave = async ({ employeeNumber, payCode, leaveStartDate, leaveEndDate, payType }) => {
+const createEmployeeLeave = async ({ employeeNumber, payCode, leaveStartDate, leaveEndDate, payType, leaveReferenceNumber }) => {
     if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
     if (!employeeNumber) throw new Error('employeeNumber is required.');
     if (payCode == null) throw new Error('payCode is required.');
@@ -183,7 +183,8 @@ const createEmployeeLeave = async ({ employeeNumber, payCode, leaveStartDate, le
         payCode: Number(payCode),
         leaveStartDate,
         leaveEndDate,
-        payType
+        payType,
+        ...(leaveReferenceNumber ? { leaveReferenceNumber } : {})
     };
 
     const res = await fetch(url, {

@@ -50,16 +50,18 @@ exports.applyLeave = async (req, res) => {
             } catch (_) { /* fall back to no-split */ }
         }
 
-        // Build the leave segments: 1 segment normally, 2 segments when balance < totalDays.
+        // Build segments per the org's Pay Type rule:
+        //   balance > 0 → those days are UnPaid (consume balance)
+        //   balance = 0 → remaining days are Paid
         const segments = [];
-        if (totalDays <= availableBalance) {
+        if (availableBalance <= 0) {
             segments.push({
-                payType: payType || 'Paid',
+                payType: 'Paid',
                 fromDate: new Date(fromDate),
                 toDate: new Date(toDate),
                 totalDays
             });
-        } else if (availableBalance <= 0) {
+        } else if (totalDays <= availableBalance) {
             segments.push({
                 payType: 'Unpaid',
                 fromDate: new Date(fromDate),
@@ -67,16 +69,20 @@ exports.applyLeave = async (req, res) => {
                 totalDays
             });
         } else {
-            const paidDays = availableBalance;
-            const unpaidDays = totalDays - paidDays;
-            const paidFrom = new Date(fromDate);
-            const paidTo = new Date(fromDate);
-            paidTo.setDate(paidTo.getDate() + paidDays - 1);
+            const unpaidDays = availableBalance;          // first chunk: within balance → Unpaid
+            const paidDays = totalDays - unpaidDays;      // overflow chunk → Paid
             const unpaidFrom = new Date(fromDate);
-            unpaidFrom.setDate(unpaidFrom.getDate() + paidDays);
-            segments.push({ payType: 'Paid', fromDate: paidFrom, toDate: paidTo, totalDays: paidDays });
-            segments.push({ payType: 'Unpaid', fromDate: unpaidFrom, toDate: new Date(toDate), totalDays: unpaidDays });
+            const unpaidTo = new Date(fromDate);
+            unpaidTo.setDate(unpaidTo.getDate() + unpaidDays - 1);
+            const paidFrom = new Date(fromDate);
+            paidFrom.setDate(paidFrom.getDate() + unpaidDays);
+            segments.push({ payType: 'Unpaid', fromDate: unpaidFrom, toDate: unpaidTo, totalDays: unpaidDays });
+            segments.push({ payType: 'Paid', fromDate: paidFrom, toDate: new Date(toDate), totalDays: paidDays });
         }
+
+        // Generate a shared reference number for all segments of this application.
+        const totalLeavesSoFar = await Leave.countDocuments();
+        const leaveReferenceNumber = `PR${String(totalLeavesSoFar + 1).padStart(6, '0')}`;
 
         // Create each segment in MongoDB and push to BC.
         const leaves = [];
@@ -86,6 +92,7 @@ exports.applyLeave = async (req, res) => {
                 employee: req.user.id,
                 leaveType,
                 leaveFinId: leaveFinId ?? null,
+                leaveReferenceNumber,
                 payType: seg.payType,
                 fromDate: seg.fromDate,
                 toDate: seg.toDate,
@@ -101,7 +108,8 @@ exports.applyLeave = async (req, res) => {
                         payCode: leaveFinId,
                         leaveStartDate: toBcDate(seg.fromDate),
                         leaveEndDate: toBcDate(seg.toDate),
-                        payType: toBcPayType(seg.payType)
+                        payType: toBcPayType(seg.payType),
+                        leaveReferenceNumber
                     });
                     bc.push({ ok: true, payType: seg.payType, days: seg.totalDays, result });
                 } catch (e) {
@@ -111,8 +119,8 @@ exports.applyLeave = async (req, res) => {
         }
 
         const message = segments.length > 1
-            ? `Leave split: ${segments[0].totalDays} day(s) Paid + ${segments[1].totalDays} day(s) Unpaid.`
-            : 'Leave application submitted';
+            ? `Leave split (${leaveReferenceNumber}): ${segments[0].totalDays} day(s) Unpaid + ${segments[1].totalDays} day(s) Paid.`
+            : `Leave application submitted (${leaveReferenceNumber})`;
 
         res.status(201).json({ message, leaves, bc });
     } catch (err) {

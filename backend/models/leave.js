@@ -14,6 +14,10 @@ const leaveSchema = new mongoose.Schema({
         type: Number,
         default: null
     },
+    leaveReferenceNumber: {
+        type: String,
+        default: ''
+    },
     payType: {
         type: String,
         enum: ['Paid', 'Unpaid', 'Half Paid'],
