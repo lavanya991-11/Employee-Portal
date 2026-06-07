@@ -6,7 +6,8 @@ const {
     getMyLeaves,
     getAllLeaves,
     updateLeaveStatus,
-    bcLeaveBalance
+    bcLeaveBalance,
+    cancelMyLeave
 } = require('../controllers/leaveController');
 
 router.post('/apply', protect, applyLeave);
@@ -14,5 +15,6 @@ router.get('/my', protect, getMyLeaves);
 router.get('/all', protect, getAllLeaves);
 router.get('/bc-balance', protect, bcLeaveBalance);
 router.put('/:id/status', protect, updateLeaveStatus);
+router.delete('/:id', protect, cancelMyLeave);
 
 module.exports = router;
