@@ -61,6 +61,37 @@ function MyLeaves() {
         }
     };
 
+    // Group leaves that share the same leaveReferenceNumber (split Paid+Unpaid lines).
+    const groupedLeaves = useMemo(() => {
+        const byRef = new Map();
+        for (const l of leaves) {
+            const key = l.leaveReferenceNumber || `single-${l._id}`;
+            if (!byRef.has(key)) byRef.set(key, []);
+            byRef.get(key).push(l);
+        }
+        return Array.from(byRef.entries()).map(([ref, items]) => {
+            const sorted = [...items].sort((a, b) => new Date(a.fromDate) - new Date(b.fromDate));
+            const first = sorted[0];
+            const last = sorted[sorted.length - 1];
+            const totalDays = items.reduce((s, l) => s + (l.totalDays || 0), 0);
+            const payTypes = items.map((l) => `${l.totalDays} ${l.payType}`).join(' + ');
+            return {
+                _id: first._id,
+                ids: items.map((l) => l._id),
+                refNumber: ref.startsWith('single-') ? null : ref,
+                items,
+                createdAt: first.createdAt,
+                leaveType: first.leaveType,
+                leaveFinId: first.leaveFinId,
+                fromDate: first.fromDate,
+                toDate: last.toDate,
+                totalDays,
+                status: first.status,
+                payTypes: items.length > 1 ? payTypes : null
+            };
+        });
+    }, [leaves]);
+
     const stats = useMemo(() => {
         const total = leaves.length;
         const counts = leaves.reduce((acc, l) => { acc[l.status] = (acc[l.status] || 0) + 1; return acc; }, {});
@@ -112,24 +143,31 @@ function MyLeaves() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {leaves.map((l) => {
-                                            const isSel = selected?._id === l._id;
+                                        {groupedLeaves.map((g) => {
+                                            const isSel = selected?._id === g._id;
                                             return (
                                                 <tr
-                                                    key={l._id}
+                                                    key={g._id}
                                                     className={isSel ? 'erp-row-selected' : ''}
-                                                    onClick={() => setSelected(l)}
+                                                    onClick={() => setSelected(g.items[0])}
                                                 >
                                                     <td><input type="checkbox" checked={isSel} readOnly /></td>
-                                                    <td>{fmtDate(l.createdAt)}</td>
-                                                    <td className="erp-doc-link">{docNo(l)}</td>
-                                                    <td>{l.leaveType}</td>
-                                                    <td>{fmtDate(l.fromDate)}</td>
-                                                    <td>{fmtDate(l.toDate)}</td>
-                                                    <td>{l.totalDays}</td>
+                                                    <td>{fmtDate(g.createdAt)}</td>
+                                                    <td className="erp-doc-link">{g.refNumber || docNo(g.items[0])}</td>
                                                     <td>
-                                                        <span style={{ color: STATUS_COLOR[l.status] || '#374151', fontWeight: 600 }}>
-                                                            {STATUS_LABEL[l.status] || l.status}
+                                                        {g.leaveType}
+                                                        {g.payTypes && (
+                                                            <span style={{ display: 'block', fontSize: 11, color: '#6b7280', marginTop: 2 }}>
+                                                                {g.payTypes}
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td>{fmtDate(g.fromDate)}</td>
+                                                    <td>{fmtDate(g.toDate)}</td>
+                                                    <td>{g.totalDays}</td>
+                                                    <td>
+                                                        <span style={{ color: STATUS_COLOR[g.status] || '#374151', fontWeight: 600 }}>
+                                                            {STATUS_LABEL[g.status] || g.status}
                                                         </span>
                                                     </td>
                                                 </tr>
