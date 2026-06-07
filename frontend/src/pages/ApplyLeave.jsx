@@ -174,14 +174,14 @@ function ApplyLeave() {
                 toDate: form.toDate,
                 reason: form.reason
             });
-            if (data?.bc?.ok) {
-                setSuccess('Leave submitted and pushed to Business Central.');
-            } else if (data?.bc?.error) {
-                setSuccess(`Leave submitted. BC sync failed: ${data.bc.error}`);
-            } else {
-                setSuccess('Leave application submitted.');
-            }
-            setTimeout(() => navigate('/leaves/my'), 1500);
+            const bcResults = Array.isArray(data?.bc) ? data.bc : [];
+            const bcOk = bcResults.length > 0 && bcResults.every((r) => r.ok);
+            const bcFails = bcResults.filter((r) => !r.ok);
+            let msg = data?.message || 'Leave application submitted.';
+            if (bcOk) msg += ` ${bcResults.length === 1 ? 'Pushed to Business Central.' : `${bcResults.length} lines pushed to Business Central.`}`;
+            else if (bcFails.length > 0) msg += ` BC sync failed for ${bcFails.length} line(s): ${bcFails.map((f) => f.error).join(' | ')}`;
+            setSuccess(msg);
+            setTimeout(() => navigate('/leaves/my'), 1800);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to apply leave');
         } finally {
