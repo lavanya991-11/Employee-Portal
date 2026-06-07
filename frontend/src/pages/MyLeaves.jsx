@@ -25,6 +25,27 @@ function MyLeaves() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selected, setSelected] = useState(null);
+    const [message, setMessage] = useState('');
+
+    const onEdit = () => {
+        if (!selected) { alert('Select a row first.'); return; }
+        if (selected.status !== 'Pending') {
+            alert(`Cannot edit a ${selected.status.toLowerCase()} leave.`);
+            return;
+        }
+        navigate(`/leaves/apply?edit=${selected._id}`);
+    };
+
+    const onRegenerate = async () => {
+        setMessage('Regenerating from server…');
+        try {
+            await load();
+            setMessage(`Regenerated · ${leaves.length} record(s) refreshed at ${new Date().toLocaleTimeString('en-GB')}`);
+            setTimeout(() => setMessage(''), 3000);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Regenerate failed');
+        }
+    };
 
     useEffect(() => { load(); }, []);
 
@@ -62,13 +83,16 @@ function MyLeaves() {
                         <div className="erp-title">Apply Leave</div>
                         <div className="erp-titlebar-actions">
                             <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
+                            <button className="erp-action-btn" onClick={onEdit} disabled={!selected}>✏️ Edit</button>
                             <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
+                            <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
                         </div>
                     </div>
 
                     <div className="erp-body">
                         <div className="erp-list-card">
                             {error && <div className="error">{error}</div>}
+                            {message && <div className="success">{message}</div>}
                             {loading && <p style={{ padding: 16 }}>Loading…</p>}
                             {!loading && leaves.length === 0 && (
                                 <p style={{ padding: 16, color: '#888' }}>No leave requests yet. Click <b>New</b> to apply.</p>
