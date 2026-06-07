@@ -160,10 +160,6 @@ function ApplyLeave() {
             setError(`You already have a ${dup.status.toLowerCase()} ${dup.leaveType} leave from ${f1} to ${t1}. Cannot apply on the same date.`);
             return;
         }
-        if (Number(form.noOfDays) > Number(form.availableLeaves)) {
-            setError(`Not enough balance. Available: ${form.availableLeaves}, requested: ${form.noOfDays}.`);
-            return;
-        }
         setSaving(true);
         try {
             const { data } = await leaveApi.apply({
