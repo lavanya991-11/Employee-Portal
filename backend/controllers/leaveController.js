@@ -71,10 +71,8 @@ exports.applyLeave = async (req, res) => {
             segments.push({ payType: 'Paid', fromDate: paidFrom, toDate: new Date(toDate), totalDays: paidDays });
         }
 
-        // Single reference number shared across all segments of this application.
-        const totalLeavesSoFar = await Leave.countDocuments();
-        const leaveReferenceNumber = `PR${String(totalLeavesSoFar + 1).padStart(6, '0')}`;
-
+        // BC auto-generates its own leaveReferenceNumber.
+        // We create the MongoDB row first (no ref yet), POST to BC, then save BC's ref back.
         const leaves = [];
         const bc = [];
         for (const seg of segments) {
@@ -82,14 +80,12 @@ exports.applyLeave = async (req, res) => {
                 employee: req.user.id,
                 leaveType,
                 leaveFinId: leaveFinId ?? null,
-                leaveReferenceNumber,
                 payType: seg.payType,
                 fromDate: seg.fromDate,
                 toDate: seg.toDate,
                 totalDays: seg.totalDays,
                 reason: segments.length > 1 ? `${reason} (${seg.payType} part)` : reason
             });
-            leaves.push(created);
 
             if (bcConfigured() && leaveFinId != null && employeeCode) {
                 try {
@@ -98,19 +94,27 @@ exports.applyLeave = async (req, res) => {
                         payCode: leaveFinId,
                         leaveStartDate: toBcDate(seg.fromDate),
                         leaveEndDate: toBcDate(seg.toDate),
-                        payType: toBcPayType(seg.payType),
-                        leaveReferenceNumber
+                        payType: toBcPayType(seg.payType)
+                        // Don't send leaveReferenceNumber — BC generates it.
                     });
-                    bc.push({ ok: true, payType: seg.payType, days: seg.totalDays, result });
+                    // Capture BC's generated reference and store on our row.
+                    const bcRef = result?.leaveReferenceNumber || result?.LeaveReferenceNumber || null;
+                    if (bcRef) {
+                        created.leaveReferenceNumber = bcRef;
+                        await created.save();
+                    }
+                    bc.push({ ok: true, payType: seg.payType, days: seg.totalDays, leaveReferenceNumber: bcRef, result });
                 } catch (e) {
                     bc.push({ ok: false, payType: seg.payType, days: seg.totalDays, error: e.message });
                 }
             }
+            leaves.push(created);
         }
 
+        const refs = leaves.map((l) => l.leaveReferenceNumber).filter(Boolean);
         const message = segments.length > 1
-            ? `Leave split (${leaveReferenceNumber}): ${segments[0].totalDays} day(s) Unpaid + ${segments[1].totalDays} day(s) Paid.`
-            : `Leave application submitted (${leaveReferenceNumber})`;
+            ? `Leave split: ${segments[0].totalDays} day(s) Unpaid + ${segments[1].totalDays} day(s) Paid${refs.length ? ` (BC refs: ${refs.join(', ')})` : ''}.`
+            : `Leave application submitted${refs.length ? ` (BC ref: ${refs[0]})` : ''}.`;
 
         res.status(201).json({ message, leaves, bc });
     } catch (err) {
