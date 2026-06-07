@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { leaveApi } from '../services/api';
@@ -26,6 +26,18 @@ function MyLeaves() {
     const [error, setError] = useState('');
     const [selected, setSelected] = useState(null);
     const [message, setMessage] = useState('');
+    const tableRef = useRef(null);
+
+    // Deselect when clicking outside the table or toolbar.
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (tableRef.current && !tableRef.current.contains(e.target)) {
+                setSelected(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const onEdit = () => {
         if (!selected) { alert('Select a row first.'); return; }
@@ -90,7 +102,7 @@ function MyLeaves() {
                     </div>
 
                     <div className="erp-body">
-                        <div className="erp-list-card">
+                        <div className="erp-list-card" ref={tableRef}>
                             {error && <div className="error">{error}</div>}
                             {message && <div className="success">{message}</div>}
                             {loading && <p style={{ padding: 16 }}>Loading…</p>}
@@ -118,9 +130,15 @@ function MyLeaves() {
                                                 <tr
                                                     key={l._id}
                                                     className={isSel ? 'erp-row-selected' : ''}
-                                                    onClick={() => setSelected(l)}
+                                                    onClick={() => setSelected(isSel ? null : l)}
                                                 >
-                                                    <td><input type="checkbox" checked={isSel} readOnly /></td>
+                                                    <td onClick={(e) => e.stopPropagation()}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isSel}
+                                                            onChange={() => setSelected(isSel ? null : l)}
+                                                        />
+                                                    </td>
                                                     <td>{fmtDate(l.createdAt)}</td>
                                                     <td className="erp-doc-link">{docNo(l)}</td>
                                                     <td>{l.leaveType}</td>
