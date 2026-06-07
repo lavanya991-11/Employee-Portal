@@ -40,17 +40,6 @@ function MyLeaves() {
         }
     };
 
-    const onDelete = async (l) => {
-        if (!window.confirm(`Delete ${docNo(l)} (${l.leaveType}, ${fmtDate(l.fromDate)} → ${fmtDate(l.toDate)})?`)) return;
-        try {
-            await leaveApi.cancel(l._id);
-            setSelected(null);
-            load();
-        } catch (err) {
-            setError(err.response?.data?.message || 'Delete failed');
-        }
-    };
-
     const stats = useMemo(() => {
         const total = leaves.length;
         const counts = leaves.reduce((acc, l) => { acc[l.status] = (acc[l.status] || 0) + 1; return acc; }, {});
@@ -96,7 +85,6 @@ function MyLeaves() {
                                             <th>To</th>
                                             <th>Days</th>
                                             <th>Status</th>
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -119,20 +107,6 @@ function MyLeaves() {
                                                         <span style={{ color: STATUS_COLOR[l.status] || '#374151', fontWeight: 600 }}>
                                                             {STATUS_LABEL[l.status] || l.status}
                                                         </span>
-                                                    </td>
-                                                    <td onClick={(e) => e.stopPropagation()}>
-                                                        {l.status === 'Pending' ? (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => onDelete(l)}
-                                                                title="Delete this pending leave"
-                                                                style={{ background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca', padding: '3px 10px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}
-                                                            >
-                                                                🗑 Delete
-                                                            </button>
-                                                        ) : (
-                                                            <span style={{ color: '#9ca3af', fontSize: 12 }}>—</span>
-                                                        )}
                                                     </td>
                                                 </tr>
                                             );
