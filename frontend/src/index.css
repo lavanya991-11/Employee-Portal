@@ -715,6 +715,7 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 .erp-field input, .erp-field select {
     border: 1px solid #d1d5db; border-radius: 3px;
     padding: 5px 8px; font-size: 13px; background: white;
+    width: 100%; box-sizing: border-box;
 }
 .erp-readonly { background: #f9fafb !important; color: #6b7280; }
 .erp-required { border-color: #ef4444 !important; box-shadow: 0 0 0 1px #fecaca; }
