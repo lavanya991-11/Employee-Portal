@@ -41,41 +41,78 @@ exports.applyLeave = async (req, res) => {
         const info = await EmployeeInfo.findOne({ user: req.user.id });
         const employeeCode = info?.employeeCode || null;
 
-        const leave = await Leave.create({
-            employee: req.user.id,
-            leaveType,
-            leaveFinId: leaveFinId ?? null,
-            payType: payType || 'Paid',
-            fromDate,
-            toDate,
-            totalDays,
-            reason
-        });
-
-        // Best-effort push to Business Central.
-        let bcResult = null;
-        let bcError = null;
+        // Look up live BC balance to decide if we need to split this leave.
+        let availableBalance = totalDays;
         if (bcConfigured() && leaveFinId != null && employeeCode) {
             try {
-                bcResult = await createEmployeeLeave({
-                    employeeNumber: employeeCode,
-                    payCode: leaveFinId,
-                    leaveStartDate: toBcDate(fromDate),
-                    leaveEndDate: toBcDate(toDate),
-                    payType: toBcPayType(payType || 'Paid')
-                });
-            } catch (e) {
-                bcError = e.message;
-            }
-        } else if (!employeeCode) {
-            bcError = 'EmployeeInfo missing employeeCode — BC not called.';
+                const result = await checkLeaveBalance(employeeCode, leaveFinId, toBcDate(fromDate));
+                availableBalance = Number(result?.balance) || 0;
+            } catch (_) { /* fall back to no-split */ }
         }
 
-        res.status(201).json({
-            message: 'Leave application submitted',
-            leave,
-            bc: bcResult ? { ok: true, result: bcResult } : (bcError ? { ok: false, error: bcError } : null)
-        });
+        // Split rule:
+        //   balance = 0           → one segment, Paid
+        //   totalDays ≤ balance   → one segment, Unpaid
+        //   totalDays > balance   → split: first `balance` days Unpaid, overflow days Paid
+        const segments = [];
+        if (availableBalance <= 0) {
+            segments.push({ payType: 'Paid', fromDate: new Date(fromDate), toDate: new Date(toDate), totalDays });
+        } else if (totalDays <= availableBalance) {
+            segments.push({ payType: 'Unpaid', fromDate: new Date(fromDate), toDate: new Date(toDate), totalDays });
+        } else {
+            const unpaidDays = availableBalance;
+            const paidDays = totalDays - unpaidDays;
+            const unpaidFrom = new Date(fromDate);
+            const unpaidTo = new Date(fromDate);
+            unpaidTo.setDate(unpaidTo.getDate() + unpaidDays - 1);
+            const paidFrom = new Date(fromDate);
+            paidFrom.setDate(paidFrom.getDate() + unpaidDays);
+            segments.push({ payType: 'Unpaid', fromDate: unpaidFrom, toDate: unpaidTo, totalDays: unpaidDays });
+            segments.push({ payType: 'Paid', fromDate: paidFrom, toDate: new Date(toDate), totalDays: paidDays });
+        }
+
+        // Single reference number shared across all segments of this application.
+        const totalLeavesSoFar = await Leave.countDocuments();
+        const leaveReferenceNumber = `PR${String(totalLeavesSoFar + 1).padStart(6, '0')}`;
+
+        const leaves = [];
+        const bc = [];
+        for (const seg of segments) {
+            const created = await Leave.create({
+                employee: req.user.id,
+                leaveType,
+                leaveFinId: leaveFinId ?? null,
+                leaveReferenceNumber,
+                payType: seg.payType,
+                fromDate: seg.fromDate,
+                toDate: seg.toDate,
+                totalDays: seg.totalDays,
+                reason: segments.length > 1 ? `${reason} (${seg.payType} part)` : reason
+            });
+            leaves.push(created);
+
+            if (bcConfigured() && leaveFinId != null && employeeCode) {
+                try {
+                    const result = await createEmployeeLeave({
+                        employeeNumber: employeeCode,
+                        payCode: leaveFinId,
+                        leaveStartDate: toBcDate(seg.fromDate),
+                        leaveEndDate: toBcDate(seg.toDate),
+                        payType: toBcPayType(seg.payType),
+                        leaveReferenceNumber
+                    });
+                    bc.push({ ok: true, payType: seg.payType, days: seg.totalDays, result });
+                } catch (e) {
+                    bc.push({ ok: false, payType: seg.payType, days: seg.totalDays, error: e.message });
+                }
+            }
+        }
+
+        const message = segments.length > 1
+            ? `Leave split (${leaveReferenceNumber}): ${segments[0].totalDays} day(s) Unpaid + ${segments[1].totalDays} day(s) Paid.`
+            : `Leave application submitted (${leaveReferenceNumber})`;
+
+        res.status(201).json({ message, leaves, bc });
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err.message });
     }
