@@ -46,7 +46,9 @@ export const leaveApi = {
     myLeaves: () => api.get('/leaves/my'),
     allLeaves: () => api.get('/leaves/all'),
     updateStatus: (id, data) => api.put(`/leaves/${id}/status`, data),
-    bcBalance: (finId, asOfDate) => api.get('/leaves/bc-balance', { params: { finId, asOfDate } })
+    bcBalance: (finId, asOfDate) => api.get('/leaves/bc-balance', { params: { finId, asOfDate } }),
+    getOne: (id) => api.get(`/leaves/${id}`),
+    update: (id, data) => api.put(`/leaves/${id}`, data)
 };
 
 export const loanApi = {

@@ -168,6 +168,62 @@ exports.getAllLeaves = async (req, res) => {
     }
 };
 
+exports.updateMyLeave = async (req, res) => {
+    try {
+        const leave = await Leave.findById(req.params.id);
+        if (!leave) return res.status(404).json({ message: 'Leave not found' });
+        if (String(leave.employee) !== String(req.user.id)) {
+            return res.status(403).json({ message: 'You can only edit your own leaves' });
+        }
+        if (leave.status !== 'Pending') {
+            return res.status(400).json({ message: `Cannot edit a ${leave.status.toLowerCase()} leave` });
+        }
+        const { leaveType, leaveFinId, payType, fromDate, toDate, reason } = req.body;
+        if (new Date(toDate) < new Date(fromDate)) {
+            return res.status(400).json({ message: 'toDate cannot be before fromDate' });
+        }
+        // Block overlap with OTHER leaves (excluding this one).
+        const overlap = await Leave.findOne({
+            _id: { $ne: leave._id },
+            employee: req.user.id,
+            status: { $in: ['Pending', 'Approved'] },
+            fromDate: { $lte: new Date(toDate) },
+            toDate: { $gte: new Date(fromDate) }
+        });
+        if (overlap) {
+            const f = new Date(overlap.fromDate).toLocaleDateString('en-GB');
+            const t = new Date(overlap.toDate).toLocaleDateString('en-GB');
+            return res.status(400).json({
+                message: `You already have a ${overlap.status.toLowerCase()} ${overlap.leaveType} leave from ${f} to ${t}.`
+            });
+        }
+        leave.leaveType = leaveType ?? leave.leaveType;
+        leave.leaveFinId = leaveFinId ?? leave.leaveFinId;
+        leave.payType = payType ?? leave.payType;
+        leave.fromDate = fromDate ?? leave.fromDate;
+        leave.toDate = toDate ?? leave.toDate;
+        leave.reason = reason ?? leave.reason;
+        leave.totalDays = calculateDays(leave.fromDate, leave.toDate);
+        await leave.save();
+        res.json({ message: 'Leave updated', leave });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+};
+
+exports.getOneMyLeave = async (req, res) => {
+    try {
+        const leave = await Leave.findById(req.params.id);
+        if (!leave) return res.status(404).json({ message: 'Leave not found' });
+        if (String(leave.employee) !== String(req.user.id)) {
+            return res.status(403).json({ message: 'Not your leave' });
+        }
+        res.json({ leave });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+};
+
 exports.updateLeaveStatus = async (req, res) => {
     try {
         const { id } = req.params;

@@ -37,14 +37,39 @@ function ApplyLeave() {
     const [success, setSuccess] = useState('');
     const [saving, setSaving] = useState(false);
     const [actionsOpen, setActionsOpen] = useState(true);
+    const editId = searchParams.get('edit');
 
     // Load user's existing leaves once so we can warn about duplicates.
     useEffect(() => {
         leaveApi.myLeaves().then(({ data }) => {
-            const active = (data.leaves || []).filter((l) => ['Pending', 'Approved'].includes(l.status));
+            const active = (data.leaves || [])
+                .filter((l) => ['Pending', 'Approved'].includes(l.status))
+                .filter((l) => l._id !== editId); // exclude the one being edited
             setExistingLeaves(active);
         }).catch(() => {});
-    }, []);
+    }, [editId]);
+
+    // If editing, pre-fill the form from the existing leave.
+    useEffect(() => {
+        if (!editId) return;
+        leaveApi.getOne(editId).then(({ data }) => {
+            const l = data.leave;
+            if (!l) return;
+            setForm((f) => ({
+                ...f,
+                leaveType: l.leaveType || '',
+                leaveFinId: l.leaveFinId || null,
+                payType: l.payType || 'Paid',
+                payTypeManual: true,
+                fromDate: l.fromDate ? l.fromDate.slice(0, 10) : '',
+                toDate: l.toDate ? l.toDate.slice(0, 10) : '',
+                reason: l.reason || ''
+            }));
+            setSuccess(`Editing ${l.leaveReferenceNumber || l._id}`);
+        }).catch((err) => {
+            setError(err.response?.data?.message || 'Failed to load leave');
+        });
+    }, [editId]);
 
     // Load leave-type FIN elements (PaidLeave + UnPaidLeave) from MongoDB.
     useEffect(() => {
@@ -162,14 +187,17 @@ function ApplyLeave() {
         }
         setSaving(true);
         try {
-            const { data } = await leaveApi.apply({
+            const payload = {
                 leaveType: form.leaveType,
                 leaveFinId: form.leaveFinId,
                 payType: form.payType,
                 fromDate: form.fromDate,
                 toDate: form.toDate,
                 reason: form.reason
-            });
+            };
+            const { data } = editId
+                ? await leaveApi.update(editId, payload)
+                : await leaveApi.apply(payload);
             const bcResults = Array.isArray(data?.bc) ? data.bc : [];
             const bcOk = bcResults.length > 0 && bcResults.every((r) => r.ok);
             const bcFails = bcResults.filter((r) => !r.ok);
@@ -309,7 +337,7 @@ function ApplyLeave() {
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">
-                            Apply Leave <span className="erp-badge">Draft</span>
+                            {editId ? 'Edit Leave' : 'Apply Leave'} <span className="erp-badge">{editId ? 'Editing' : 'Draft'}</span>
                         </div>
                         <div className="erp-titlebar-actions">
                             <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
