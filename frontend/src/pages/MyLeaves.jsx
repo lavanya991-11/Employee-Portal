@@ -25,29 +25,6 @@ function MyLeaves() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selected, setSelected] = useState(null);
-    const [checkedIds, setCheckedIds] = useState(new Set());
-
-    const toggleChecked = (id) => {
-        setCheckedIds((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) next.delete(id); else next.add(id);
-            return next;
-        });
-    };
-
-    const onBulkDelete = async () => {
-        const toDelete = leaves.filter((l) => checkedIds.has(l._id) && l.status === 'Pending');
-        if (toDelete.length === 0) { alert('Select at least one UnApproved row to delete.'); return; }
-        if (!window.confirm(`Delete ${toDelete.length} selected leave(s)?`)) return;
-        try {
-            await Promise.all(toDelete.map((l) => leaveApi.cancel(l._id)));
-            setCheckedIds(new Set());
-            setSelected(null);
-            load();
-        } catch (err) {
-            setError(err.response?.data?.message || 'Bulk delete failed');
-        }
-    };
 
     useEffect(() => { load(); }, []);
 
@@ -96,7 +73,6 @@ function MyLeaves() {
                         <div className="erp-title">Apply Leave</div>
                         <div className="erp-titlebar-actions">
                             <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
-                            <button className="erp-action-btn" onClick={onBulkDelete} disabled={checkedIds.size === 0}>🗑 Delete{checkedIds.size > 0 ? ` (${checkedIds.size})` : ''}</button>
                             <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
                         </div>
                     </div>
@@ -132,13 +108,7 @@ function MyLeaves() {
                                                     className={isSel ? 'erp-row-selected' : ''}
                                                     onClick={() => setSelected(l)}
                                                 >
-                                                    <td onClick={(e) => e.stopPropagation()}>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={checkedIds.has(l._id)}
-                                                            onChange={() => toggleChecked(l._id)}
-                                                        />
-                                                    </td>
+                                                    <td><input type="checkbox" checked={isSel} readOnly /></td>
                                                     <td>{fmtDate(l.createdAt)}</td>
                                                     <td className="erp-doc-link">{docNo(l)}</td>
                                                     <td>{l.leaveType}</td>
