@@ -168,23 +168,6 @@ exports.getAllLeaves = async (req, res) => {
     }
 };
 
-exports.cancelMyLeave = async (req, res) => {
-    try {
-        const leave = await Leave.findById(req.params.id);
-        if (!leave) return res.status(404).json({ message: 'Leave not found' });
-        if (String(leave.employee) !== String(req.user.id)) {
-            return res.status(403).json({ message: 'You can only cancel your own leaves' });
-        }
-        if (leave.status !== 'Pending') {
-            return res.status(400).json({ message: `Cannot cancel a ${leave.status.toLowerCase()} leave` });
-        }
-        await leave.deleteOne();
-        res.json({ message: 'Leave cancelled' });
-    } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
-    }
-};
-
 exports.updateLeaveStatus = async (req, res) => {
     try {
         const { id } = req.params;
