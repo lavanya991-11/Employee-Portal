@@ -17,7 +17,8 @@ const STATUS_COLOR = {
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 const docNo = (l) =>
-    `AYL-${new Date(l.createdAt || Date.now()).getFullYear()}/${(l._id || '').slice(-3).toUpperCase()}`;
+    l.leaveReferenceNumber
+        || `AYL-${new Date(l.createdAt || Date.now()).getFullYear()}/${(l._id || '').slice(-3).toUpperCase()}`;
 
 function MyLeaves() {
     const navigate = useNavigate();
