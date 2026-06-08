@@ -1,0 +1,106 @@
+{
+  "info": {
+    "name": "ESS Leave PATCH By Reference",
+    "description": "Approve or reject all leave rows that share a single BC leaveReferenceNumber.\n\nTwo variants:\n  1. Approve by Reference (boolean true)\n  2. Reject by Reference (boolean false)\n\nThe filter is the URL parameter :refNumber (the BC reference, e.g. PR000027).\nBody supports: isApproved (true/false), approvedByName, approvedAt, approverRemarks.\nIf approvedByName/approvedAt are omitted, the server fills them from the logged-in user and current timestamp.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "ess-leave-patch-by-ref-2026"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://ess-backend-xxxxx.onrender.com",
+      "type": "string",
+      "description": "Render backend base URL (override for local: http://localhost:3000)"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT from POST /api/auth/login → response.accessToken"
+    },
+    {
+      "key": "refNumber",
+      "value": "PR000027",
+      "type": "string",
+      "description": "BC leaveReferenceNumber to filter on"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Approve by Reference Number",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/leaves/by-ref/{{refNumber}}/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "leaves", "by-ref", "{{refNumber}}", "status"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isApproved\": true,\n  \"approvedByName\": \"Mohd Riyaz Uddin\",\n  \"approvedAt\": \"2026-06-08\",\n  \"approverRemarks\": \"Approved via Postman\"\n}"
+        },
+        "description": "Marks every leave row with leaveReferenceNumber={{refNumber}} as Approved.\n\nBody fields:\n  - isApproved (boolean, required if status not sent): true → Approved, false → Rejected\n  - approvedByName (string, optional): if omitted, uses the logged-in user's name\n  - approvedAt (ISO date, optional): if omitted, server uses new Date() (current timestamp)\n  - approverRemarks (string, optional): free-text note\n\nAlternative: send `\"status\": \"Approved\"` instead of `isApproved: true`.\n\nResponse 200:\n{\n  \"message\": \"2 leave(s) approved for ref PR000027\",\n  \"refNumber\": \"PR000027\",\n  \"isApproved\": true,\n  \"approvedByName\": \"Mohd Riyaz Uddin\",\n  \"approvedAt\": \"2026-06-08T00:00:00.000Z\",\n  \"leaves\": [ ... ]\n}"
+      }
+    },
+    {
+      "name": "Reject by Reference Number",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/leaves/by-ref/{{refNumber}}/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "leaves", "by-ref", "{{refNumber}}", "status"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isApproved\": false,\n  \"approvedByName\": \"Mohd Riyaz Uddin\",\n  \"approvedAt\": \"2026-06-08\",\n  \"approverRemarks\": \"Rejected via Postman\"\n}"
+        },
+        "description": "Marks every leave row with leaveReferenceNumber={{refNumber}} as Rejected.\n\nSame body shape as the Approve variant, but isApproved: false → status becomes Rejected."
+      }
+    },
+    {
+      "name": "Approve with Explicit Status (alt)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/leaves/by-ref/{{refNumber}}/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "leaves", "by-ref", "{{refNumber}}", "status"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Approved\",\n  \"approvedByName\": \"Mohd Riyaz Uddin\",\n  \"approvedAt\": \"2026-06-08\",\n  \"approverRemarks\": \"Approved by Super Admin\"\n}"
+        },
+        "description": "Alternative payload using `status` string (Approved | Rejected) instead of `isApproved` boolean.\nSame effect."
+      }
+    }
+  ]
+}

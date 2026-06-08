@@ -253,14 +253,19 @@ exports.updateLeaveStatus = async (req, res) => {
 };
 
 // PATCH /api/leaves/by-ref/:refNumber/status — update all leaves sharing a BC reference number.
+// Body can supply isApproved (bool), approvedByName, approvedAt, status, approverRemarks.
+// If status not supplied: derived from isApproved (true→Approved, false→Rejected).
 exports.updateLeaveStatusByRef = async (req, res) => {
     try {
         const { refNumber } = req.params;
-        const { status, approverRemarks } = req.body;
+        const { isApproved, approvedByName, approvedAt, status: bodyStatus, approverRemarks } = req.body;
 
         if (!refNumber) return res.status(400).json({ message: 'refNumber is required' });
+
+        // Derive status from boolean isApproved if status not explicitly sent.
+        const status = bodyStatus || (isApproved === true ? 'Approved' : isApproved === false ? 'Rejected' : null);
         if (!['Approved', 'Rejected'].includes(status)) {
-            return res.status(400).json({ message: 'Status must be Approved or Rejected' });
+            return res.status(400).json({ message: 'status must be Approved or Rejected (or send isApproved: true/false)' });
         }
 
         const matches = await Leave.find({ leaveReferenceNumber: refNumber });
@@ -268,14 +273,33 @@ exports.updateLeaveStatusByRef = async (req, res) => {
             return res.status(404).json({ message: `No leaves found with reference number ${refNumber}` });
         }
 
-        const approver = await User.findById(req.user.id).select('name');
+        // Look up approver name from User unless caller explicitly provided one.
+        let approverName = approvedByName;
+        if (!approverName) {
+            const approver = await User.findById(req.user.id).select('name');
+            approverName = approver?.name || '';
+        }
+        const stamp = approvedAt ? new Date(approvedAt) : new Date();
+
         const updated = [];
         for (const leave of matches) {
-            applyApproval(leave, { status, approverRemarks, approverId: req.user.id, approverName: approver?.name || '' });
+            leave.status = status;
+            leave.isApproved = status === 'Approved';
+            leave.approverRemarks = approverRemarks || '';
+            leave.approvedBy = req.user.id;
+            leave.approvedByName = approverName;
+            leave.approvedAt = stamp;
             await leave.save();
             updated.push(leave);
         }
-        res.json({ message: `${updated.length} leave(s) ${status.toLowerCase()} for ref ${refNumber}`, leaves: updated });
+        res.json({
+            message: `${updated.length} leave(s) ${status.toLowerCase()} for ref ${refNumber}`,
+            refNumber,
+            isApproved: status === 'Approved',
+            approvedByName: approverName,
+            approvedAt: stamp,
+            leaves: updated
+        });
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
