@@ -167,8 +167,7 @@ function ApplyLeave() {
         setError(''); setSuccess('');
     };
 
-    const onSubmit = async (e) => {
-        e.preventDefault();
+    const submitLeave = async (saveOnly) => {
         setError(''); setSuccess('');
         if (!form.fromDate || !form.toDate || !form.reason) {
             setError('Leave From Date, Leave To Date and Reasons are required.');
@@ -178,12 +177,15 @@ function ApplyLeave() {
             setError('LeaveToDate cannot be before LeaveFromDate.');
             return;
         }
-        const dup = findOverlap(form.fromDate, form.toDate);
-        if (dup) {
-            const f1 = new Date(dup.fromDate).toLocaleDateString('en-GB');
-            const t1 = new Date(dup.toDate).toLocaleDateString('en-GB');
-            setError(`You already have a ${dup.status.toLowerCase()} ${dup.leaveType} leave from ${f1} to ${t1}. Cannot apply on the same date.`);
-            return;
+        // Overlap check ONLY when posting (not when saving a draft).
+        if (!saveOnly) {
+            const dup = findOverlap(form.fromDate, form.toDate);
+            if (dup) {
+                const f1 = new Date(dup.fromDate).toLocaleDateString('en-GB');
+                const t1 = new Date(dup.toDate).toLocaleDateString('en-GB');
+                setError(`You already have a ${dup.status.toLowerCase()} ${dup.leaveType} leave from ${f1} to ${t1}. Cannot apply on the same date.`);
+                return;
+            }
         }
         setSaving(true);
         try {
@@ -193,25 +195,31 @@ function ApplyLeave() {
                 payType: form.payType,
                 fromDate: form.fromDate,
                 toDate: form.toDate,
-                reason: form.reason
+                reason: form.reason,
+                saveOnly: !!saveOnly
             };
             const { data } = editId
                 ? await leaveApi.update(editId, payload)
                 : await leaveApi.apply(payload);
-            let msg = data?.message || 'Leave application submitted.';
-            const bcResults = Array.isArray(data?.bc) ? data.bc : (data?.bc ? [data.bc] : []);
-            const bcOk = bcResults.length > 0 && bcResults.every((r) => r.ok);
-            const bcFails = bcResults.filter((r) => !r.ok);
-            if (bcOk) msg += ` ${bcResults.length === 1 ? 'Pushed to Business Central.' : `${bcResults.length} lines pushed to Business Central.`}`;
-            else if (bcFails.length > 0) msg += ` BC sync failed: ${bcFails.map((f) => f.error || 'unknown').join(' | ')}`;
+            let msg = data?.message || (saveOnly ? 'Leave saved.' : 'Leave application submitted.');
+            if (!saveOnly) {
+                const bcResults = Array.isArray(data?.bc) ? data.bc : (data?.bc ? [data.bc] : []);
+                const bcOk = bcResults.length > 0 && bcResults.every((r) => r.ok);
+                const bcFails = bcResults.filter((r) => !r.ok);
+                if (bcOk) msg += ` ${bcResults.length === 1 ? 'Pushed to Business Central.' : `${bcResults.length} lines pushed to Business Central.`}`;
+                else if (bcFails.length > 0) msg += ` BC sync failed: ${bcFails.map((f) => f.error || 'unknown').join(' | ')}`;
+            }
             setSuccess(msg);
-            setTimeout(() => navigate('/leaves/my'), 1800);
+            setTimeout(() => navigate('/leaves/my'), 1500);
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to apply leave');
+            setError(err.response?.data?.message || (saveOnly ? 'Failed to save leave' : 'Failed to apply leave'));
         } finally {
             setSaving(false);
         }
     };
+
+    const onSubmit = (e) => { e?.preventDefault?.(); return submitLeave(false); };
+    const onSaveDraft = () => submitLeave(true);
 
     const onNew = () => {
         const first = leaveOptions[0];
@@ -341,6 +349,9 @@ function ApplyLeave() {
                         </div>
                         <div className="erp-titlebar-actions">
                             <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
+                            <button type="button" className="erp-action-btn" onClick={onSaveDraft} disabled={saving}>
+                                {saving ? 'Saving…' : '💾 Save'}
+                            </button>
                             <button type="button" className="erp-action-btn" onClick={onSubmit} disabled={saving}>
                                 {saving ? 'Posting…' : '📤 Post'}
                             </button>

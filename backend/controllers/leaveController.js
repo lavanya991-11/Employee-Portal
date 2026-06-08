@@ -16,28 +16,49 @@ const calculateDays = (from, to) => {
 
 exports.applyLeave = async (req, res) => {
     try {
-        const { leaveType, leaveFinId, payType, fromDate, toDate, reason } = req.body;
+        const { leaveType, leaveFinId, payType, fromDate, toDate, reason, saveOnly } = req.body;
 
         if (new Date(toDate) < new Date(fromDate)) {
             return res.status(400).json({ message: "toDate cannot be before fromDate" });
         }
 
-        // Block duplicate / overlapping leave for this employee.
-        const overlap = await Leave.findOne({
-            employee: req.user.id,
-            status: { $in: ['Pending', 'Approved'] },
-            fromDate: { $lte: new Date(toDate) },
-            toDate: { $gte: new Date(fromDate) }
-        });
-        if (overlap) {
-            const f = new Date(overlap.fromDate).toLocaleDateString('en-GB');
-            const t = new Date(overlap.toDate).toLocaleDateString('en-GB');
-            return res.status(400).json({
-                message: `You already have a ${overlap.status.toLowerCase()} ${overlap.leaveType} leave from ${f} to ${t}. Cannot create another leave on the same date.`
+        // Overlap check only when actually posting (not when saving a draft).
+        if (!saveOnly) {
+            const overlap = await Leave.findOne({
+                employee: req.user.id,
+                status: { $in: ['Pending', 'Approved'] },
+                fromDate: { $lte: new Date(toDate) },
+                toDate: { $gte: new Date(fromDate) }
             });
+            if (overlap) {
+                const f = new Date(overlap.fromDate).toLocaleDateString('en-GB');
+                const t = new Date(overlap.toDate).toLocaleDateString('en-GB');
+                return res.status(400).json({
+                    message: `You already have a ${overlap.status.toLowerCase()} ${overlap.leaveType} leave from ${f} to ${t}. Cannot create another leave on the same date.`
+                });
+            }
         }
 
         const totalDays = calculateDays(fromDate, toDate);
+
+        // saveOnly: just save to MongoDB, no BC call, no split.
+        if (saveOnly) {
+            const saved = await Leave.create({
+                employee: req.user.id,
+                leaveType,
+                leaveFinId: leaveFinId ?? null,
+                payType: payType || 'Paid',
+                fromDate,
+                toDate,
+                totalDays,
+                reason
+            });
+            return res.status(201).json({
+                message: 'Leave saved as draft (not posted to BC).',
+                leaves: [saved],
+                bc: []
+            });
+        }
 
         const info = await EmployeeInfo.findOne({ user: req.user.id });
         const employeeCode = info?.employeeCode || null;
