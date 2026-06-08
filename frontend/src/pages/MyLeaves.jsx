@@ -75,13 +75,18 @@ function MyLeaves() {
 
     const stats = useMemo(() => {
         const total = leaves.length;
-        const counts = leaves.reduce((acc, l) => { acc[l.status] = (acc[l.status] || 0) + 1; return acc; }, {});
+        let approved = 0, rejected = 0, pending = 0;
+        for (const l of leaves) {
+            if (l.isApproved) approved++;
+            else if (l.status === 'Rejected') rejected++;
+            else pending++;
+        }
         return {
             total,
             items: [
-                { key: 'Pending', label: 'UnApproved', count: counts.Pending || 0, color: STATUS_COLOR.Pending },
-                { key: 'Rejected', label: 'Rejected', count: counts.Rejected || 0, color: STATUS_COLOR.Rejected },
-                { key: 'Approved', label: 'Posted', count: counts.Approved || 0, color: STATUS_COLOR.Approved }
+                { key: 'Pending', label: 'UnApproved', count: pending, color: STATUS_COLOR.Pending },
+                { key: 'Rejected', label: 'Rejected', count: rejected, color: STATUS_COLOR.Rejected },
+                { key: 'Approved', label: 'Approved', count: approved, color: STATUS_COLOR.Approved }
             ].map((s) => ({ ...s, pct: total ? Math.round((s.count / total) * 100) : 0 }))
         };
     }, [leaves]);
@@ -162,9 +167,13 @@ function MyLeaves() {
                                                     <td>{fmtDate(l.toDate)}</td>
                                                     <td>{l.totalDays}</td>
                                                     <td>
-                                                        <span style={{ color: STATUS_COLOR[l.status] || '#374151', fontWeight: 600 }}>
-                                                            {STATUS_LABEL[l.status] || l.status}
-                                                        </span>
+                                                        {l.isApproved ? (
+                                                            <span style={{ color: '#15803d', fontWeight: 600 }}>✓ Approved</span>
+                                                        ) : l.status === 'Rejected' ? (
+                                                            <span style={{ color: '#b91c1c', fontWeight: 600 }}>✗ Rejected</span>
+                                                        ) : (
+                                                            <span style={{ color: '#a16207', fontWeight: 600 }}>⏳ UnApproved</span>
+                                                        )}
                                                     </td>
                                                     <td>{l.approvedAt ? fmtDate(l.approvedAt) : '—'}</td>
                                                     <td>{l.approvedByName || '—'}</td>
