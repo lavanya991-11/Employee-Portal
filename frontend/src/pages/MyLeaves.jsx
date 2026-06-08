@@ -95,7 +95,7 @@ function MyLeaves() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
-                <div className="erp-page">
+                <div className="erp-page" ref={tableRef}>
                     <div className="erp-titlebar">
                         <div className="erp-title">Apply Leave</div>
                         <div className="erp-titlebar-actions">
@@ -107,7 +107,7 @@ function MyLeaves() {
                     </div>
 
                     <div className="erp-body">
-                        <div className="erp-list-card" ref={tableRef}>
+                        <div className="erp-list-card">
                             {error && <div className="error">{error}</div>}
                             {message && <div className="success">{message}</div>}
                             {loading && <p style={{ padding: 16 }}>Loading…</p>}
