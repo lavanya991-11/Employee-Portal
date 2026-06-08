@@ -17,8 +17,7 @@ const STATUS_COLOR = {
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 const docNo = (l) =>
-    l.leaveReferenceNumber
-        || `AYL-${new Date(l.createdAt || Date.now()).getFullYear()}/${(l._id || '').slice(-3).toUpperCase()}`;
+    `AYL-${new Date(l.createdAt || Date.now()).getFullYear()}/${(l._id || '').slice(-3).toUpperCase()}`;
 
 function MyLeaves() {
     const navigate = useNavigate();
@@ -117,6 +116,7 @@ function MyLeaves() {
                                             <th>Select</th>
                                             <th>Doc Date</th>
                                             <th>Doc No</th>
+                                            <th>Ref No</th>
                                             <th>Type</th>
                                             <th>From</th>
                                             <th>To</th>
@@ -142,6 +142,9 @@ function MyLeaves() {
                                                     </td>
                                                     <td>{fmtDate(l.createdAt)}</td>
                                                     <td className="erp-doc-link">{docNo(l)}</td>
+                                                    <td style={{ fontWeight: 600, color: l.leaveReferenceNumber ? '#1e3a8a' : '#9ca3af' }}>
+                                                        {l.leaveReferenceNumber || '—'}
+                                                    </td>
                                                     <td>{l.leaveType}</td>
                                                     <td>{fmtDate(l.fromDate)}</td>
                                                     <td>{fmtDate(l.toDate)}</td>
