@@ -48,7 +48,8 @@ export const leaveApi = {
     updateStatus: (id, data) => api.put(`/leaves/${id}/status`, data),
     bcBalance: (finId, asOfDate) => api.get('/leaves/bc-balance', { params: { finId, asOfDate } }),
     getOne: (id) => api.get(`/leaves/${id}`),
-    update: (id, data) => api.put(`/leaves/${id}`, data)
+    update: (id, data) => api.put(`/leaves/${id}`, data),
+    updateStatusByRef: (refNumber, data) => api.patch(`/leaves/by-ref/${refNumber}/status`, data)
 };
 
 export const loanApi = {

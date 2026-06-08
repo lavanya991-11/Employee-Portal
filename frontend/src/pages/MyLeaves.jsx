@@ -123,6 +123,8 @@ function MyLeaves() {
                                             <th>To</th>
                                             <th>Days</th>
                                             <th>Status</th>
+                                            <th>Approved Date</th>
+                                            <th>Approved By</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -164,6 +166,8 @@ function MyLeaves() {
                                                             {STATUS_LABEL[l.status] || l.status}
                                                         </span>
                                                     </td>
+                                                    <td>{l.approvedAt ? fmtDate(l.approvedAt) : '—'}</td>
+                                                    <td>{l.approvedByName || '—'}</td>
                                                 </tr>
                                             );
                                         })}

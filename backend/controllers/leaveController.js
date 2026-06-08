@@ -1,5 +1,6 @@
 const Leave = require('../models/leave');
 const EmployeeInfo = require('../models/employeeInfo');
+const User = require('../models/user');
 const { checkLeaveBalance, createEmployeeLeave, bcConfigured } = require('../services/bcClient');
 
 const toBcPayType = (p) => {
@@ -218,6 +219,15 @@ exports.getOneMyLeave = async (req, res) => {
     }
 };
 
+const applyApproval = (leave, { status, approverRemarks, approverId, approverName }) => {
+    leave.status = status;
+    leave.approverRemarks = approverRemarks || '';
+    leave.approvedBy = approverId || null;
+    leave.approvedByName = approverName || '';
+    leave.approvedAt = new Date();
+    leave.isApproved = status === 'Approved';
+};
+
 exports.updateLeaveStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -232,13 +242,41 @@ exports.updateLeaveStatus = async (req, res) => {
             return res.status(404).json({ message: "Leave not found" });
         }
 
-        leave.status = status;
-        leave.approverRemarks = approverRemarks || '';
-        leave.approvedBy = req.user.id;
+        const approver = await User.findById(req.user.id).select('name');
+        applyApproval(leave, { status, approverRemarks, approverId: req.user.id, approverName: approver?.name || '' });
         await leave.save();
 
         res.json({ message: `Leave ${status.toLowerCase()}`, leave });
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err.message });
+    }
+};
+
+// PATCH /api/leaves/by-ref/:refNumber/status — update all leaves sharing a BC reference number.
+exports.updateLeaveStatusByRef = async (req, res) => {
+    try {
+        const { refNumber } = req.params;
+        const { status, approverRemarks } = req.body;
+
+        if (!refNumber) return res.status(400).json({ message: 'refNumber is required' });
+        if (!['Approved', 'Rejected'].includes(status)) {
+            return res.status(400).json({ message: 'Status must be Approved or Rejected' });
+        }
+
+        const matches = await Leave.find({ leaveReferenceNumber: refNumber });
+        if (matches.length === 0) {
+            return res.status(404).json({ message: `No leaves found with reference number ${refNumber}` });
+        }
+
+        const approver = await User.findById(req.user.id).select('name');
+        const updated = [];
+        for (const leave of matches) {
+            applyApproval(leave, { status, approverRemarks, approverId: req.user.id, approverName: approver?.name || '' });
+            await leave.save();
+            updated.push(leave);
+        }
+        res.json({ message: `${updated.length} leave(s) ${status.toLowerCase()} for ref ${refNumber}`, leaves: updated });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
 };

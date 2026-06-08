@@ -52,6 +52,18 @@ const leaveSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         default: null
+    },
+    approvedByName: {
+        type: String,
+        default: ''
+    },
+    approvedAt: {
+        type: Date,
+        default: null
+    },
+    isApproved: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 
