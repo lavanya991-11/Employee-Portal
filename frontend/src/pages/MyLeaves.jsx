@@ -118,6 +118,7 @@ function MyLeaves() {
                                             <th>Doc No</th>
                                             <th>Ref No</th>
                                             <th>Type</th>
+                                            <th>Pay Type</th>
                                             <th>From</th>
                                             <th>To</th>
                                             <th>Days</th>
@@ -146,6 +147,15 @@ function MyLeaves() {
                                                         {l.leaveReferenceNumber || '—'}
                                                     </td>
                                                     <td>{l.leaveType}</td>
+                                                    <td>
+                                                        <span style={{
+                                                            display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600,
+                                                            background: l.payType === 'Paid' ? '#dcfce7' : l.payType === 'Unpaid' ? '#fee2e2' : '#fef3c7',
+                                                            color:      l.payType === 'Paid' ? '#15803d' : l.payType === 'Unpaid' ? '#b91c1c' : '#a16207'
+                                                        }}>
+                                                            {l.payType || '—'}
+                                                        </span>
+                                                    </td>
                                                     <td>{fmtDate(l.fromDate)}</td>
                                                     <td>{fmtDate(l.toDate)}</td>
                                                     <td>{l.totalDays}</td>
