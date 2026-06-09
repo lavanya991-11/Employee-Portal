@@ -115,23 +115,23 @@ function MyLeaves() {
             <main className="main-content">
                 <PageHeader pageName="Apply Leave" />
                 <div className="erp-page" ref={tableRef}>
-                    <div className="erp-titlebar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div className="erp-titlebar" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
+                        <input
+                            type="text"
+                            placeholder="🔍 Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ padding: '8px 14px', fontSize: 14, border: '1px solid #d1d5db', borderRadius: 8, width: '100%', background: '#fff' }}
+                        />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                             <div className="erp-title">Apply Leave</div>
-                            <input
-                                type="text"
-                                placeholder="🔍 Search..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{ padding: '8px 12px', fontSize: 13, border: '1px solid #d1d5db', borderRadius: 6, width: 260 }}
-                            />
-                        </div>
-                        <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
-                            <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
-                            <button className="erp-action-btn" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>✏️ Edit</button>
-                            <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
-                            <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
+                            <div className="erp-titlebar-actions">
+                                <button className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
+                                <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
+                                <button className="erp-action-btn" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>✏️ Edit</button>
+                                <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
+                                <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
+                            </div>
                         </div>
                     </div>
 
