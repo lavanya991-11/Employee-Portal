@@ -11,6 +11,8 @@ import Approvals from './pages/Approvals';
 import ApplyLoan from './pages/ApplyLoan';
 import ApplyRequest from './pages/ApplyRequest';
 import Payslip from './pages/Payslip';
+import Attendance from './pages/Attendance';
+import OnDuty from './pages/OnDuty';
 import TravelRequest from './pages/TravelRequest';
 import TravelRequests from './pages/TravelRequests';
 import TravelExpenses from './pages/TravelExpenses';
@@ -109,6 +111,22 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <Payslip />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/attendance"
+                element={
+                    <ProtectedRoute>
+                        <Attendance />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/on-duty"
+                element={
+                    <ProtectedRoute>
+                        <OnDuty />
                     </ProtectedRoute>
                 }
             />

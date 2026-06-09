@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import PageHeader from '../components/PageHeader';
 import { authApi, employeeInfoApi } from '../services/api';
 
 const monthOptions = (() => {
@@ -128,6 +129,7 @@ function Payslip() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="Payslip" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">Payslip</div>
