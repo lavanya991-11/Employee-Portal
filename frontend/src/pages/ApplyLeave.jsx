@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import UserMenu from '../components/UserMenu';
 import { leaveApi, finElementApi } from '../services/api';
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -363,11 +364,8 @@ function ApplyLeave() {
             <Sidebar />
             <main className="main-content">
                 <div className="erp-page">
-                    <div className="erp-titlebar">
-                        <div className="erp-title">
-                            {editId ? 'Edit Leave' : cloneId ? 'Resubmit Leave' : 'Apply Leave'} <span className="erp-badge">{editId ? 'Editing' : cloneId ? 'Resubmit' : 'Draft'}</span>
-                        </div>
-                        <div className="erp-titlebar-actions">
+                    <div className="erp-titlebar" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 12 }}>
+                        <div className="erp-titlebar-actions" style={{ justifyContent: 'flex-end' }}>
                             <button type="button" className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
                             <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
                             <button type="button" className="erp-action-btn" onClick={onSaveDraft} disabled={saving}>
@@ -379,6 +377,10 @@ function ApplyLeave() {
                             <button type="button" className="erp-action-btn" onClick={() => { onSubmit({ preventDefault: () => {} }); window.print(); }} disabled={saving}>
                                 🖨️ Post & Print
                             </button>
+                            <UserMenu />
+                        </div>
+                        <div className="erp-title">
+                            {editId ? 'Edit Leave' : cloneId ? 'Resubmit Leave' : 'Apply Leave'} <span className="erp-badge">{editId ? 'Editing' : cloneId ? 'Resubmit' : 'Draft'}</span>
                         </div>
                     </div>
 

@@ -130,9 +130,8 @@ function MyLeaves() {
             <Sidebar />
             <main className="main-content">
                 <div className="erp-page" ref={tableRef}>
-                    <div className="erp-titlebar">
-                        <div className="erp-title">Apply Leave</div>
-                        <div className="erp-titlebar-actions">
+                    <div className="erp-titlebar" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 12 }}>
+                        <div className="erp-titlebar-actions" style={{ justifyContent: 'flex-end' }}>
                             <input
                                 type="text"
                                 placeholder="🔍 Search..."
@@ -148,6 +147,7 @@ function MyLeaves() {
                             <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
                             <UserMenu />
                         </div>
+                        <div className="erp-title">Apply Leave</div>
                     </div>
 
                     <div className="erp-body">

@@ -172,9 +172,8 @@ function EmployeeInformation() {
             <Sidebar />
             <main className="main-content">
                 <div className="card">
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 8, flexWrap: 'wrap' }}>
-                        <h2 style={{ margin: 0 }}>EMPLOYEE INFORMATION</h2>
-                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', marginBottom: 12, gap: 10 }}>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                             <input
                                 type="text"
                                 placeholder="🔍 Search fields..."
@@ -186,6 +185,7 @@ function EmployeeInformation() {
                             <button type="button" onClick={refresh} className="erp-action-btn">🔄 Refresh</button>
                             <UserMenu />
                         </div>
+                        <h2 style={{ margin: 0 }}>EMPLOYEE INFORMATION</h2>
                     </div>
                     {error && <div className="error">{error}</div>}
                     {success && <div className="success">{success}</div>}
