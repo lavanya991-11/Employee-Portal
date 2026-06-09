@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import UserMenu from '../components/UserMenu';
-import { leaveApi, authApi } from '../services/api';
+import PageHeader from '../components/PageHeader';
+import { leaveApi } from '../services/api';
 
 const STATUS_LABEL = {
     Pending: 'UnApproved',
@@ -29,13 +29,6 @@ function MyLeaves() {
     const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const tableRef = useRef(null);
-
-    const onSignOut = async () => {
-        if (!window.confirm('Sign out?')) return;
-        try { await authApi.logout(); } catch (e) {}
-        localStorage.clear();
-        navigate('/login');
-    };
 
     // Deselect when clicking outside the table or toolbar.
     useEffect(() => {
@@ -120,6 +113,7 @@ function MyLeaves() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="Apply Leave" />
                 <div className="erp-page" ref={tableRef}>
                     <div className="erp-titlebar" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 12 }}>
                         <div className="erp-titlebar-actions" style={{ justifyContent: 'flex-end' }}>
@@ -135,7 +129,6 @@ function MyLeaves() {
                             <button className="erp-action-btn" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>✏️ Edit</button>
                             <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
                             <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
-                            <UserMenu />
                         </div>
                         <div className="erp-title">Apply Leave</div>
                     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import PageHeader from '../components/PageHeader';
 import { loanApi } from '../services/api';
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -102,6 +103,7 @@ function ApplyLoan() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="Apply Loan" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">Apply Loan <span className="erp-badge">Draft</span></div>

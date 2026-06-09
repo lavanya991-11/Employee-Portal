@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import UserMenu from '../components/UserMenu';
-import { employeeInfoApi, authApi } from '../services/api';
+import PageHeader from '../components/PageHeader';
+import { employeeInfoApi } from '../services/api';
 
 const toDateInput = (d) => d ? new Date(d).toISOString().slice(0, 10) : '';
 
@@ -119,13 +119,6 @@ function EmployeeInformation() {
         }
     };
 
-    const onSignOut = async () => {
-        if (!window.confirm('Sign out?')) return;
-        try { await authApi.logout(); } catch (e) {}
-        localStorage.clear();
-        navigate('/login');
-    };
-
     useEffect(() => { refresh(); }, []);
 
     // Filter visible fields by label text matching the search query.
@@ -171,6 +164,7 @@ function EmployeeInformation() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="Employee Information" />
                 <div className="card">
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', marginBottom: 12, gap: 10 }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -183,7 +177,6 @@ function EmployeeInformation() {
                             />
                             <button type="button" onClick={() => navigate(-1)} className="erp-action-btn">← Back</button>
                             <button type="button" onClick={refresh} className="erp-action-btn">🔄 Refresh</button>
-                            <UserMenu />
                         </div>
                         <h2 style={{ margin: 0 }}>EMPLOYEE INFORMATION</h2>
                     </div>
