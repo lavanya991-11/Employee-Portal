@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { employeeInfoApi } from '../services/api';
 
@@ -76,6 +77,7 @@ function Field({ label, name, value, onChange, type = 'text', readOnly = false, 
 }
 
 function EmployeeInformation() {
+    const navigate = useNavigate();
     const [form, setForm] = useState(emptyForm);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -150,7 +152,12 @@ function EmployeeInformation() {
             <Sidebar />
             <main className="main-content">
                 <div className="card">
-                    <h2>EMPLOYEE INFORMATION</h2>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                        <h2 style={{ margin: 0 }}>EMPLOYEE INFORMATION</h2>
+                        <button type="button" onClick={() => navigate(-1)} className="erp-action-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                            ← Back
+                        </button>
+                    </div>
                     {error && <div className="error">{error}</div>}
                     {success && <div className="success">{success}</div>}
                     {loading && <p>Loading…</p>}

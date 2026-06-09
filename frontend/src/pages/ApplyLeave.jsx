@@ -352,6 +352,7 @@ function ApplyLeave() {
                             {editId ? 'Edit Leave' : cloneId ? 'Resubmit Leave' : 'Apply Leave'} <span className="erp-badge">{editId ? 'Editing' : cloneId ? 'Resubmit' : 'Draft'}</span>
                         </div>
                         <div className="erp-titlebar-actions">
+                            <button type="button" className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
                             <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
                             <button type="button" className="erp-action-btn" onClick={onSaveDraft} disabled={saving}>
                                 {saving ? 'Saving…' : '💾 Save'}
