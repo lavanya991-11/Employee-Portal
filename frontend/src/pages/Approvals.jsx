@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { leaveApi } from '../services/api';
+import { leaveApi, authApi } from '../services/api';
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 const docNo = (l) =>
@@ -18,8 +18,31 @@ function Approvals() {
     const [actionDate, setActionDate] = useState(new Date().toISOString().slice(0, 10));
     const [remarks, setRemarks] = useState('Approved');
     const [saving, setSaving] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => { load(); }, []);
+
+    const onSignOut = async () => {
+        if (!window.confirm('Sign out?')) return;
+        try { await authApi.logout(); } catch (e) {}
+        localStorage.clear();
+        navigate('/login');
+    };
+
+    const filteredPending = useMemo(() => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return pending;
+        return pending.filter((l) => {
+            const haystack = [
+                l.employee?.name,
+                l.leaveType,
+                l.reason,
+                docNo(l),
+                l.leaveReferenceNumber
+            ].filter(Boolean).join(' ').toLowerCase();
+            return haystack.includes(q);
+        });
+    }, [pending, searchQuery]);
 
     const load = async () => {
         setLoading(true); setError(''); setSuccess('');
@@ -64,9 +87,17 @@ function Approvals() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Approvals</div>
                         <div className="erp-titlebar-actions">
+                            <input
+                                type="text"
+                                placeholder="🔍 Search..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{ padding: '6px 10px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 4, width: 180 }}
+                            />
                             <button className="erp-action-btn" onClick={openAction}>⚙ Actions</button>
                             <button className="erp-action-btn" onClick={() => navigate(-1)}>↩ Back</button>
                             <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
+                            <button className="erp-action-btn" onClick={onSignOut} style={{ color: '#dc2626', borderColor: '#fecaca' }}>↪ Sign out</button>
                         </div>
                     </div>
 
@@ -78,7 +109,10 @@ function Approvals() {
                             {!loading && pending.length === 0 && (
                                 <p style={{ padding: 16, color: '#888' }}>No pending leave requests. 🎉</p>
                             )}
-                            {pending.length > 0 && (
+                            {pending.length > 0 && filteredPending.length === 0 && (
+                                <p style={{ padding: 16, color: '#888' }}>No results match "{searchQuery}".</p>
+                            )}
+                            {filteredPending.length > 0 && (
                                 <table className="erp-table">
                                     <thead>
                                         <tr>
@@ -93,7 +127,7 @@ function Approvals() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {pending.map((l) => {
+                                        {filteredPending.map((l) => {
                                             const isSel = selected?._id === l._id;
                                             return (
                                                 <tr
