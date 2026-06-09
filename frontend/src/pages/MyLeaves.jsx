@@ -135,7 +135,7 @@ function MyLeaves() {
                         </div>
                     </div>
 
-                    <div className="erp-body">
+                    <div className="erp-body" style={{ flexDirection: 'column' }}>
                         <div className="erp-list-card">
                             {error && <div className="error">{error}</div>}
                             {message && <div className="success">{message}</div>}
@@ -222,14 +222,14 @@ function MyLeaves() {
                             )}
                         </div>
 
-                        <aside className="erp-actions-panel">
+                        <aside className="erp-actions-panel" style={{ width: '100%', marginTop: 12 }}>
                             <div className="erp-actions-header">
                                 <span>Document Status</span>
                                 <span style={{ color: '#1e3a8a', fontWeight: 700 }}>{stats.total}</span>
                             </div>
-                            <div style={{ padding: 14 }}>
+                            <div style={{ padding: 14, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                                 {stats.items.map((s) => (
-                                    <div key={s.key} style={{ marginBottom: 14 }}>
+                                    <div key={s.key}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#374151', marginBottom: 4 }}>
                                             <span>{s.label} <span style={{ color: '#9ca3af' }}>{s.pct}%</span></span>
                                             <span style={{ fontWeight: 600 }}>{s.count}</span>
