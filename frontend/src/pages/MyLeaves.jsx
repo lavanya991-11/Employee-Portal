@@ -61,15 +61,6 @@ function MyLeaves() {
         navigate(`/leaves/apply?edit=${selected._id}`);
     };
 
-    const onResubmit = () => {
-        if (!selected) { alert('Select a rejected row to resubmit.'); return; }
-        if (selected.status !== 'Rejected') {
-            alert('Only Rejected leaves can be resubmitted.');
-            return;
-        }
-        navigate(`/leaves/apply?clone=${selected._id}`);
-    };
-
     const onRegenerate = async () => {
         setMessage('Regenerating from server…');
         try {
@@ -142,7 +133,6 @@ function MyLeaves() {
                             <button className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
                             <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
                             <button className="erp-action-btn" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>✏️ Edit</button>
-                            <button className="erp-action-btn" onClick={onResubmit} disabled={!selected || selected.status !== 'Rejected'}>🔁 Resubmit</button>
                             <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
                             <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
                             <UserMenu />

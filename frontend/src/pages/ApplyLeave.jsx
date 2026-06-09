@@ -39,7 +39,6 @@ function ApplyLeave() {
     const [saving, setSaving] = useState(false);
     const [actionsOpen, setActionsOpen] = useState(true);
     const editId = searchParams.get('edit');
-    const cloneId = searchParams.get('clone');
     const [savedId, setSavedId] = useState(editId || null);
 
     // Load user's existing leaves once so we can warn about duplicates.
@@ -52,11 +51,10 @@ function ApplyLeave() {
         }).catch(() => {});
     }, [editId]);
 
-    // If editing OR cloning a rejected leave, pre-fill the form from the existing leave.
+    // If editing, pre-fill the form from the existing leave.
     useEffect(() => {
-        const sourceId = editId || cloneId;
-        if (!sourceId) return;
-        leaveApi.getOne(sourceId).then(({ data }) => {
+        if (!editId) return;
+        leaveApi.getOne(editId).then(({ data }) => {
             const l = data.leave;
             if (!l) return;
             setForm((f) => ({
@@ -69,13 +67,11 @@ function ApplyLeave() {
                 toDate: l.toDate ? l.toDate.slice(0, 10) : '',
                 reason: l.reason || ''
             }));
-            setSuccess(cloneId
-                ? `Resubmitting rejected ${l.leaveReferenceNumber || l._id} — review and Post to send a fresh application.`
-                : `Editing ${l.leaveReferenceNumber || l._id}`);
+            setSuccess(`Editing ${l.leaveReferenceNumber || l._id}`);
         }).catch((err) => {
             setError(err.response?.data?.message || 'Failed to load leave');
         });
-    }, [editId, cloneId]);
+    }, [editId]);
 
     // Load leave-type FIN elements (PaidLeave + UnPaidLeave) from MongoDB.
     useEffect(() => {
@@ -380,7 +376,7 @@ function ApplyLeave() {
                             <UserMenu />
                         </div>
                         <div className="erp-title">
-                            {editId ? 'Edit Leave' : cloneId ? 'Resubmit Leave' : 'Apply Leave'} <span className="erp-badge">{editId ? 'Editing' : cloneId ? 'Resubmit' : 'Draft'}</span>
+                            {editId ? 'Edit Leave' : 'Apply Leave'} <span className="erp-badge">{editId ? 'Editing' : 'Draft'}</span>
                         </div>
                     </div>
 
