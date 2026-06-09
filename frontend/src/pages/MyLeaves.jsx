@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import UserMenu from '../components/UserMenu';
 import { leaveApi, authApi } from '../services/api';
 
 const STATUS_LABEL = {
@@ -145,19 +146,7 @@ function MyLeaves() {
                             <button className="erp-action-btn" onClick={onResubmit} disabled={!selected || selected.status !== 'Rejected'}>🔁 Resubmit</button>
                             <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
                             <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
-                            <button
-                                className="erp-action-btn"
-                                onClick={onSignOut}
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 10px 4px 4px' }}
-                            >
-                                <span style={{
-                                    width: 24, height: 24, borderRadius: '50%', background: '#e5e7eb',
-                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 14, color: '#6b7280'
-                                }}>👤</span>
-                                <span style={{ color: '#374151', fontWeight: 500 }}>Signout</span>
-                                <span style={{ color: '#374151', fontSize: 14 }}>⏻</span>
-                            </button>
+                            <UserMenu />
                         </div>
                     </div>
 

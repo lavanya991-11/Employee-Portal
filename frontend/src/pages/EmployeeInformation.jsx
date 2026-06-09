@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import UserMenu from '../components/UserMenu';
 import { employeeInfoApi, authApi } from '../services/api';
 
 const toDateInput = (d) => d ? new Date(d).toISOString().slice(0, 10) : '';
@@ -183,20 +184,7 @@ function EmployeeInformation() {
                             />
                             <button type="button" onClick={() => navigate(-1)} className="erp-action-btn">← Back</button>
                             <button type="button" onClick={refresh} className="erp-action-btn">🔄 Refresh</button>
-                            <button
-                                type="button"
-                                onClick={onSignOut}
-                                className="erp-action-btn"
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 10px 4px 4px' }}
-                            >
-                                <span style={{
-                                    width: 24, height: 24, borderRadius: '50%', background: '#e5e7eb',
-                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 14, color: '#6b7280'
-                                }}>👤</span>
-                                <span style={{ color: '#374151', fontWeight: 500 }}>Signout</span>
-                                <span style={{ color: '#374151', fontSize: 14 }}>⏻</span>
-                            </button>
+                            <UserMenu />
                         </div>
                     </div>
                     {error && <div className="error">{error}</div>}
