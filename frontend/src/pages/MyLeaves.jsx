@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { leaveApi } from '../services/api';
+import { leaveApi, authApi } from '../services/api';
 
 const STATUS_LABEL = {
     Pending: 'UnApproved',
@@ -26,7 +26,15 @@ function MyLeaves() {
     const [error, setError] = useState('');
     const [selected, setSelected] = useState(null);
     const [message, setMessage] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
     const tableRef = useRef(null);
+
+    const onSignOut = async () => {
+        if (!window.confirm('Sign out?')) return;
+        try { await authApi.logout(); } catch (e) {}
+        localStorage.clear();
+        navigate('/login');
+    };
 
     // Deselect when clicking outside the table or toolbar.
     useEffect(() => {
@@ -86,6 +94,18 @@ function MyLeaves() {
         }
     };
 
+    const filteredLeaves = useMemo(() => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return leaves;
+        return leaves.filter((l) => {
+            const hay = [
+                docNo(l), l.leaveReferenceNumber, l.leaveType, l.payType,
+                l.reason, l.status, l.approvedByName
+            ].filter(Boolean).join(' ').toLowerCase();
+            return hay.includes(q);
+        });
+    }, [leaves, searchQuery]);
+
     const stats = useMemo(() => {
         const total = leaves.length;
         let approved = 0, rejected = 0, pending = 0;
@@ -112,11 +132,20 @@ function MyLeaves() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Apply Leave</div>
                         <div className="erp-titlebar-actions">
+                            <input
+                                type="text"
+                                placeholder="🔍 Search..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{ padding: '6px 10px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 4, width: 160 }}
+                            />
+                            <button className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
                             <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
                             <button className="erp-action-btn" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>✏️ Edit</button>
                             <button className="erp-action-btn" onClick={onResubmit} disabled={!selected || selected.status !== 'Rejected'}>🔁 Resubmit</button>
                             <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
                             <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
+                            <button className="erp-action-btn" onClick={onSignOut} style={{ color: '#dc2626', borderColor: '#fecaca' }}>↪ Sign out</button>
                         </div>
                     </div>
 
@@ -148,7 +177,7 @@ function MyLeaves() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {leaves.map((l) => {
+                                        {filteredLeaves.map((l) => {
                                             const isSel = selected?._id === l._id;
                                             return (
                                                 <tr

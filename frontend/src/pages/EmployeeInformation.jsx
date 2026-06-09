@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { employeeInfoApi } from '../services/api';
+import { employeeInfoApi, authApi } from '../services/api';
 
 const toDateInput = (d) => d ? new Date(d).toISOString().slice(0, 10) : '';
 
@@ -83,42 +83,61 @@ function EmployeeInformation() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
 
-    useEffect(() => {
-        let cancelled = false;
-        const load = async () => {
-            setLoading(true);
-            try {
-                const { data } = await employeeInfoApi.getMy();
-                if (cancelled) return;
-                if (data.employeeInfo) {
-                    const info = data.employeeInfo;
-                    setForm({
-                        ...emptyForm,
-                        ...info,
-                        dateOfJoining: toDateInput(info.dateOfJoining),
-                        administration: {
-                            ...emptyForm.administration,
-                            ...(info.administration || {}),
-                            birthDate: toDateInput(info.administration?.birthDate),
-                            probationDate: toDateInput(info.administration?.probationDate),
-                            employmentDate: toDateInput(info.administration?.employmentDate),
-                            seniorityDate: toDateInput(info.administration?.seniorityDate),
-                            terminationDate: toDateInput(info.administration?.terminationDate),
-                            altAddressStartDate: toDateInput(info.administration?.altAddressStartDate),
-                            altAddressEndDate: toDateInput(info.administration?.altAddressEndDate)
-                        }
-                    });
-                }
-            } catch (err) {
-                setError(err.response?.data?.message || 'Could not load');
-            } finally {
-                if (!cancelled) setLoading(false);
+    const refresh = async () => {
+        setLoading(true);
+        setError(''); setSuccess('');
+        try {
+            const { data } = await employeeInfoApi.getMy();
+            if (data.employeeInfo) {
+                const info = data.employeeInfo;
+                setForm({
+                    ...emptyForm,
+                    ...info,
+                    dateOfJoining: toDateInput(info.dateOfJoining),
+                    administration: {
+                        ...emptyForm.administration,
+                        ...(info.administration || {}),
+                        birthDate: toDateInput(info.administration?.birthDate),
+                        probationDate: toDateInput(info.administration?.probationDate),
+                        employmentDate: toDateInput(info.administration?.employmentDate),
+                        seniorityDate: toDateInput(info.administration?.seniorityDate),
+                        terminationDate: toDateInput(info.administration?.terminationDate),
+                        altAddressStartDate: toDateInput(info.administration?.altAddressStartDate),
+                        altAddressEndDate: toDateInput(info.administration?.altAddressEndDate)
+                    }
+                });
+                setSuccess('Refreshed.');
+                setTimeout(() => setSuccess(''), 1500);
             }
-        };
-        load();
-        return () => { cancelled = true; };
-    }, []);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not load');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const onSignOut = async () => {
+        if (!window.confirm('Sign out?')) return;
+        try { await authApi.logout(); } catch (e) {}
+        localStorage.clear();
+        navigate('/login');
+    };
+
+    useEffect(() => { refresh(); }, []);
+
+    // Filter visible fields by label text matching the search query.
+    useEffect(() => {
+        const root = document.querySelector('.card');
+        if (!root) return;
+        const q = searchQuery.trim().toLowerCase();
+        const rows = root.querySelectorAll('.emp-field-row');
+        rows.forEach((row) => {
+            const lbl = row.querySelector('label')?.textContent?.toLowerCase() || '';
+            row.style.display = !q || lbl.includes(q) ? '' : 'none';
+        });
+    }, [searchQuery]);
 
     const onChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -152,11 +171,20 @@ function EmployeeInformation() {
             <Sidebar />
             <main className="main-content">
                 <div className="card">
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 8, flexWrap: 'wrap' }}>
                         <h2 style={{ margin: 0 }}>EMPLOYEE INFORMATION</h2>
-                        <button type="button" onClick={() => navigate(-1)} className="erp-action-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                            ← Back
-                        </button>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                            <input
+                                type="text"
+                                placeholder="🔍 Search fields..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{ padding: '6px 10px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 4, width: 160 }}
+                            />
+                            <button type="button" onClick={() => navigate(-1)} className="erp-action-btn">← Back</button>
+                            <button type="button" onClick={refresh} className="erp-action-btn">🔄 Refresh</button>
+                            <button type="button" onClick={onSignOut} className="erp-action-btn" style={{ color: '#dc2626', borderColor: '#fecaca' }}>↪ Sign out</button>
+                        </div>
                     </div>
                     {error && <div className="error">{error}</div>}
                     {success && <div className="success">{success}</div>}
