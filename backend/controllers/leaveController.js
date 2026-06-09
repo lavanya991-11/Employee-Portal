@@ -16,10 +16,19 @@ const calculateDays = (from, to) => {
 
 exports.applyLeave = async (req, res) => {
     try {
-        const { leaveType, leaveFinId, payType, fromDate, toDate, reason, saveOnly } = req.body;
+        const { leaveType, leaveFinId, payType, fromDate, toDate, reason, saveOnly, replaceDraftId } = req.body;
 
         if (new Date(toDate) < new Date(fromDate)) {
             return res.status(400).json({ message: "toDate cannot be before fromDate" });
+        }
+
+        // If we're posting/saving over an existing unposted draft of ours, remove it first.
+        if (replaceDraftId) {
+            await Leave.findOneAndDelete({
+                _id: replaceDraftId,
+                employee: req.user.id,
+                isPosted: false
+            });
         }
 
         // Overlap check only when actually posting (not when saving a draft).

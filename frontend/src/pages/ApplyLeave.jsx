@@ -39,6 +39,7 @@ function ApplyLeave() {
     const [actionsOpen, setActionsOpen] = useState(true);
     const editId = searchParams.get('edit');
     const cloneId = searchParams.get('clone');
+    const [savedId, setSavedId] = useState(editId || null);
 
     // Load user's existing leaves once so we can warn about duplicates.
     useEffect(() => {
@@ -184,7 +185,7 @@ function ApplyLeave() {
         // Overlap check ONLY when posting (not when saving a draft).
         if (!saveOnly) {
             const dup = findOverlap(form.fromDate, form.toDate);
-            if (dup) {
+            if (dup && dup._id !== savedId) {
                 const f1 = new Date(dup.fromDate).toLocaleDateString('en-GB');
                 const t1 = new Date(dup.toDate).toLocaleDateString('en-GB');
                 setError(`You already have a ${dup.status.toLowerCase()} ${dup.leaveType} leave from ${f1} to ${t1}. Cannot apply on the same date.`);
@@ -193,26 +194,41 @@ function ApplyLeave() {
         }
         setSaving(true);
         try {
-            const payload = {
+            const basePayload = {
                 leaveType: form.leaveType,
                 leaveFinId: form.leaveFinId,
                 payType: form.payType,
                 fromDate: form.fromDate,
                 toDate: form.toDate,
-                reason: form.reason,
-                saveOnly: !!saveOnly
+                reason: form.reason
             };
-            const { data } = editId
-                ? await leaveApi.update(editId, payload)
-                : await leaveApi.apply(payload);
-            let msg = data?.message || (saveOnly ? 'Leave saved.' : 'Leave application submitted.');
-            if (!saveOnly) {
-                const bcResults = Array.isArray(data?.bc) ? data.bc : (data?.bc ? [data.bc] : []);
-                const bcOk = bcResults.length > 0 && bcResults.every((r) => r.ok);
-                const bcFails = bcResults.filter((r) => !r.ok);
-                if (bcOk) msg += ` ${bcResults.length === 1 ? 'Pushed to Business Central.' : `${bcResults.length} lines pushed to Business Central.`}`;
-                else if (bcFails.length > 0) msg += ` BC sync failed: ${bcFails.map((f) => f.error || 'unknown').join(' | ')}`;
+
+            if (saveOnly) {
+                // Save = create new draft or update the one we already created on this page.
+                let resData;
+                if (savedId) {
+                    const { data } = await leaveApi.update(savedId, basePayload);
+                    resData = data;
+                    setSuccess('Draft updated. Click 📤 Post when ready.');
+                } else {
+                    const { data } = await leaveApi.apply({ ...basePayload, saveOnly: true });
+                    resData = data;
+                    const newId = data.leaves?.[0]?._id;
+                    if (newId) setSavedId(newId);
+                    setSuccess('Saved as draft. Click 📤 Post when ready.');
+                }
+                // STAY on page — no navigate.
+                return;
             }
+
+            // Post = full BC flow. If we have a draft on this page, replace it.
+            const { data } = await leaveApi.apply({ ...basePayload, replaceDraftId: savedId || undefined });
+            let msg = data?.message || 'Leave application submitted.';
+            const bcResults = Array.isArray(data?.bc) ? data.bc : (data?.bc ? [data.bc] : []);
+            const bcOk = bcResults.length > 0 && bcResults.every((r) => r.ok);
+            const bcFails = bcResults.filter((r) => !r.ok);
+            if (bcOk) msg += ` ${bcResults.length === 1 ? 'Pushed to Business Central.' : `${bcResults.length} lines pushed to Business Central.`}`;
+            else if (bcFails.length > 0) msg += ` BC sync failed: ${bcFails.map((f) => f.error || 'unknown').join(' | ')}`;
             setSuccess(msg);
             setTimeout(() => navigate('/leaves/my'), 1500);
         } catch (err) {
