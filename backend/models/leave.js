@@ -64,6 +64,10 @@ const leaveSchema = new mongoose.Schema({
     isApproved: {
         type: Boolean,
         default: false
+    },
+    isPosted: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

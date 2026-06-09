@@ -38,6 +38,7 @@ function ApplyLeave() {
     const [saving, setSaving] = useState(false);
     const [actionsOpen, setActionsOpen] = useState(true);
     const editId = searchParams.get('edit');
+    const cloneId = searchParams.get('clone');
 
     // Load user's existing leaves once so we can warn about duplicates.
     useEffect(() => {
@@ -49,10 +50,11 @@ function ApplyLeave() {
         }).catch(() => {});
     }, [editId]);
 
-    // If editing, pre-fill the form from the existing leave.
+    // If editing OR cloning a rejected leave, pre-fill the form from the existing leave.
     useEffect(() => {
-        if (!editId) return;
-        leaveApi.getOne(editId).then(({ data }) => {
+        const sourceId = editId || cloneId;
+        if (!sourceId) return;
+        leaveApi.getOne(sourceId).then(({ data }) => {
             const l = data.leave;
             if (!l) return;
             setForm((f) => ({
@@ -65,11 +67,13 @@ function ApplyLeave() {
                 toDate: l.toDate ? l.toDate.slice(0, 10) : '',
                 reason: l.reason || ''
             }));
-            setSuccess(`Editing ${l.leaveReferenceNumber || l._id}`);
+            setSuccess(cloneId
+                ? `Resubmitting rejected ${l.leaveReferenceNumber || l._id} — review and Post to send a fresh application.`
+                : `Editing ${l.leaveReferenceNumber || l._id}`);
         }).catch((err) => {
             setError(err.response?.data?.message || 'Failed to load leave');
         });
-    }, [editId]);
+    }, [editId, cloneId]);
 
     // Load leave-type FIN elements (PaidLeave + UnPaidLeave) from MongoDB.
     useEffect(() => {
@@ -345,7 +349,7 @@ function ApplyLeave() {
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">
-                            {editId ? 'Edit Leave' : 'Apply Leave'} <span className="erp-badge">{editId ? 'Editing' : 'Draft'}</span>
+                            {editId ? 'Edit Leave' : cloneId ? 'Resubmit Leave' : 'Apply Leave'} <span className="erp-badge">{editId ? 'Editing' : cloneId ? 'Resubmit' : 'Draft'}</span>
                         </div>
                         <div className="erp-titlebar-actions">
                             <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>

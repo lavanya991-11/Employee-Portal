@@ -41,11 +41,24 @@ function MyLeaves() {
 
     const onEdit = () => {
         if (!selected) { alert('Select a row first.'); return; }
+        if (selected.isPosted) {
+            alert('Cannot edit a leave already posted to Business Central.');
+            return;
+        }
         if (selected.status !== 'Pending') {
             alert(`Cannot edit a ${selected.status.toLowerCase()} leave.`);
             return;
         }
         navigate(`/leaves/apply?edit=${selected._id}`);
+    };
+
+    const onResubmit = () => {
+        if (!selected) { alert('Select a rejected row to resubmit.'); return; }
+        if (selected.status !== 'Rejected') {
+            alert('Only Rejected leaves can be resubmitted.');
+            return;
+        }
+        navigate(`/leaves/apply?clone=${selected._id}`);
     };
 
     const onRegenerate = async () => {
@@ -100,7 +113,8 @@ function MyLeaves() {
                         <div className="erp-title">Apply Leave</div>
                         <div className="erp-titlebar-actions">
                             <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
-                            <button className="erp-action-btn" onClick={onEdit} disabled={!selected}>✏️ Edit</button>
+                            <button className="erp-action-btn" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>✏️ Edit</button>
+                            <button className="erp-action-btn" onClick={onResubmit} disabled={!selected || selected.status !== 'Rejected'}>🔁 Resubmit</button>
                             <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
                             <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
                         </div>
@@ -127,6 +141,7 @@ function MyLeaves() {
                                             <th>From</th>
                                             <th>To</th>
                                             <th>Days</th>
+                                            <th>Posted</th>
                                             <th>Status</th>
                                             <th>Approved Date</th>
                                             <th>Approved By</th>
@@ -166,6 +181,13 @@ function MyLeaves() {
                                                     <td>{fmtDate(l.fromDate)}</td>
                                                     <td>{fmtDate(l.toDate)}</td>
                                                     <td>{l.totalDays}</td>
+                                                    <td>
+                                                        {l.isPosted ? (
+                                                            <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: '#dbeafe', color: '#1e3a8a' }}>✓ Posted</span>
+                                                        ) : (
+                                                            <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: '#f3f4f6', color: '#6b7280' }}>Draft</span>
+                                                        )}
+                                                    </td>
                                                     <td>
                                                         {l.isApproved ? (
                                                             <span style={{ color: '#15803d', fontWeight: 600 }}>✓ Approved</span>

@@ -119,12 +119,11 @@ exports.applyLeave = async (req, res) => {
                         payType: toBcPayType(seg.payType)
                         // Don't send leaveReferenceNumber — BC generates it.
                     });
-                    // Capture BC's generated reference and store on our row.
+                    // Capture BC's generated reference and store on our row. Mark as posted.
                     const bcRef = result?.leaveReferenceNumber || result?.LeaveReferenceNumber || null;
-                    if (bcRef) {
-                        created.leaveReferenceNumber = bcRef;
-                        await created.save();
-                    }
+                    created.isPosted = true;
+                    if (bcRef) created.leaveReferenceNumber = bcRef;
+                    await created.save();
                     bc.push({ ok: true, payType: seg.payType, days: seg.totalDays, leaveReferenceNumber: bcRef, result });
                 } catch (e) {
                     bc.push({ ok: false, payType: seg.payType, days: seg.totalDays, error: e.message });
@@ -193,6 +192,9 @@ exports.updateMyLeave = async (req, res) => {
         }
         if (leave.status !== 'Pending') {
             return res.status(400).json({ message: `Cannot edit a ${leave.status.toLowerCase()} leave` });
+        }
+        if (leave.isPosted) {
+            return res.status(400).json({ message: 'Cannot edit a leave that has already been posted to Business Central.' });
         }
         const { leaveType, leaveFinId, payType, fromDate, toDate, reason } = req.body;
         if (new Date(toDate) < new Date(fromDate)) {
