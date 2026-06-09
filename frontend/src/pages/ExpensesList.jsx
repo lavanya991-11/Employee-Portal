@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import PageHeader from '../components/PageHeader';
 import { expenseApi } from '../services/api';
 
 const STATUS_LABEL = { Pending: 'UnApproved', Approved: 'Posted', Rejected: 'Rejected' };
@@ -61,6 +62,7 @@ function ExpensesList() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName={title} />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">{title} <span style={{ fontSize: 12, color: '#6b7280' }}>▼</span></div>

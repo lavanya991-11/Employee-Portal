@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import PageHeader from '../components/PageHeader';
 import { employeeInfoApi, travelApi } from '../services/api';
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -173,6 +174,7 @@ function TravelRequest() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="Travel Request" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">Travel Request <span className="erp-badge">Draft</span></div>

@@ -19,6 +19,8 @@ import ExpensesList from './pages/ExpensesList';
 import OvertimeRequest from './pages/OvertimeRequest';
 import FinElements from './pages/FinElements';
 import FinElementForm from './pages/FinElementForm';
+import IncomeTaxDeclarations from './pages/IncomeTaxDeclarations';
+import IncomeTaxComputation from './pages/IncomeTaxComputation';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import AdminCollection from './pages/AdminCollection';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -187,6 +189,22 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <FinElementForm />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/tax/declarations"
+                element={
+                    <ProtectedRoute>
+                        <IncomeTaxDeclarations />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/tax/computation"
+                element={
+                    <ProtectedRoute>
+                        <IncomeTaxComputation />
                     </ProtectedRoute>
                 }
             />
