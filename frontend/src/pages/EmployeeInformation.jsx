@@ -165,7 +165,7 @@ function EmployeeInformation() {
             <Sidebar />
             <main className="main-content">
                 <PageHeader pageName="Employee Information" />
-                <div className="card">
+                <div className="card" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, marginTop: 0, boxShadow: 'none', border: '1px solid #e5e7eb', borderTop: 'none' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', marginBottom: 12, gap: 10 }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                             <input
