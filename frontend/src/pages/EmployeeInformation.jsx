@@ -166,16 +166,19 @@ function EmployeeInformation() {
             <main className="main-content">
                 <PageHeader pageName="Employee Information" />
                 <div className="card" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, marginTop: 0, boxShadow: 'none', border: '1px solid #e5e7eb', borderTop: 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                        <input
-                            type="text"
-                            placeholder="🔍 Search fields..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{ padding: '6px 10px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 4, width: 160 }}
-                        />
-                        <button type="button" onClick={() => navigate(-1)} className="erp-action-btn">← Back</button>
-                        <button type="button" onClick={refresh} className="erp-action-btn">🔄 Refresh</button>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', marginBottom: 12, gap: 10 }}>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                            <input
+                                type="text"
+                                placeholder="🔍 Search fields..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{ padding: '6px 10px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 4, width: 160 }}
+                            />
+                            <button type="button" onClick={() => navigate(-1)} className="erp-action-btn">← Back</button>
+                            <button type="button" onClick={refresh} className="erp-action-btn">🔄 Refresh</button>
+                        </div>
+                        <h2 style={{ margin: 0 }}>EMPLOYEE INFORMATION</h2>
                     </div>
                     {error && <div className="error">{error}</div>}
                     {success && <div className="success">{success}</div>}
