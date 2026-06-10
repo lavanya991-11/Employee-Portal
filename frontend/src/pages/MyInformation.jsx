@@ -79,9 +79,13 @@ function MyInformation() {
             if (info?.employeeCode) setSelectedEmpCode(info.employeeCode);
         }).catch(() => {});
 
-        employeeInfoApi.getAll().then(({ data }) => {
-            setAllEmployees(data.employees || []);
-        }).catch(() => {});
+        // Only admin / super-admin should see all employees in the picker.
+        const role = JSON.parse(localStorage.getItem('user') || '{}').role;
+        if (['admin', 'super-admin'].includes(role)) {
+            employeeInfoApi.getAll().then(({ data }) => {
+                setAllEmployees(data.employees || []);
+            }).catch(() => {});
+        }
 
         leaveApi.myLeaves().then(({ data }) => {
             setLeaves(data.leaves || []);
