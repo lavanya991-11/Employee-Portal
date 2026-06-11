@@ -146,12 +146,11 @@ function ApplyLeave() {
         setForm((f) => ({ ...f, noOfDays: computed }));
     }, [form.fromDate, form.toDate, form.session]);
 
-    // Auto-set Pay Type from available balance (skip if user manually overrode).
+    // Auto-set Pay Type from available balance — read-only, always derived.
     //   balance == 0 → Paid
     //   balance >  0 → Unpaid
     useEffect(() => {
         setForm((f) => {
-            if (f.payTypeManual) return f;
             const avail = Number(f.availableLeaves) || 0;
             return { ...f, payType: avail > 0 ? 'Unpaid' : 'Paid' };
         });
@@ -439,19 +438,14 @@ function ApplyLeave() {
                                         <input type="number" name="balanceLeaves" value={form.balanceLeaves} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
-                                        <label>Pay Type *</label>
-                                        <select
+                                        <label>Pay Type</label>
+                                        <input
+                                            type="text"
                                             name="payType"
                                             value={form.payType}
-                                            onChange={(e) => {
-                                                setForm({ ...form, payType: e.target.value, payTypeManual: true });
-                                                setError(''); setSuccess('');
-                                            }}
-                                        >
-                                            <option value="Paid">Paid</option>
-                                            <option value="Unpaid">Unpaid</option>
-                                            <option value="Half Paid">Half Paid</option>
-                                        </select>
+                                            readOnly
+                                            className="erp-readonly"
+                                        />
                                     </div>
                                     <div className="erp-field erp-field-wide">
                                         <label>Reasons *</label>
