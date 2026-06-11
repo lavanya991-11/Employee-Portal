@@ -253,9 +253,17 @@ function MyInformation() {
                                     ))}
                                 </select>
                             ) : (
-                                <span style={{ fontWeight: 600, color: '#1e3a8a', fontSize: 14 }}>
-                                    {info.employeeCode || user.empId || ''}
-                                </span>
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={info.employeeCode || user.empId || ''}
+                                    style={{
+                                        background: '#f3f4f6', color: '#6b7280',
+                                        border: '1px solid #e5e7eb', borderRadius: 4,
+                                        padding: '4px 10px', fontSize: 13, fontWeight: 600,
+                                        width: 90, textAlign: 'center', cursor: 'not-allowed'
+                                    }}
+                                />
                             )}
                         </div>
                         <div className="leaves-stats">
@@ -308,9 +316,17 @@ function MyInformation() {
                                 ))}
                             </select>
                         ) : (
-                            <span style={{ fontWeight: 600, color: '#1e3a8a', fontSize: 14 }}>
-                                {info.employeeCode || user.empId || ''}
-                            </span>
+                            <input
+                                type="text"
+                                readOnly
+                                value={info.employeeCode || user.empId || ''}
+                                style={{
+                                    background: '#f3f4f6', color: '#6b7280',
+                                    border: '1px solid #e5e7eb', borderRadius: 4,
+                                    padding: '4px 10px', fontSize: 13, fontWeight: 600,
+                                    width: 90, textAlign: 'center', cursor: 'not-allowed'
+                                }}
+                            />
                         )}
                         <div className="calendar-legend">
                             {legend.map((l) => (
