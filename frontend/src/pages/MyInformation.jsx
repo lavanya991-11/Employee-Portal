@@ -240,22 +240,23 @@ function MyInformation() {
                     <div className="info-panel leaves-panel">
                         <div className="info-panel-header">
                             <h3>Leaves</h3>
-                            <select
-                                className="leaves-emp-select"
-                                value={selectedEmpCode || user.empId || info.employeeCode || ''}
-                                onChange={(e) => setSelectedEmpCode(e.target.value)}
-                            >
-                                {allEmployees.length === 0 && (
-                                    <option value={info.employeeCode || user.empId || ''}>
-                                        {info.employeeCode || user.empId || 'FDMS0013'}
-                                    </option>
-                                )}
-                                {allEmployees.map((emp) => (
-                                    <option key={emp._id} value={emp.employeeCode}>
-                                        {emp.employeeCode}{emp.firstName ? ` - ${emp.firstName}` : ''}
-                                    </option>
-                                ))}
-                            </select>
+                            {allEmployees.length > 0 ? (
+                                <select
+                                    className="leaves-emp-select"
+                                    value={selectedEmpCode || user.empId || info.employeeCode || ''}
+                                    onChange={(e) => setSelectedEmpCode(e.target.value)}
+                                >
+                                    {allEmployees.map((emp) => (
+                                        <option key={emp._id} value={emp.employeeCode}>
+                                            {emp.employeeCode}{emp.firstName ? ` - ${emp.firstName}` : ''}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <span style={{ fontWeight: 600, color: '#1e3a8a', fontSize: 14 }}>
+                                    {info.employeeCode || user.empId || ''}
+                                </span>
+                            )}
                         </div>
                         <div className="leaves-stats">
                             <CircleStat
@@ -294,22 +295,23 @@ function MyInformation() {
                 <div className="info-panel">
                     <div className="info-panel-header calendar-header-row">
                         <h3>My Calendar</h3>
-                        <select
-                            className="leaves-emp-select"
-                            value={selectedEmpCode || user.empId || info.employeeCode || ''}
-                            onChange={(e) => setSelectedEmpCode(e.target.value)}
-                        >
-                            {allEmployees.length === 0 && (
-                                <option value={info.employeeCode || user.empId || ''}>
-                                    {info.employeeCode || user.empId || 'FDMS0013'}
-                                </option>
-                            )}
-                            {allEmployees.map((emp) => (
-                                <option key={emp._id} value={emp.employeeCode}>
-                                    {emp.employeeCode}{emp.firstName ? ` - ${emp.firstName}` : ''}
-                                </option>
-                            ))}
-                        </select>
+                        {allEmployees.length > 0 ? (
+                            <select
+                                className="leaves-emp-select"
+                                value={selectedEmpCode || user.empId || info.employeeCode || ''}
+                                onChange={(e) => setSelectedEmpCode(e.target.value)}
+                            >
+                                {allEmployees.map((emp) => (
+                                    <option key={emp._id} value={emp.employeeCode}>
+                                        {emp.employeeCode}{emp.firstName ? ` - ${emp.firstName}` : ''}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : (
+                            <span style={{ fontWeight: 600, color: '#1e3a8a', fontSize: 14 }}>
+                                {info.employeeCode || user.empId || ''}
+                            </span>
+                        )}
                         <div className="calendar-legend">
                             {legend.map((l) => (
                                 <div className="cal-legend-item" key={l.key}>
