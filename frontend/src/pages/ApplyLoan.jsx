@@ -51,6 +51,19 @@ function ApplyLoan() {
         return isNaN(n) ? 0 : n;
     }, [form.instAmount, form.noOfInstallments]);
 
+    // Auto-derive Approved Amount, No Of Installments, Inst Amount from Loan Amount.
+    useEffect(() => {
+        const amount = Number(form.loanAmount) || 0;
+        const installments = 12; // default monthly EMIs
+        const inst = installments > 0 ? +(amount / installments).toFixed(2) : 0;
+        setForm((f) => ({
+            ...f,
+            approvedAmount: amount,
+            noOfInstallments: amount > 0 ? installments : 0,
+            instAmount: inst
+        }));
+    }, [form.loanAmount]);
+
     const onSubmit = async (e) => {
         e?.preventDefault?.();
         setError(''); setSuccess('');
@@ -164,17 +177,15 @@ function ApplyLoan() {
                                     </div>
                                     <div className="erp-field">
                                         <label>Approved Amount</label>
-                                        <input type="number" name="approvedAmount" value={form.approvedAmount} onChange={onChange} min="0" step="0.01" />
+                                        <input type="number" name="approvedAmount" value={form.approvedAmount} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
-                                        <label>Inst Amount *</label>
-                                        <input type="number" name="instAmount" value={form.instAmount} onChange={onChange} min="0" step="0.01"
-                                            className={form.instAmount ? '' : 'erp-required'} />
+                                        <label>Inst Amount</label>
+                                        <input type="number" name="instAmount" value={form.instAmount} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
-                                        <label>No Of Installments *</label>
-                                        <input type="number" name="noOfInstallments" value={form.noOfInstallments} onChange={onChange} min="0"
-                                            className={form.noOfInstallments ? '' : 'erp-required'} />
+                                        <label>No Of Installments</label>
+                                        <input type="number" name="noOfInstallments" value={form.noOfInstallments} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Deduction Month</label>
