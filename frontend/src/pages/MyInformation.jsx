@@ -240,7 +240,7 @@ function MyInformation() {
                     <div className="info-panel leaves-panel">
                         <div className="info-panel-header">
                             <h3>Leaves</h3>
-                            {allEmployees.length > 0 && (
+                            {allEmployees.length > 0 ? (
                                 <select
                                     className="leaves-emp-select"
                                     value={selectedEmpCode || user.empId || info.employeeCode || ''}
@@ -252,6 +252,10 @@ function MyInformation() {
                                         </option>
                                     ))}
                                 </select>
+                            ) : (
+                                <span style={{ fontWeight: 600, color: '#1e3a8a', fontSize: 14 }}>
+                                    {info.employeeCode || user.empId || ''}
+                                </span>
                             )}
                         </div>
                         <div className="leaves-stats">
@@ -291,7 +295,7 @@ function MyInformation() {
                 <div className="info-panel">
                     <div className="info-panel-header calendar-header-row">
                         <h3>My Calendar</h3>
-                        {allEmployees.length > 0 && (
+                        {allEmployees.length > 0 ? (
                             <select
                                 className="leaves-emp-select"
                                 value={selectedEmpCode || user.empId || info.employeeCode || ''}
@@ -303,6 +307,10 @@ function MyInformation() {
                                     </option>
                                 ))}
                             </select>
+                        ) : (
+                            <span style={{ fontWeight: 600, color: '#1e3a8a', fontSize: 14 }}>
+                                {info.employeeCode || user.empId || ''}
+                            </span>
                         )}
                         <div className="calendar-legend">
                             {legend.map((l) => (
