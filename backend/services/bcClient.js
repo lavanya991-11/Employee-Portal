@@ -205,4 +205,34 @@ const createEmployeeLeave = async ({ employeeNumber, payCode, leaveStartDate, le
     return res.json().catch(() => ({}));
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave };
+const getHolidays = async () => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    // Try the payroll path first (most common for HR data), fall back to standard API path.
+    const candidates = [
+        `${basePayrollCompanyUrl()}/holidays`,
+        `${basePayrollCompanyUrl()}/publicHolidays`,
+        `${baseCompanyUrl()}/holidays`,
+        `${baseCompanyUrl()}/publicHolidays`
+    ];
+
+    let lastErr = null;
+    for (const url of candidates) {
+        try {
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                return data.value || data || [];
+            }
+            lastErr = new Error(`${res.status} ${await res.text()}`);
+        } catch (e) {
+            lastErr = e;
+        }
+    }
+    throw new Error(`BC holidays not found at any known endpoint. Last error: ${lastErr?.message || 'unknown'}`);
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays };

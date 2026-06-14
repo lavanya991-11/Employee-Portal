@@ -93,6 +93,10 @@ export const employeeInfoApi = {
     getAll: () => api.get('/employee-info/all')
 };
 
+export const holidayApi = {
+    list: () => api.get('/holidays')
+};
+
 export const finElementApi = {
     list: (params) => api.get('/fin-elements', { params }),
     getOne: (id) => api.get(`/fin-elements/${id}`),

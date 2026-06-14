@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
-import { authApi, leaveApi, employeeInfoApi, finElementApi } from '../services/api';
+import { authApi, leaveApi, employeeInfoApi, finElementApi, holidayApi } from '../services/api';
 
 const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 
@@ -58,13 +58,14 @@ function MyInformation() {
     const [calendarDate, setCalendarDate] = useState(new Date());
     const [holidayIndex, setHolidayIndex] = useState(0);
 
-    const holidays = [
+    const fallbackHolidays = [
         { day: '11', month: 'Oct', weekday: 'Fri', year: '2024', name: 'Saraswathi Pooja, Ayutha Pooja' },
         { day: '12', month: 'Oct', weekday: 'Sat', year: '2024', name: 'Vijayadashami' },
         { day: '01', month: 'Nov', weekday: 'Fri', year: '2024', name: 'Diwali' },
         { day: '25', month: 'Dec', weekday: 'Wed', year: '2024', name: 'Christmas' },
         { day: '01', month: 'Jan', weekday: 'Wed', year: '2025', name: 'New Year' }
     ];
+    const [holidays, setHolidays] = useState(fallbackHolidays);
 
     useEffect(() => {
         authApi.me().then(({ data }) => {
@@ -90,6 +91,21 @@ function MyInformation() {
         leaveApi.myLeaves().then(({ data }) => {
             setLeaves(data.leaves || []);
         }).catch(() => {});
+
+        holidayApi.list().then(({ data }) => {
+            const fromBc = (data.holidays || []).map((h) => {
+                const d = new Date(h.date);
+                if (isNaN(d)) return null;
+                return {
+                    day: String(d.getDate()).padStart(2, '0'),
+                    month: d.toLocaleDateString('en-GB', { month: 'short' }),
+                    weekday: d.toLocaleDateString('en-GB', { weekday: 'short' }),
+                    year: String(d.getFullYear()),
+                    name: h.name || 'Holiday'
+                };
+            }).filter(Boolean);
+            if (fromBc.length) setHolidays(fromBc);
+        }).catch(() => { /* keep fallback holidays */ });
 
         finElementApi.list().then(({ data }) => {
             const items = (data.items || [])
