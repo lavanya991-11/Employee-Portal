@@ -29,11 +29,14 @@ function Holidays() {
             const list = data.holidays || [];
             setHolidays(list);
             if (list.length > 0) {
-                setSuccess(`Imported ${list.length} holiday(s) from Business Central for ${y}.`);
-                setTimeout(() => setSuccess(''), 2500);
+                const tag = data.source === 'fallback'
+                    ? `Showing fallback list (${list.length} holidays for ${y}). BC holidays endpoint not configured — ask Narsingh for the URL.`
+                    : `Imported ${list.length} holiday(s) from Business Central for ${y}.`;
+                setSuccess(tag);
+                setTimeout(() => setSuccess(''), 4000);
             }
         }).catch((err) => {
-            setError(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch holidays from BC');
+            setError(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch holidays');
             setHolidays([]);
         }).finally(() => setLoading(false));
     };

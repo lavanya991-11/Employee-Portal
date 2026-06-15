@@ -209,12 +209,21 @@ const getHolidays = async () => {
     if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
 
     const token = await getAccessToken();
-    // Try the payroll path first (most common for HR data), fall back to standard API path.
+    // Try every known BC holiday endpoint variant. Returns the first one that responds 200.
     const candidates = [
         `${basePayrollCompanyUrl()}/holidays`,
         `${basePayrollCompanyUrl()}/publicHolidays`,
+        `${basePayrollCompanyUrl()}/holidayMasters`,
+        `${basePayrollCompanyUrl()}/holidayMaster`,
+        `${basePayrollCompanyUrl()}/holidayList`,
+        `${basePayrollCompanyUrl()}/companyHolidays`,
+        `${basePayrollCompanyUrl()}/holidaySetup`,
         `${baseCompanyUrl()}/holidays`,
-        `${baseCompanyUrl()}/publicHolidays`
+        `${baseCompanyUrl()}/publicHolidays`,
+        `${baseCompanyUrl()}/holidayMasters`,
+        `${baseCompanyUrl()}/holidayMaster`,
+        `${baseCompanyUrl()}/holidayList`,
+        `${baseCompanyUrl()}/companyHolidays`
     ];
 
     let lastErr = null;
@@ -227,12 +236,14 @@ const getHolidays = async () => {
                 const data = await res.json();
                 return data.value || data || [];
             }
-            lastErr = new Error(`${res.status} ${await res.text()}`);
+            lastErr = new Error(`${res.status} at ${url.split('/companies')[1]?.split('?')[0] || url}`);
         } catch (e) {
             lastErr = e;
         }
     }
-    throw new Error(`BC holidays not found at any known endpoint. Last error: ${lastErr?.message || 'unknown'}`);
+    const err = new Error(`BC holidays endpoint not published. Tried ${candidates.length} URL variants. Last: ${lastErr?.message || 'unknown'}`);
+    err.bcNotFound = true;
+    throw err;
 };
 
 module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays };
