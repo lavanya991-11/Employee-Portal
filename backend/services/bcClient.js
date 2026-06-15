@@ -205,45 +205,28 @@ const createEmployeeLeave = async ({ employeeNumber, payCode, leaveStartDate, le
     return res.json().catch(() => ({}));
 };
 
-const getHolidays = async () => {
+const getHolidays = async (year) => {
     if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
 
     const token = await getAccessToken();
-    // Try every known BC holiday endpoint variant. Returns the first one that responds 200.
-    const candidates = [
-        `${basePayrollCompanyUrl()}/holidays`,
-        `${basePayrollCompanyUrl()}/publicHolidays`,
-        `${basePayrollCompanyUrl()}/holidayMasters`,
-        `${basePayrollCompanyUrl()}/holidayMaster`,
-        `${basePayrollCompanyUrl()}/holidayList`,
-        `${basePayrollCompanyUrl()}/companyHolidays`,
-        `${basePayrollCompanyUrl()}/holidaySetup`,
-        `${baseCompanyUrl()}/holidays`,
-        `${baseCompanyUrl()}/publicHolidays`,
-        `${baseCompanyUrl()}/holidayMasters`,
-        `${baseCompanyUrl()}/holidayMaster`,
-        `${baseCompanyUrl()}/holidayList`,
-        `${baseCompanyUrl()}/companyHolidays`
-    ];
+    const y = year || new Date().getFullYear();
+    // OData filter REQUIRED by this BC endpoint:  ?$filter=year eq '2026'
+    const filter = encodeURIComponent(`year eq '${y}'`);
+    const url = `${basePayrollCompanyUrl()}/publicHolidays?$filter=${filter}`;
 
-    let lastErr = null;
-    for (const url of candidates) {
-        try {
-            const res = await fetch(url, {
-                headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                return data.value || data || [];
-            }
-            lastErr = new Error(`${res.status} at ${url.split('/companies')[1]?.split('?')[0] || url}`);
-        } catch (e) {
-            lastErr = e;
-        }
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        const err = new Error(`BC publicHolidays failed: ${res.status} ${text}`);
+        if (res.status === 404) err.bcNotFound = true;
+        throw err;
     }
-    const err = new Error(`BC holidays endpoint not published. Tried ${candidates.length} URL variants. Last: ${lastErr?.message || 'unknown'}`);
-    err.bcNotFound = true;
-    throw err;
+
+    const data = await res.json();
+    return data.value || [];
 };
 
 module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays };

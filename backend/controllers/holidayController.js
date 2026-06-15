@@ -24,9 +24,11 @@ exports.list = async (req, res) => {
     let holidays = [];
     let source = 'bc';
 
+    const yearFilter = req.query.year ? Number(req.query.year) : new Date().getFullYear();
+
     if (bcConfigured()) {
         try {
-            const items = await getHolidays();
+            const items = await getHolidays(yearFilter);
             holidays = (items || []).map((h) => ({
                 fromDate: h.fromDate || h.startDate || h.date || h.holidayDate || h.day || null,
                 toDate: h.toDate || h.endDate || h.date || h.holidayDate || h.day || null,
@@ -45,7 +47,7 @@ exports.list = async (req, res) => {
         source = 'fallback';
     }
 
-    const yearFilter = req.query.year ? Number(req.query.year) : null;
+    // Final year filter (covers the fallback path too).
     if (yearFilter && !Number.isNaN(yearFilter)) {
         holidays = holidays.filter((h) => new Date(h.fromDate).getFullYear() === yearFilter);
     }
