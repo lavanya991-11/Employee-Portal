@@ -210,8 +210,8 @@ const getHolidays = async (year) => {
 
     const token = await getAccessToken();
     const y = year || new Date().getFullYear();
-    // OData filter REQUIRED by this BC endpoint:  ?$filter=year eq '2026'
-    const filter = encodeURIComponent(`year eq '${y}'`);
+    // BC `year` is Edm.Int32 — must be unquoted in the filter:  ?$filter=year eq 2026
+    const filter = encodeURIComponent(`year eq ${Number(y)}`);
     const url = `${basePayrollCompanyUrl()}/publicHolidays?$filter=${filter}`;
 
     const res = await fetch(url, {
