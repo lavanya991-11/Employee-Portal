@@ -311,8 +311,8 @@ function MyInformation() {
                         </div>
                         <div className="holiday-content">
                             {holidays.length === 0 ? (
-                                <div style={{ padding: 20, textAlign: 'center', color: 'white', opacity: 0.85 }}>
-                                    Loading upcoming holidays…
+                                <div style={{ padding: 20, textAlign: 'center', color: 'white', opacity: 0.9 }}>
+                                    No upcoming holidays.
                                 </div>
                             ) : (
                                 <>
