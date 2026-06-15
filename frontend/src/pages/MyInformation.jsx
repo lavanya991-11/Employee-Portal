@@ -85,7 +85,7 @@ function MyInformation() {
             setLeaves(data.leaves || []);
         }).catch(() => {});
 
-        // Fetch current year + next year, keep only upcoming holidays (>= today).
+        // Fetch current year + next year. Prefer upcoming; if none, show all year holidays.
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const thisYear = today.getFullYear();
         const mapHoliday = (h) => {
@@ -104,12 +104,13 @@ function MyInformation() {
             holidayApi.list(thisYear).catch(() => ({ data: { holidays: [] } })),
             holidayApi.list(thisYear + 1).catch(() => ({ data: { holidays: [] } }))
         ]).then(([cur, next]) => {
-            const merged = [...(cur.data.holidays || []), ...(next.data.holidays || [])]
+            const all = [...(cur.data.holidays || []), ...(next.data.holidays || [])]
                 .map(mapHoliday)
                 .filter(Boolean)
-                .filter((h) => new Date(h.iso) >= today)
                 .sort((a, b) => new Date(a.iso) - new Date(b.iso));
-            setHolidays(merged);
+            const upcoming = all.filter((h) => new Date(h.iso) >= today);
+            // Show upcoming if any; otherwise show all holidays we have so panel isn't blank.
+            setHolidays(upcoming.length > 0 ? upcoming : all);
         });
 
         finElementApi.list().then(({ data }) => {
