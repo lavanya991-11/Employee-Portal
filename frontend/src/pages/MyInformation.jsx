@@ -58,14 +58,7 @@ function MyInformation() {
     const [calendarDate, setCalendarDate] = useState(new Date());
     const [holidayIndex, setHolidayIndex] = useState(0);
 
-    const fallbackHolidays = [
-        { day: '11', month: 'Oct', weekday: 'Fri', year: '2024', name: 'Saraswathi Pooja, Ayutha Pooja' },
-        { day: '12', month: 'Oct', weekday: 'Sat', year: '2024', name: 'Vijayadashami' },
-        { day: '01', month: 'Nov', weekday: 'Fri', year: '2024', name: 'Diwali' },
-        { day: '25', month: 'Dec', weekday: 'Wed', year: '2024', name: 'Christmas' },
-        { day: '01', month: 'Jan', weekday: 'Wed', year: '2025', name: 'New Year' }
-    ];
-    const [holidays, setHolidays] = useState(fallbackHolidays);
+    const [holidays, setHolidays] = useState([]);
 
     useEffect(() => {
         authApi.me().then(({ data }) => {
@@ -92,22 +85,32 @@ function MyInformation() {
             setLeaves(data.leaves || []);
         }).catch(() => {});
 
-        holidayApi.list(new Date().getFullYear()).then(({ data }) => {
-            const today = new Date(); today.setHours(0, 0, 0, 0);
-            const fromBc = (data.holidays || []).map((h) => {
-                const d = new Date(h.fromDate || h.date);
-                if (isNaN(d)) return null;
-                return {
-                    iso: d.toISOString(),
-                    day: String(d.getDate()).padStart(2, '0'),
-                    month: d.toLocaleDateString('en-GB', { month: 'short' }),
-                    weekday: d.toLocaleDateString('en-GB', { weekday: 'short' }),
-                    year: String(d.getFullYear()),
-                    name: h.description || h.name || 'Holiday'
-                };
-            }).filter(Boolean).filter((h) => new Date(h.iso) >= today);
-            if (fromBc.length) setHolidays(fromBc);
-        }).catch(() => { /* keep fallback holidays */ });
+        // Fetch current year + next year, keep only upcoming holidays (>= today).
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const thisYear = today.getFullYear();
+        const mapHoliday = (h) => {
+            const d = new Date(h.fromDate || h.date);
+            if (isNaN(d)) return null;
+            return {
+                iso: d.toISOString(),
+                day: String(d.getDate()).padStart(2, '0'),
+                month: d.toLocaleDateString('en-GB', { month: 'short' }),
+                weekday: d.toLocaleDateString('en-GB', { weekday: 'short' }),
+                year: String(d.getFullYear()),
+                name: h.description || h.name || 'Holiday'
+            };
+        };
+        Promise.all([
+            holidayApi.list(thisYear).catch(() => ({ data: { holidays: [] } })),
+            holidayApi.list(thisYear + 1).catch(() => ({ data: { holidays: [] } }))
+        ]).then(([cur, next]) => {
+            const merged = [...(cur.data.holidays || []), ...(next.data.holidays || [])]
+                .map(mapHoliday)
+                .filter(Boolean)
+                .filter((h) => new Date(h.iso) >= today)
+                .sort((a, b) => new Date(a.iso) - new Date(b.iso));
+            setHolidays(merged);
+        });
 
         finElementApi.list().then(({ data }) => {
             const items = (data.items || [])
@@ -307,13 +310,21 @@ function MyInformation() {
                             </div>
                         </div>
                         <div className="holiday-content">
-                            <div className="holiday-date">
-                                <div className="holiday-day">{holidays[holidayIndex].day}</div>
-                                <div className="holiday-month">{holidays[holidayIndex].month}</div>
-                                <div className="holiday-weekday">{holidays[holidayIndex].weekday} | {holidays[holidayIndex].year}</div>
-                            </div>
-                            <div className="holiday-divider" />
-                            <div className="holiday-name">{holidays[holidayIndex].name}</div>
+                            {holidays.length === 0 ? (
+                                <div style={{ padding: 20, textAlign: 'center', color: 'white', opacity: 0.85 }}>
+                                    Loading upcoming holidays…
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="holiday-date">
+                                        <div className="holiday-day">{holidays[holidayIndex % holidays.length].day}</div>
+                                        <div className="holiday-month">{holidays[holidayIndex % holidays.length].month}</div>
+                                        <div className="holiday-weekday">{holidays[holidayIndex % holidays.length].weekday} | {holidays[holidayIndex % holidays.length].year}</div>
+                                    </div>
+                                    <div className="holiday-divider" />
+                                    <div className="holiday-name">{holidays[holidayIndex % holidays.length].name}</div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
