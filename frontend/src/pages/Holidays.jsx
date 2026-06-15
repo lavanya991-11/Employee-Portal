@@ -120,6 +120,7 @@ function Holidays() {
                                     <thead>
                                         <tr>
                                             <th>Select</th>
+                                            <th>Doc Date</th>
                                             <th>Doc No</th>
                                             <th>From Date</th>
                                             <th>To Date</th>
@@ -136,6 +137,7 @@ function Holidays() {
                                                     onClick={() => setSelected({ ...h, idx: i })}
                                                 >
                                                     <td><input type="checkbox" checked={isSel} readOnly /></td>
+                                                    <td>{fmtDate(new Date())}</td>
                                                     <td className="erp-doc-link">{docNo(h, i, year)}</td>
                                                     <td>{fmtDate(h.fromDate)}</td>
                                                     <td>{fmtDate(h.toDate)}</td>
