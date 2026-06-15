@@ -92,18 +92,20 @@ function MyInformation() {
             setLeaves(data.leaves || []);
         }).catch(() => {});
 
-        holidayApi.list().then(({ data }) => {
+        holidayApi.list(new Date().getFullYear()).then(({ data }) => {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
             const fromBc = (data.holidays || []).map((h) => {
-                const d = new Date(h.date);
+                const d = new Date(h.fromDate || h.date);
                 if (isNaN(d)) return null;
                 return {
+                    iso: d.toISOString(),
                     day: String(d.getDate()).padStart(2, '0'),
                     month: d.toLocaleDateString('en-GB', { month: 'short' }),
                     weekday: d.toLocaleDateString('en-GB', { weekday: 'short' }),
                     year: String(d.getFullYear()),
-                    name: h.name || 'Holiday'
+                    name: h.description || h.name || 'Holiday'
                 };
-            }).filter(Boolean);
+            }).filter(Boolean).filter((h) => new Date(h.iso) >= today);
             if (fromBc.length) setHolidays(fromBc);
         }).catch(() => { /* keep fallback holidays */ });
 

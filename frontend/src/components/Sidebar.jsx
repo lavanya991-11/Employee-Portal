@@ -109,6 +109,10 @@ function Sidebar() {
                     <span className="nav-item-icon">🪪</span> My Information
                 </Link>
 
+                <Link to="/holidays" className="nav-item">
+                    <span className="nav-item-icon">🎉</span> Holidays
+                </Link>
+
                 {['manager', 'admin', 'super-admin'].includes(user.role) && (
                     <Link to="/fin-elements" className="nav-item">
                         <span className="nav-item-icon">⚙️</span> FIN Elements

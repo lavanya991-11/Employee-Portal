@@ -7,12 +7,23 @@ exports.list = async (req, res) => {
         }
         const items = await getHolidays();
         // Normalize to a consistent shape — handle BC's various field names.
-        const holidays = (items || []).map((h) => ({
-            date: h.date || h.holidayDate || h.startDate || h.day || null,
-            name: h.description || h.name || h.holidayName || h.title || '',
+        let holidays = (items || []).map((h) => ({
+            fromDate: h.fromDate || h.startDate || h.date || h.holidayDate || h.day || null,
+            toDate: h.toDate || h.endDate || h.date || h.holidayDate || h.day || null,
+            description: h.description || h.name || h.holidayName || h.title || '',
             type: h.type || h.holidayType || ''
-        })).filter((h) => h.date);
-        res.json({ success: true, count: holidays.length, holidays });
+        })).filter((h) => h.fromDate);
+
+        // Optional year filter (?year=2026).
+        const yearFilter = req.query.year ? Number(req.query.year) : null;
+        if (yearFilter && !Number.isNaN(yearFilter)) {
+            holidays = holidays.filter((h) => new Date(h.fromDate).getFullYear() === yearFilter);
+        }
+
+        // Sort earliest first.
+        holidays.sort((a, b) => new Date(a.fromDate) - new Date(b.fromDate));
+
+        res.json({ success: true, count: holidays.length, year: yearFilter || null, holidays });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Failed to fetch holidays from BC', error: err.message });
     }

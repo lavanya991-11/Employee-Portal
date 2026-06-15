@@ -13,6 +13,7 @@ import ApplyRequest from './pages/ApplyRequest';
 import Payslip from './pages/Payslip';
 import Attendance from './pages/Attendance';
 import OnDuty from './pages/OnDuty';
+import Holidays from './pages/Holidays';
 import TravelRequest from './pages/TravelRequest';
 import TravelRequests from './pages/TravelRequests';
 import TravelExpenses from './pages/TravelExpenses';
@@ -127,6 +128,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <OnDuty />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/holidays"
+                element={
+                    <ProtectedRoute>
+                        <Holidays />
                     </ProtectedRoute>
                 }
             />

@@ -94,7 +94,7 @@ export const employeeInfoApi = {
 };
 
 export const holidayApi = {
-    list: () => api.get('/holidays')
+    list: (year) => api.get('/holidays', { params: year ? { year } : {} })
 };
 
 export const finElementApi = {
