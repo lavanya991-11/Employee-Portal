@@ -85,7 +85,7 @@ function MyInformation() {
             setLeaves(data.leaves || []);
         }).catch(() => {});
 
-        // Fetch current year + next year. Prefer upcoming; if none, show all year holidays.
+        // Show ALL BC holidays for current + next year, upcoming first then past.
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const thisYear = today.getFullYear();
         const mapHoliday = (h) => {
@@ -109,8 +109,8 @@ function MyInformation() {
                 .filter(Boolean)
                 .sort((a, b) => new Date(a.iso) - new Date(b.iso));
             const upcoming = all.filter((h) => new Date(h.iso) >= today);
-            // Show upcoming if any; otherwise show all holidays we have so panel isn't blank.
-            setHolidays(upcoming.length > 0 ? upcoming : all);
+            const past = all.filter((h) => new Date(h.iso) < today);
+            setHolidays([...upcoming, ...past]); // upcoming shown first, past after
         });
 
         finElementApi.list().then(({ data }) => {
@@ -303,7 +303,7 @@ function MyInformation() {
 
                     <div className="info-panel holidays-panel holidays-compact">
                         <div className="holidays-header">
-                            <h3>Upcoming Holidays</h3>
+                            <h3>Holidays</h3>
                             <div className="holidays-nav">
                                 <button type="button" title="Grid view" onClick={() => setHolidayIndex(0)}>⊞</button>
                                 <button type="button" title="Previous" onClick={() => setHolidayIndex((i) => (i - 1 + holidays.length) % holidays.length)}>‹</button>
@@ -313,7 +313,7 @@ function MyInformation() {
                         <div className="holiday-content">
                             {holidays.length === 0 ? (
                                 <div style={{ padding: 20, textAlign: 'center', color: 'white', opacity: 0.9 }}>
-                                    No upcoming holidays.
+                                    No holidays found.
                                 </div>
                             ) : (
                                 <>
