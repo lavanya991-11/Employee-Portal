@@ -94,11 +94,7 @@ export const employeeInfoApi = {
 };
 
 export const holidayApi = {
-    list: (year) => api.get('/holidays', { params: year ? { year } : {} }),
-    create: (data) => api.post('/holidays', data),
-    getOne: (id) => api.get(`/holidays/${id}`),
-    update: (id, data) => api.put(`/holidays/${id}`, data),
-    remove: (id) => api.delete(`/holidays/${id}`)
+    list: (year) => api.get('/holidays', { params: year ? { year } : {} })
 };
 
 export const finElementApi = {
