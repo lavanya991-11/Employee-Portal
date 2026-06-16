@@ -300,6 +300,7 @@ function Dashboard() {
 
 function AttendanceCalendar({ leaves }) {
     const [cursor, setCursor] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(null);
     const today = new Date(); today.setHours(0, 0, 0, 0);
 
     const year = cursor.getFullYear();
@@ -373,21 +374,85 @@ function AttendanceCalendar({ leaves }) {
                         const status = dayStatus[d.getDate()];
                         const isWeekend = d.getDay() === 0 || d.getDay() === 6;
                         const isMonthDay = !otherMonth;
+                        const isSelected = selectedDate && d.getTime() === selectedDate.getTime();
                         const showStatusBg = isMonthDay && !isToday;
                         const style = showStatusBg ? dotStyle(status, isWeekend) : null;
-                        const bg = isToday ? '#2563eb' : (style?.background || 'transparent');
-                        const fg = isToday ? '#ffffff' : (otherMonth ? '#d1d5db' : (style?.color || '#374151'));
+                        const bg = isSelected ? '#1e3a8a'
+                            : isToday ? '#2563eb'
+                            : (style?.background || 'transparent');
+                        const fg = isSelected ? '#ffffff'
+                            : isToday ? '#ffffff'
+                            : (otherMonth ? '#d1d5db' : (style?.color || '#374151'));
                         return (
-                            <div key={i} style={{
-                                width: 32, height: 32, lineHeight: '32px', borderRadius: '50%',
-                                textAlign: 'center', fontSize: 12, fontWeight: 600,
-                                background: bg, color: fg, margin: '0 auto'
-                            }}>
+                            <div key={i}
+                                onClick={() => !otherMonth && setSelectedDate(new Date(d))}
+                                style={{
+                                    width: 32, height: 32, lineHeight: '32px', borderRadius: '50%',
+                                    textAlign: 'center', fontSize: 12, fontWeight: 600,
+                                    background: bg, color: fg, margin: '0 auto',
+                                    cursor: otherMonth ? 'default' : 'pointer',
+                                    border: isSelected ? '2px solid #fbbf24' : 'none'
+                                }}
+                            >
                                 {d.getDate()}
                             </div>
                         );
                     })}
                 </div>
+
+                {/* Day details panel */}
+                {selectedDate && (() => {
+                    const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
+                    const dayLeaves = (leaves || []).filter((l) => {
+                        const from = new Date(l.fromDate); from.setHours(0, 0, 0, 0);
+                        const to = new Date(l.toDate); to.setHours(0, 0, 0, 0);
+                        return selectedDate >= from && selectedDate <= to;
+                    });
+                    const isToday = selectedDate.getTime() === today.getTime();
+                    let statusLabel = 'Present';
+                    let statusColor = '#15803d';
+                    if (dayLeaves.length > 0) {
+                        const l = dayLeaves[0];
+                        const isHalf = l.payType === 'Half Paid' || l.leaveType?.toLowerCase().includes('half');
+                        statusLabel = isHalf ? 'Half Day Leave' : 'Full Day Leave';
+                        statusColor = isHalf ? '#92400e' : '#b91c1c';
+                    } else if (isWeekend) {
+                        statusLabel = 'Weekly Off';
+                        statusColor = '#6b7280';
+                    }
+                    return (
+                        <div style={{ marginTop: 14, padding: 12, background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                <div>
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                                        {selectedDate.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
+                                    </div>
+                                    {isToday && <span style={{ display: 'inline-block', marginTop: 4, padding: '1px 8px', borderRadius: 10, background: '#dbeafe', color: '#1e40af', fontSize: 10, fontWeight: 600 }}>TODAY</span>}
+                                </div>
+                                <span style={{
+                                    padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600,
+                                    background: statusColor + '22', color: statusColor
+                                }}>{statusLabel}</span>
+                            </div>
+                            {dayLeaves.length > 0 ? (
+                                dayLeaves.map((l) => (
+                                    <div key={l._id} style={{ fontSize: 12, color: '#374151', padding: '4px 0' }}>
+                                        <b>{l.leaveType}</b> · {new Date(l.fromDate).toLocaleDateString('en-GB')} → {new Date(l.toDate).toLocaleDateString('en-GB')} · {l.totalDays} day(s) · <span style={{ color: l.status === 'Approved' ? '#15803d' : l.status === 'Rejected' ? '#b91c1c' : '#a16207' }}>{l.status}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div style={{ fontSize: 12, color: '#6b7280' }}>
+                                    {isWeekend ? 'No work scheduled.' : 'No leave on this day.'}
+                                </div>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => setSelectedDate(null)}
+                                style={{ marginTop: 8, background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: 11, padding: 0 }}
+                            >Clear selection ✕</button>
+                        </div>
+                    );
+                })()}
             </div>
         </div>
     );
