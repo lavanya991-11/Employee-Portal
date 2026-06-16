@@ -269,34 +269,8 @@ function Dashboard() {
                         </div>
                     </div>
 
-                    <div className="dash-card">
-                        <div className="dash-card-head">
-                            <span>My Leaves</span>
-                            <Link to="/leaves/my" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>View All</Link>
-                        </div>
-                        <div style={{ padding: 14 }}>
-                            {recentLeaves.length === 0 ? (
-                                <p style={{ color: '#9ca3af', fontSize: 13, margin: 0 }}>No leaves yet. Apply for one from the sidebar.</p>
-                            ) : (
-                                recentLeaves.map((l) => (
-                                    <div key={l._id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
-                                        <div>
-                                            <div style={{ fontWeight: 600, fontSize: 13, color: '#111827' }}>{l.leaveType}</div>
-                                            <div style={{ fontSize: 11, color: '#6b7280' }}>
-                                                {new Date(l.fromDate).toLocaleDateString('en-GB')} → {new Date(l.toDate).toLocaleDateString('en-GB')}
-                                            </div>
-                                        </div>
-                                        <span style={{
-                                            alignSelf: 'center', fontSize: 11, fontWeight: 600,
-                                            padding: '2px 8px', borderRadius: 10,
-                                            background: l.status === 'Approved' ? '#dcfce7' : l.status === 'Rejected' ? '#fee2e2' : '#fef3c7',
-                                            color: l.status === 'Approved' ? '#15803d' : l.status === 'Rejected' ? '#b91c1c' : '#a16207'
-                                        }}>{l.status}</span>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
+                    <AttendanceCalendar leaves={allLeaves} />
+
 
                     <div className="dash-card">
                         <div className="dash-card-head"><span>Quick Links</span></div>
@@ -338,6 +312,108 @@ function Dashboard() {
         </div>
     );
 }
+
+function AttendanceCalendar({ leaves }) {
+    const [cursor, setCursor] = useState(new Date());
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+
+    const year = cursor.getFullYear();
+    const month = cursor.getMonth();
+    const monthLabel = cursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+    // Build day-status map from leaves (Approved leaves = Absent on those days).
+    const dayStatus = {};
+    (leaves || []).forEach((l) => {
+        if (l.status !== 'Approved') return;
+        const status = (l.payType === 'Unpaid' || l.leaveType?.toLowerCase().includes('half')) ? 'half' : 'absent';
+        const from = new Date(l.fromDate); from.setHours(0, 0, 0, 0);
+        const to = new Date(l.toDate); to.setHours(0, 0, 0, 0);
+        for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+            if (d.getFullYear() === year && d.getMonth() === month) {
+                dayStatus[d.getDate()] = status;
+            }
+        }
+    });
+
+    // Build the 7×N grid starting on Monday.
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startOffset = (firstDay.getDay() + 6) % 7; // Mon = 0
+    const cells = [];
+    for (let i = 0; i < startOffset; i++) {
+        const d = new Date(year, month, 1 - (startOffset - i));
+        cells.push({ d, otherMonth: true });
+    }
+    for (let n = 1; n <= lastDay.getDate(); n++) {
+        cells.push({ d: new Date(year, month, n), otherMonth: false });
+    }
+    while (cells.length % 7 !== 0) {
+        const last = cells[cells.length - 1].d;
+        const next = new Date(last); next.setDate(last.getDate() + 1);
+        cells.push({ d: next, otherMonth: true });
+    }
+
+    const dotStyle = (status) => {
+        if (status === 'absent') return { background: '#fee2e2', color: '#b91c1c' };
+        if (status === 'half') return { background: '#fef3c7', color: '#a16207' };
+        return { background: '#dcfce7', color: '#15803d' };
+    };
+
+    return (
+        <div className="dash-card">
+            <div className="dash-card-head">
+                <span>My Attendance</span>
+                <Link to="/leaves/my" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>View All</Link>
+            </div>
+            <div style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', borderBottom: '1px solid #f3f4f6' }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#111827', flex: 1 }}>{monthLabel}</span>
+                <button type="button" onClick={() => setCursor(new Date(year, month - 1, 1))} style={attBtn}>‹</button>
+                <button type="button" onClick={() => setCursor(new Date(year, month + 1, 1))} style={attBtn}>›</button>
+                <span style={legendItem}><span style={{ ...legendDot, background: '#22c55e' }} /> Present</span>
+                <span style={legendItem}><span style={{ ...legendDot, background: '#ef4444' }} /> Absent</span>
+                <span style={legendItem}><span style={{ ...legendDot, background: '#f59e0b' }} /> Half Day</span>
+            </div>
+            <div style={{ padding: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, marginBottom: 6 }}>
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dn) => (
+                        <div key={dn} style={{ textAlign: 'center', fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{dn}</div>
+                    ))}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
+                    {cells.map(({ d, otherMonth }, i) => {
+                        const isToday = d.getTime() === today.getTime();
+                        const status = dayStatus[d.getDate()];
+                        const isMonthDay = !otherMonth;
+                        const showStatusBg = isMonthDay && !isToday;
+                        const bg = isToday ? '#2563eb'
+                            : showStatusBg ? dotStyle(status).background
+                            : 'transparent';
+                        const fg = isToday ? '#ffffff'
+                            : otherMonth ? '#d1d5db'
+                            : showStatusBg ? dotStyle(status).color
+                            : '#374151';
+                        return (
+                            <div key={i} style={{
+                                width: 32, height: 32, lineHeight: '32px', borderRadius: '50%',
+                                textAlign: 'center', fontSize: 12, fontWeight: 600,
+                                background: bg, color: fg, margin: '0 auto'
+                            }}>
+                                {d.getDate()}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const attBtn = {
+    width: 24, height: 24, borderRadius: 4, border: '1px solid #e5e7eb',
+    background: 'white', cursor: 'pointer', fontSize: 12, lineHeight: 1, color: '#374151'
+};
+const legendItem = { display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#6b7280' };
+const legendDot = { width: 8, height: 8, borderRadius: '50%', display: 'inline-block' };
 
 function StatCard({ icon, iconBg, iconColor, label, value, sub, delta, big }) {
     return (
