@@ -22,6 +22,8 @@ const docNo = (l) =>
 
 function MyLeaves() {
     const navigate = useNavigate();
+    const userRole = JSON.parse(localStorage.getItem('user') || '{}').role;
+    const isManager = ['manager', 'admin', 'super-admin'].includes(userRole);
     const [leaves, setLeaves] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -70,7 +72,10 @@ function MyLeaves() {
     const load = async () => {
         setLoading(true);
         try {
-            const { data } = await leaveApi.myLeaves();
+            // Admins / managers / super-admin see ALL employees' leaves; everyone else sees own.
+            const role = JSON.parse(localStorage.getItem('user') || '{}').role;
+            const isManager = ['manager', 'admin', 'super-admin'].includes(role);
+            const { data } = await (isManager ? leaveApi.allLeaves() : leaveApi.myLeaves());
             setLeaves(data.leaves || []);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to load leaves');
@@ -149,6 +154,7 @@ function MyLeaves() {
                                         <tr>
                                             <th>Select</th>
                                             <th>Doc Date</th>
+                                            {isManager && <th>Employee</th>}
                                             <th>Doc No</th>
                                             <th>Ref No</th>
                                             <th>Type</th>
@@ -179,6 +185,7 @@ function MyLeaves() {
                                                         />
                                                     </td>
                                                     <td>{fmtDate(l.createdAt)}</td>
+                                                    {isManager && <td>{l.employee?.name || l.employee?.email || '—'}</td>}
                                                     <td className="erp-doc-link">{docNo(l)}</td>
                                                     <td style={{ fontWeight: 600, color: l.leaveReferenceNumber ? '#1e3a8a' : '#9ca3af' }}>
                                                         {l.leaveReferenceNumber || '—'}
