@@ -167,7 +167,24 @@ function MyInformation() {
         const today = new Date();
         const todayStr = today.toDateString();
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const demo = ['P', 'A', 'P', 'H', 'P', 'S', 'P', 'P', 'L', 'P', 'P', 'A'];
+
+        // Build a date-keyed lookup of holidays + leaves so each day can show its events.
+        const holidayByDate = {};
+        holidays.forEach((h) => {
+            const key = `${h.year}-${h.month}-${h.day}`;
+            holidayByDate[key] = h.name;
+        });
+        const leaveByDate = {};
+        leaves.forEach((l) => {
+            const from = new Date(l.fromDate);
+            const to = new Date(l.toDate);
+            for (let cur = new Date(from); cur <= to; cur.setDate(cur.getDate() + 1)) {
+                if (cur.getFullYear() === year && cur.getMonth() === month) {
+                    leaveByDate[cur.getDate()] = l.leaveType || 'Leave';
+                }
+            }
+        });
+
         const days = [];
         for (let n = 1; n <= daysInMonth; n++) {
             const d = new Date(year, month, n);
@@ -175,15 +192,28 @@ function MyInformation() {
             const isToday = d.toDateString() === todayStr;
             const isWeekend = wd === 0 || wd === 6;
             const isFuture = d > today && !isToday;
+
+            const monShort = d.toLocaleDateString('en-GB', { month: 'short' });
+            const yr = String(d.getFullYear());
+            const holidayName = holidayByDate[`${yr}-${monShort}-${String(n).padStart(2, '0')}`];
+            const leaveType = leaveByDate[n];
+
             let mark = '';
-            if (isWeekend) mark = 'W';
+            if (holidayName) mark = 'H';
+            else if (leaveType) mark = 'L';
+            else if (isWeekend) mark = 'W';
             else if (isFuture) mark = '';
             else if (isToday) mark = 'P';
-            else mark = demo[(n - 1) % demo.length];
-            days.push({ name: dayNames[wd], date: n, mark, time: mark === 'S' ? '12:37' : '', isToday });
+            else mark = 'P';
+
+            const events = [];
+            if (holidayName) events.push({ type: 'H', label: holidayName });
+            if (leaveType) events.push({ type: 'L', label: leaveType });
+
+            days.push({ name: dayNames[wd], date: n, mark, events, isToday });
         }
         return days;
-    }, [calendarDate]);
+    }, [calendarDate, holidays, leaves]);
 
     const legend = [
         { key: 'P', label: 'Present', color: '#22c55e' },
@@ -331,41 +361,24 @@ function MyInformation() {
                 </div>
 
                 <div className="info-panel">
-                    <div className="info-panel-header calendar-header-row">
-                        <h3>My Calendar</h3>
-                        {allEmployees.length > 0 ? (
-                            <select
-                                className="leaves-emp-select"
-                                value={selectedEmpCode || user.empId || info.employeeCode || ''}
-                                onChange={(e) => setSelectedEmpCode(e.target.value)}
-                            >
-                                {allEmployees.map((emp) => (
-                                    <option key={emp._id} value={emp.employeeCode}>
-                                        {emp.employeeCode}{emp.firstName ? ` - ${emp.firstName}` : ''}
-                                    </option>
-                                ))}
-                            </select>
-                        ) : (
-                            <input
-                                type="text"
-                                readOnly
-                                value={info.employeeCode || user.empId || ''}
-                                style={{
-                                    background: '#f3f4f6', color: '#6b7280',
-                                    border: '1px solid #e5e7eb', borderRadius: 4,
-                                    padding: '4px 10px', fontSize: 13, fontWeight: 600,
-                                    width: 90, textAlign: 'center', cursor: 'not-allowed'
-                                }}
-                            />
-                        )}
-                        <div className="calendar-legend">
-                            {legend.map((l) => (
-                                <div className="cal-legend-item" key={l.key}>
-                                    <span className="cal-legend-count" style={{ background: l.color }}>{l.count}</span>
-                                    {l.label}
-                                </div>
-                            ))}
+                    <div className="cal-toolbar">
+                        <div className="cal-nav">
+                            <button type="button" onClick={() => changeMonth(-1)}>‹</button>
+                            <span className="cal-month-label">
+                                {calendarDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
+                            </span>
+                            <button type="button" onClick={() => changeMonth(1)}>›</button>
+                            <button type="button" className="cal-today-btn" onClick={() => setCalendarDate(new Date())}>📅 Today</button>
                         </div>
+                        <h3 style={{ margin: 0, color: '#1e3a8a' }}>My Calendar</h3>
+                    </div>
+                    <div className="cal-legend-bar">
+                        {legend.map((l) => (
+                            <div className="cal-legend-item" key={l.key}>
+                                <span className="cal-legend-dot" style={{ background: l.color }}>{l.key}</span>
+                                {l.label}
+                            </div>
+                        ))}
                     </div>
                     <div className="calendar-month">
                         {monthDays.map((d) => (
@@ -373,7 +386,15 @@ function MyInformation() {
                                 <div className="cal-day-name">{d.name}</div>
                                 <div className="cal-day-num">{String(d.date).padStart(2, '0')}</div>
                                 <div className={`cal-day-mark mark-${d.mark}`}>{d.mark}</div>
-                                {d.time && <div className="cal-day-time">{d.time}</div>}
+                                {d.events && d.events.length > 0 && (
+                                    <div className="cal-day-events">
+                                        {d.events.map((ev, i) => (
+                                            <span key={i} className={`cal-event-chip chip-${ev.type}`} title={ev.label}>
+                                                {ev.label}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
