@@ -14,7 +14,6 @@ function Holidays() {
     const [holidays, setHolidays] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
     const [selected, setSelected] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -24,17 +23,9 @@ function Holidays() {
     }, []);
 
     const importFromBC = (y) => {
-        setLoading(true); setError(''); setSuccess('');
+        setLoading(true); setError('');
         holidayApi.list(y).then(({ data }) => {
-            const list = data.holidays || [];
-            setHolidays(list);
-            if (list.length > 0) {
-                const tag = data.source === 'fallback'
-                    ? `Showing fallback list (${list.length} holidays for ${y}). BC holidays endpoint not configured — ask Narsingh for the URL.`
-                    : `Imported ${list.length} holiday(s) from Business Central for ${y}.`;
-                setSuccess(tag);
-                setTimeout(() => setSuccess(''), 4000);
-            }
+            setHolidays(data.holidays || []);
         }).catch((err) => {
             setError(err.response?.data?.error || err.response?.data?.message || 'Failed to fetch holidays');
             setHolidays([]);
@@ -113,7 +104,6 @@ function Holidays() {
                     <div className="erp-body">
                         <div className="erp-list-card">
                             {error && <div className="error">{error}</div>}
-                            {success && <div className="success">{success}</div>}
                             {loading && <p style={{ padding: 16 }}>Loading from Business Central…</p>}
                             {!loading && !error && filteredHolidays.length === 0 && (
                                 <p style={{ padding: 16, color: '#888' }}>No holidays found for {year}.</p>
