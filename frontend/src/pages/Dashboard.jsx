@@ -306,11 +306,12 @@ function AttendanceCalendar({ leaves }) {
     const month = cursor.getMonth();
     const monthLabel = cursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
-    // Build day-status map from leaves (Approved leaves = Absent on those days).
+    // Build day-status map from leaves (Approved leaves only).
     const dayStatus = {};
     (leaves || []).forEach((l) => {
         if (l.status !== 'Approved') return;
-        const status = (l.payType === 'Unpaid' || l.leaveType?.toLowerCase().includes('half')) ? 'half' : 'absent';
+        const isHalf = l.payType === 'Half Paid' || l.leaveType?.toLowerCase().includes('half');
+        const status = isHalf ? 'half' : 'full';
         const from = new Date(l.fromDate); from.setHours(0, 0, 0, 0);
         const to = new Date(l.toDate); to.setHours(0, 0, 0, 0);
         for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
@@ -338,10 +339,11 @@ function AttendanceCalendar({ leaves }) {
         cells.push({ d: next, otherMonth: true });
     }
 
-    const dotStyle = (status) => {
-        if (status === 'absent') return { background: '#fee2e2', color: '#b91c1c' };
-        if (status === 'half') return { background: '#fef3c7', color: '#a16207' };
-        return { background: '#dcfce7', color: '#15803d' };
+    const dotStyle = (status, isWeekend) => {
+        if (status === 'full') return { background: '#dbeafe', color: '#1e40af' };  // Full Day → blue
+        if (status === 'half') return { background: '#f5e6d3', color: '#92400e' };  // Half Day → brown
+        if (isWeekend) return { background: '#e5e7eb', color: '#6b7280' };           // Weekly Off → gray
+        return { background: '#dcfce7', color: '#15803d' };                          // Present → green
     };
 
     return (
@@ -355,8 +357,9 @@ function AttendanceCalendar({ leaves }) {
                 <button type="button" onClick={() => setCursor(new Date(year, month - 1, 1))} style={attBtn}>‹</button>
                 <button type="button" onClick={() => setCursor(new Date(year, month + 1, 1))} style={attBtn}>›</button>
                 <span style={legendItem}><span style={{ ...legendDot, background: '#22c55e' }} /> Present</span>
-                <span style={legendItem}><span style={{ ...legendDot, background: '#ef4444' }} /> Absent</span>
-                <span style={legendItem}><span style={{ ...legendDot, background: '#f59e0b' }} /> Half Day</span>
+                <span style={legendItem}><span style={{ ...legendDot, background: '#3b82f6' }} /> Full Day</span>
+                <span style={legendItem}><span style={{ ...legendDot, background: '#92400e' }} /> Half Day</span>
+                <span style={legendItem}><span style={{ ...legendDot, background: '#9ca3af' }} /> Weekly Off</span>
             </div>
             <div style={{ padding: 12 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, marginBottom: 6 }}>
@@ -368,15 +371,12 @@ function AttendanceCalendar({ leaves }) {
                     {cells.map(({ d, otherMonth }, i) => {
                         const isToday = d.getTime() === today.getTime();
                         const status = dayStatus[d.getDate()];
+                        const isWeekend = d.getDay() === 0 || d.getDay() === 6;
                         const isMonthDay = !otherMonth;
                         const showStatusBg = isMonthDay && !isToday;
-                        const bg = isToday ? '#2563eb'
-                            : showStatusBg ? dotStyle(status).background
-                            : 'transparent';
-                        const fg = isToday ? '#ffffff'
-                            : otherMonth ? '#d1d5db'
-                            : showStatusBg ? dotStyle(status).color
-                            : '#374151';
+                        const style = showStatusBg ? dotStyle(status, isWeekend) : null;
+                        const bg = isToday ? '#2563eb' : (style?.background || 'transparent');
+                        const fg = isToday ? '#ffffff' : (otherMonth ? '#d1d5db' : (style?.color || '#374151'));
                         return (
                             <div key={i} style={{
                                 width: 32, height: 32, lineHeight: '32px', borderRadius: '50%',
