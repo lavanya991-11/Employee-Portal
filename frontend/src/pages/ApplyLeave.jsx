@@ -219,14 +219,12 @@ function ApplyLeave() {
 
             // Post = full BC flow. If we have a draft on this page, replace it.
             const { data } = await leaveApi.apply({ ...basePayload, replaceDraftId: savedId || undefined });
-            let msg = data?.message || 'Leave application submitted.';
             const bcResults = Array.isArray(data?.bc) ? data.bc : (data?.bc ? [data.bc] : []);
-            const bcOk = bcResults.length > 0 && bcResults.every((r) => r.ok);
             const bcFails = bcResults.filter((r) => !r.ok);
-            if (bcOk) msg += ` ${bcResults.length === 1 ? 'Pushed to Business Central.' : `${bcResults.length} lines pushed to Business Central.`}`;
-            else if (bcFails.length > 0) msg += ` BC sync failed: ${bcFails.map((f) => f.error || 'unknown').join(' | ')}`;
-            setSuccess(msg);
-            setTimeout(() => navigate('/leaves/my'), 1500);
+            if (bcFails.length > 0) {
+                setError(`BC sync failed: ${bcFails.map((f) => f.error || 'unknown').join(' | ')}`);
+            }
+            navigate('/leaves/my');
         } catch (err) {
             setError(err.response?.data?.message || (saveOnly ? 'Failed to save leave' : 'Failed to apply leave'));
         } finally {
