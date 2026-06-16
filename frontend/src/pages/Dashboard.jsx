@@ -322,7 +322,7 @@ function Dashboard() {
                         </div>
                     </div>
 
-                    <AttendanceCalendar leaves={allLeaves} />
+                    <AttendanceCalendar leaves={allLeaves} title={isManager ? 'Employee Attendances' : 'My Attendance'} />
 
 
                     <div className="dash-card">
@@ -366,7 +366,7 @@ function Dashboard() {
     );
 }
 
-function AttendanceCalendar({ leaves }) {
+function AttendanceCalendar({ leaves, title = 'My Attendance' }) {
     const [cursor, setCursor] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
     const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -418,7 +418,7 @@ function AttendanceCalendar({ leaves }) {
     return (
         <div className="dash-card">
             <div className="dash-card-head">
-                <span>My Attendance</span>
+                <span>{title}</span>
                 <Link to="/leaves/my" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>View All</Link>
             </div>
             <div style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', borderBottom: '1px solid #f3f4f6' }}>
