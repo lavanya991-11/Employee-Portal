@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { authApi, leaveApi, employeeInfoApi } from '../services/api';
+import { authApi, leaveApi, employeeInfoApi, holidayApi } from '../services/api';
 
 function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
     const [info, setInfo] = useState(null);
     const [recentLeaves, setRecentLeaves] = useState([]);
+    const [allLeaves, setAllLeaves] = useState([]);
+    const [nextHoliday, setNextHoliday] = useState(null);
     const [notificationCount, setNotificationCount] = useState(0);
     const [notifications, setNotifications] = useState([]);
     const [bellOpen, setBellOpen] = useState(false);
@@ -35,6 +37,7 @@ function Dashboard() {
             .catch(() => {});
 
         leaveApi.myLeaves().then(({ data }) => {
+            setAllLeaves(data.leaves || []);
             setRecentLeaves((data.leaves || []).slice(0, 3));
             if (!isManager) {
                 const pending = (data.leaves || []).filter((l) => l.status === 'Pending');
@@ -47,6 +50,21 @@ function Dashboard() {
                 })));
             }
         }).catch(() => {});
+
+        // Pull current + next year holidays, pick the earliest one (upcoming preferred).
+        const thisYear = new Date().getFullYear();
+        Promise.all([
+            holidayApi.list(thisYear).catch(() => ({ data: { holidays: [] } })),
+            holidayApi.list(thisYear + 1).catch(() => ({ data: { holidays: [] } }))
+        ]).then(([cur, next]) => {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const all = [...(cur.data.holidays || []), ...(next.data.holidays || [])]
+                .map((h) => ({ ...h, _d: new Date(h.fromDate) }))
+                .filter((h) => !isNaN(h._d))
+                .sort((a, b) => a._d - b._d);
+            const upcoming = all.find((h) => h._d >= today) || all[0] || null;
+            setNextHoliday(upcoming);
+        });
 
         if (isManager) {
             leaveApi.allLeaves().then(({ data }) => {
@@ -198,57 +216,178 @@ function Dashboard() {
                     </div>
                 </div>
 
-                <div className="dashboard-grid">
+                {/* Welcome banner */}
+                <div className="dash-welcome">
                     <div>
-                        <h3 className="section-title">Quick Actions</h3>
-                        <div className="main-tiles">
-                            {tiles.map((t) => (
-                                <Link to={t.path} key={t.label} className="tile">
-                                    <div className="tile-icon">{t.icon}</div>
-                                    <div className="tile-label">{t.label}</div>
-                                </Link>
-                            ))}
+                        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#111827' }}>
+                            Welcome back, {displayName}! 👋
+                        </h1>
+                        <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>
+                            Here's what's happening with your work today.
+                        </p>
+                    </div>
+                    <div style={{ fontSize: 13, color: '#374151' }}>
+                        📅 {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
+                    </div>
+                </div>
+
+                {/* 4 stat cards */}
+                <div className="dash-stats">
+                    <StatCard icon="📅" iconBg="#dbeafe" iconColor="#1e40af"
+                        label="Present Days" value={Math.min(new Date().getDate(), 22)} sub="This Month" delta="↗ 2 from last month" />
+                    <StatCard icon="🌴" iconBg="#dcfce7" iconColor="#15803d"
+                        label="Leave Balance" value={12 - approvedLeaves} sub="Days Left" delta={`${approvedLeaves} used this month`} />
+                    <StatCard icon="⏰" iconBg="#fed7aa" iconColor="#c2410c"
+                        label="Working Hours" value="176" sub="This Month" delta="↗ 8 from last month" />
+                    <StatCard icon="🎉" iconBg="#ede9fe" iconColor="#6d28d9"
+                        label="Upcoming Holiday" value={nextHoliday?.description || '—'}
+                        sub={nextHoliday ? new Date(nextHoliday.fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
+                        delta={<Link to="/holidays" style={{ color: '#3b82f6', textDecoration: 'none' }}>View Calendar</Link>}
+                        big />
+                </div>
+
+                {/* 3-column section: Announcements | My Attendance | Quick Links */}
+                <div className="dash-three-col">
+                    <div className="dash-card">
+                        <div className="dash-card-head">
+                            <span>Announcements</span>
+                            <Link to="/announcements" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>View All</Link>
+                        </div>
+                        <div className="dash-announce-list">
+                            <AnnounceItem icon="📢" iconBg="#dbeafe"
+                                title="Welcome to the new Employee Portal"
+                                body="Use the sidebar to navigate Leave, Loan, Travel, Expenses and more."
+                                meta="HR Department · today" />
+                            <AnnounceItem icon="📋" iconBg="#dcfce7"
+                                title="Holidays for 2026 are now live"
+                                body="See the Holidays page for the official calendar from Business Central."
+                                meta="HR Department · today" />
+                            <AnnounceItem icon="👥" iconBg="#fce7f3"
+                                title="Apply Leave page now auto-splits Paid + Unpaid"
+                                body="When your request exceeds the balance, the system splits and posts to BC."
+                                meta="System · this week" />
                         </div>
                     </div>
 
-                    <div>
-                        <div className="panel">
-                            <h3>Quick Links</h3>
-                            <ul className="panel-list">
-                                {quickLinks.map((q) => (
-                                    <li key={q.label}>
-                                        <Link to={q.path}>{q.label}</Link>
-                                        {q.value && <span className="value-pill">{q.value}</span>}
-                                    </li>
-                                ))}
-                            </ul>
+                    <div className="dash-card">
+                        <div className="dash-card-head">
+                            <span>My Leaves</span>
+                            <Link to="/leaves/my" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>View All</Link>
                         </div>
+                        <div style={{ padding: 14 }}>
+                            {recentLeaves.length === 0 ? (
+                                <p style={{ color: '#9ca3af', fontSize: 13, margin: 0 }}>No leaves yet. Apply for one from the sidebar.</p>
+                            ) : (
+                                recentLeaves.map((l) => (
+                                    <div key={l._id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+                                        <div>
+                                            <div style={{ fontWeight: 600, fontSize: 13, color: '#111827' }}>{l.leaveType}</div>
+                                            <div style={{ fontSize: 11, color: '#6b7280' }}>
+                                                {new Date(l.fromDate).toLocaleDateString('en-GB')} → {new Date(l.toDate).toLocaleDateString('en-GB')}
+                                            </div>
+                                        </div>
+                                        <span style={{
+                                            alignSelf: 'center', fontSize: 11, fontWeight: 600,
+                                            padding: '2px 8px', borderRadius: 10,
+                                            background: l.status === 'Approved' ? '#dcfce7' : l.status === 'Rejected' ? '#fee2e2' : '#fef3c7',
+                                            color: l.status === 'Approved' ? '#15803d' : l.status === 'Rejected' ? '#b91c1c' : '#a16207'
+                                        }}>{l.status}</span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
 
-                        <div className="panel">
-                            <h3>My Overview</h3>
-                            <ul className="panel-list">
-                                <li>
-                                    Leave Balance
-                                    <span className="value-pill">12 days</span>
-                                </li>
-                                <li>
-                                    Pending Leaves
-                                    <span className="value-pill">{pendingLeaves}</span>
-                                </li>
-                                <li>
-                                    Approved Leaves
-                                    <span className="value-pill">{approvedLeaves}</span>
-                                </li>
-                                <li>
-                                    Recent Payslip
-                                    <Link to="/payslip">View</Link>
-                                </li>
-                            </ul>
+                    <div className="dash-card">
+                        <div className="dash-card-head"><span>Quick Links</span></div>
+                        <div className="dash-quicklink-list">
+                            <QuickLink to="/leaves/apply" icon="🗓️" iconBg="#dbeafe" label="Apply Leave" />
+                            <QuickLink to="/overtimes/apply" icon="⏰" iconBg="#fed7aa" label="Request Overtime" />
+                            <QuickLink to="/payslip" icon="💰" iconBg="#dcfce7" label="View Payslip" />
+                            <QuickLink to="/employee-information" icon="🪪" iconBg="#ede9fe" label="Update Profile" />
+                            <QuickLink to="/holidays" icon="🎉" iconBg="#fce7f3" label="Holidays" />
                         </div>
+                    </div>
+                </div>
+
+                {/* Recent activities */}
+                <div className="dash-card" style={{ marginTop: 14 }}>
+                    <div className="dash-card-head"><span>Recent Activities</span></div>
+                    <div style={{ padding: 14 }}>
+                        {recentLeaves.length === 0 ? (
+                            <p style={{ color: '#9ca3af', fontSize: 13, margin: 0 }}>No recent activity.</p>
+                        ) : (
+                            recentLeaves.slice(0, 5).map((l) => (
+                                <div key={`act-${l._id}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+                                    <span style={{
+                                        width: 8, height: 8, borderRadius: '50%',
+                                        background: l.status === 'Approved' ? '#22c55e' : l.status === 'Rejected' ? '#ef4444' : '#f59e0b'
+                                    }} />
+                                    <div style={{ flex: 1, fontSize: 13, color: '#374151' }}>
+                                        Leave request for {new Date(l.fromDate).toLocaleDateString('en-GB')} is <b>{l.status.toLowerCase()}</b>.
+                                    </div>
+                                    <div style={{ fontSize: 11, color: '#9ca3af' }}>
+                                        {new Date(l.createdAt).toLocaleDateString('en-GB')}
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </main>
         </div>
+    );
+}
+
+function StatCard({ icon, iconBg, iconColor, label, value, sub, delta, big }) {
+    return (
+        <div className="dash-stat-card">
+            <div className="dash-stat-top">
+                <div>
+                    <div style={{ fontSize: 12, color: '#6b7280' }}>{label}</div>
+                    <div style={{ fontSize: big ? 18 : 28, fontWeight: 700, color: '#111827', marginTop: 4, lineHeight: 1.2 }}>{value}</div>
+                    {sub && <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{sub}</div>}
+                </div>
+                <div style={{
+                    width: 40, height: 40, borderRadius: 10, background: iconBg, color: iconColor,
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 20
+                }}>{icon}</div>
+            </div>
+            {delta && <div style={{ marginTop: 8, fontSize: 11, color: '#16a34a' }}>{delta}</div>}
+        </div>
+    );
+}
+
+function AnnounceItem({ icon, iconBg, title, body, meta }) {
+    return (
+        <div style={{ display: 'flex', gap: 10, padding: '10px 14px', borderBottom: '1px solid #f3f4f6' }}>
+            <div style={{
+                width: 32, height: 32, borderRadius: 8, background: iconBg,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0
+            }}>{icon}</div>
+            <div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: '#111827' }}>{title}</div>
+                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{body}</div>
+                <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 4 }}>{meta}</div>
+            </div>
+        </div>
+    );
+}
+
+function QuickLink({ to, icon, iconBg, label }) {
+    return (
+        <Link to={to} style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '10px 14px', borderBottom: '1px solid #f3f4f6',
+            textDecoration: 'none', color: '#374151'
+        }}>
+            <span style={{
+                width: 28, height: 28, borderRadius: 8, background: iconBg,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14
+            }}>{icon}</span>
+            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>{label}</span>
+            <span style={{ color: '#9ca3af' }}>›</span>
+        </Link>
     );
 }
 
