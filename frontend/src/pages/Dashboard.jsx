@@ -216,21 +216,6 @@ function Dashboard() {
                     </div>
                 </div>
 
-                {/* Welcome banner */}
-                <div className="dash-welcome">
-                    <div>
-                        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#111827' }}>
-                            Welcome back, {displayName}! 👋
-                        </h1>
-                        <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>
-                            Here's what's happening with your work today.
-                        </p>
-                    </div>
-                    <div style={{ fontSize: 13, color: '#374151' }}>
-                        📅 {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
-                    </div>
-                </div>
-
                 {/* 4 stat cards */}
                 <div className="dash-stats">
                     <StatCard icon="📅" iconBg="#dbeafe" iconColor="#1e40af"
