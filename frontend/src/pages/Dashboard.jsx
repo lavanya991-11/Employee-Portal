@@ -503,11 +503,41 @@ function AttendanceCalendar({ leaves }) {
                                 }}>{statusLabel}</span>
                             </div>
                             {dayLeaves.length > 0 ? (
-                                dayLeaves.map((l) => (
-                                    <div key={l._id} style={{ fontSize: 12, color: '#374151', padding: '4px 0' }}>
-                                        <b>{l.leaveType}</b> · {new Date(l.fromDate).toLocaleDateString('en-GB')} → {new Date(l.toDate).toLocaleDateString('en-GB')} · {l.totalDays} day(s) · <span style={{ color: l.status === 'Approved' ? '#15803d' : l.status === 'Rejected' ? '#b91c1c' : '#a16207' }}>{l.status}</span>
-                                    </div>
-                                ))
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+                                    <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{dayLeaves.length} leave record(s) on this date</div>
+                                    {dayLeaves.map((l) => {
+                                        const employeeName = l.employee?.name || l.employee?.email || 'Employee';
+                                        return (
+                                            <div key={l._id} style={{ padding: 10, background: 'white', border: '1px solid #e5e7eb', borderRadius: 6 }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                        <span style={{
+                                                            width: 22, height: 22, borderRadius: '50%', background: '#3b82f6', color: 'white',
+                                                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700
+                                                        }}>{(employeeName[0] || '?').toUpperCase()}</span>
+                                                        <b style={{ fontSize: 13, color: '#111827' }}>{employeeName}</b>
+                                                    </div>
+                                                    <span style={{
+                                                        padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600,
+                                                        background: l.status === 'Approved' ? '#dcfce7' : l.status === 'Rejected' ? '#fee2e2' : '#fef3c7',
+                                                        color: l.status === 'Approved' ? '#15803d' : l.status === 'Rejected' ? '#b91c1c' : '#a16207'
+                                                    }}>{l.status}</span>
+                                                </div>
+                                                <div style={{ fontSize: 12, color: '#374151' }}>
+                                                    <b>{l.leaveType}</b>
+                                                    {l.payType ? ` · ${l.payType}` : ''}
+                                                    {l.leaveReferenceNumber ? ` · ${l.leaveReferenceNumber}` : ''}
+                                                </div>
+                                                <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
+                                                    {new Date(l.fromDate).toLocaleDateString('en-GB')} → {new Date(l.toDate).toLocaleDateString('en-GB')} · {l.totalDays} day(s)
+                                                </div>
+                                                <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 2 }}>
+                                                    Applied on {new Date(l.createdAt).toLocaleDateString('en-GB')}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             ) : (
                                 <div style={{ fontSize: 12, color: '#6b7280' }}>
                                     {isWeekend ? 'No work scheduled.' : 'No leave on this day.'}
