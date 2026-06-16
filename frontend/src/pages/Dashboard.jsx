@@ -340,8 +340,8 @@ function AttendanceCalendar({ leaves }) {
     }
 
     const dotStyle = (status, isWeekend) => {
-        if (status === 'full') return { background: '#dbeafe', color: '#1e40af' };  // Full Day → blue
-        if (status === 'half') return { background: '#f5e6d3', color: '#92400e' };  // Half Day → brown
+        if (status === 'full') return { background: '#fee2e2', color: '#b91c1c' };  // Full Day Leave → red
+        if (status === 'half') return { background: '#f5e6d3', color: '#92400e' };  // Half Day Leave → brown
         if (isWeekend) return { background: '#e5e7eb', color: '#6b7280' };           // Weekly Off → gray
         return { background: '#dcfce7', color: '#15803d' };                          // Present → green
     };
@@ -357,8 +357,8 @@ function AttendanceCalendar({ leaves }) {
                 <button type="button" onClick={() => setCursor(new Date(year, month - 1, 1))} style={attBtn}>‹</button>
                 <button type="button" onClick={() => setCursor(new Date(year, month + 1, 1))} style={attBtn}>›</button>
                 <span style={legendItem}><span style={{ ...legendDot, background: '#22c55e' }} /> Present</span>
-                <span style={legendItem}><span style={{ ...legendDot, background: '#3b82f6' }} /> Full Day</span>
-                <span style={legendItem}><span style={{ ...legendDot, background: '#92400e' }} /> Half Day</span>
+                <span style={legendItem}><span style={{ ...legendDot, background: '#ef4444' }} /> Full Day Leave</span>
+                <span style={legendItem}><span style={{ ...legendDot, background: '#92400e' }} /> Half Day Leave</span>
                 <span style={legendItem}><span style={{ ...legendDot, background: '#9ca3af' }} /> Weekly Off</span>
             </div>
             <div style={{ padding: 12 }}>
