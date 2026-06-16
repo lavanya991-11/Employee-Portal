@@ -506,7 +506,8 @@ function AttendanceCalendar({ leaves, title = 'My Attendance' }) {
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
                                     <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{dayLeaves.length} leave record(s) on this date</div>
                                     {dayLeaves.map((l) => {
-                                        const employeeName = l.employee?.name || l.employee?.email || 'Employee';
+                                        const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+                                        const employeeName = l.employee?.name || l.employee?.email || localUser.name || localUser.email || 'Employee';
                                         return (
                                             <div key={l._id} style={{ padding: 10, background: 'white', border: '1px solid #e5e7eb', borderRadius: 6 }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>

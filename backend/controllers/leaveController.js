@@ -174,7 +174,9 @@ exports.bcLeaveBalance = async (req, res) => {
 
 exports.getMyLeaves = async (req, res) => {
     try {
-        const leaves = await Leave.find({ employee: req.user.id }).sort({ createdAt: -1 });
+        const leaves = await Leave.find({ employee: req.user.id })
+            .populate('employee', 'name email')
+            .sort({ createdAt: -1 });
         res.json({ count: leaves.length, leaves });
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err.message });
