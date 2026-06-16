@@ -1,7 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { authApi, leaveApi, employeeInfoApi, holidayApi } from '../services/api';
+import { authApi, leaveApi, employeeInfoApi, holidayApi, adminApi } from '../services/api';
+
+const ADMIN_TILES = [
+    { key: 'users', title: 'Users', icon: '👥', color: '#3b82f6', path: '/admin/users' },
+    { key: 'employees', title: 'Employees', icon: '👔', color: '#1e3a8a', path: '/admin/employees' },
+    { key: 'leaves', title: 'Leaves', icon: '📅', color: '#22c55e', path: '/admin/leaves' },
+    { key: 'loans', title: 'Loans', icon: '💰', color: '#f59e0b', path: '/admin/loans' },
+    { key: 'travels', title: 'Travel Requests', icon: '✈️', color: '#0ea5e9', path: '/admin/travels' },
+    { key: 'expenses', title: 'Expenses', icon: '🧾', color: '#a855f7', path: '/admin/expenses' },
+    { key: 'overtimes', title: 'Overtime', icon: '⏰', color: '#ef4444', path: '/admin/overtimes' },
+    { key: 'assets', title: 'Asset Requests', icon: '🛠️', color: '#14b8a6', path: '/admin/assets' },
+    { key: 'finElements', title: 'FIN Elements', icon: '⚙️', color: '#6b7280', path: '/fin-elements' }
+];
 
 function Dashboard() {
     const navigate = useNavigate();
@@ -10,6 +22,7 @@ function Dashboard() {
     const [recentLeaves, setRecentLeaves] = useState([]);
     const [allLeaves, setAllLeaves] = useState([]);
     const [nextHoliday, setNextHoliday] = useState(null);
+    const [adminStats, setAdminStats] = useState(null);
     const [notificationCount, setNotificationCount] = useState(0);
     const [notifications, setNotifications] = useState([]);
     const [bellOpen, setBellOpen] = useState(false);
@@ -67,6 +80,10 @@ function Dashboard() {
         });
 
         if (isManager) {
+            adminApi.stats().then(({ data }) => {
+                setAdminStats({ totals: data.totals || {}, pending: data.pending || {} });
+            }).catch(() => {});
+
             leaveApi.allLeaves().then(({ data }) => {
                 const pending = (data.leaves || []).filter((l) => l.status === 'Pending');
                 setNotificationCount(pending.length);
@@ -268,6 +285,45 @@ function Dashboard() {
                         </div>
                     </div>
                 </div>
+
+                {/* All Collections — admins / managers / super-admin only */}
+                {isManager && adminStats && (
+                    <div className="dash-card" style={{ marginTop: 14 }}>
+                        <div className="dash-card-head">
+                            <span>All Collections</span>
+                            <Link to="/admin" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>Open Super Admin</Link>
+                        </div>
+                        <div style={{ padding: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+                            {ADMIN_TILES.map((t) => {
+                                const total = adminStats.totals?.[t.key] ?? 0;
+                                const pending = adminStats.pending?.[t.key];
+                                return (
+                                    <Link to={t.path} key={t.key} style={{
+                                        display: 'block', textDecoration: 'none',
+                                        border: '1px solid #e5e7eb', borderTop: `3px solid ${t.color}`,
+                                        borderRadius: 8, padding: 12, background: 'white'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <div style={{
+                                                width: 36, height: 36, borderRadius: 8, background: t.color, color: 'white',
+                                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 18
+                                            }}>{t.icon}</div>
+                                            <div>
+                                                <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{t.title.toUpperCase()}</div>
+                                                <div style={{ fontSize: 22, fontWeight: 700, color: '#111827', lineHeight: 1.1 }}>{total}</div>
+                                                {pending !== undefined && (
+                                                    <div style={{ fontSize: 11, color: '#a16207', marginTop: 2 }}>
+                                                        {pending} pending
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
                 {/* Recent activities */}
                 <div className="dash-card" style={{ marginTop: 14 }}>
