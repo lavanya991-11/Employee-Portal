@@ -38,6 +38,12 @@ function Dashboard() {
 
     const onBellClick = () => setBellOpen((v) => !v);
 
+    const loadAdminStats = () => {
+        adminApi.stats().then(({ data }) => {
+            setAdminStats({ totals: data.totals || {}, pending: data.pending || {} });
+        }).catch(() => {});
+    };
+
     useEffect(() => {
         authApi.me().then(({ data }) => {
             const fresh = data.user || data;
@@ -80,10 +86,7 @@ function Dashboard() {
         });
 
         if (isManager) {
-            adminApi.stats().then(({ data }) => {
-                setAdminStats({ totals: data.totals || {}, pending: data.pending || {} });
-            }).catch(() => {});
-
+            loadAdminStats();
             leaveApi.allLeaves().then(({ data }) => {
                 const pending = (data.leaves || []).filter((l) => l.status === 'Pending');
                 setNotificationCount(pending.length);
@@ -95,6 +98,18 @@ function Dashboard() {
                 })));
             }).catch(() => {});
         }
+    }, [isManager]);
+
+    // Auto-refresh admin stats: on tab focus + every 30 seconds.
+    useEffect(() => {
+        if (!isManager) return;
+        const onFocus = () => loadAdminStats();
+        window.addEventListener('focus', onFocus);
+        const interval = setInterval(loadAdminStats, 30000);
+        return () => {
+            window.removeEventListener('focus', onFocus);
+            clearInterval(interval);
+        };
     }, [isManager]);
 
     const hour = new Date().getHours();
@@ -238,7 +253,14 @@ function Dashboard() {
                     <div className="dash-card" style={{ marginBottom: 14 }}>
                         <div className="dash-card-head">
                             <span>All Collections</span>
-                            <Link to="/admin" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>Open Super Admin</Link>
+                            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                                <button
+                                    type="button"
+                                    onClick={loadAdminStats}
+                                    style={{ background: 'transparent', border: '1px solid #d1d5db', borderRadius: 4, padding: '3px 10px', fontSize: 12, color: '#374151', cursor: 'pointer' }}
+                                >🔄 Refresh</button>
+                                <Link to="/admin" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>Open Super Admin</Link>
+                            </div>
                         </div>
                         <div style={{ padding: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
                             {ADMIN_TILES.map((t) => {
