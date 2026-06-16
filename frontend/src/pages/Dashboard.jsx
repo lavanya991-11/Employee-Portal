@@ -55,19 +55,22 @@ function Dashboard() {
             .then(({ data }) => setInfo(data.employeeInfo || null))
             .catch(() => {});
 
-        leaveApi.myLeaves().then(({ data }) => {
-            setAllLeaves(data.leaves || []);
-            setRecentLeaves((data.leaves || []).slice(0, 3));
-            if (!isManager) {
-                const pending = (data.leaves || []).filter((l) => l.status === 'Pending');
-                setNotificationCount(pending.length);
-                setNotifications(pending.map((l) => ({
-                    id: l._id,
-                    title: `${l.leaveType || 'Leave'} - Pending`,
-                    subtitle: `${new Date(l.fromDate).toLocaleDateString('en-GB')} → ${new Date(l.toDate).toLocaleDateString('en-GB')} (${l.totalDays} day${l.totalDays > 1 ? 's' : ''})`,
-                    link: '/leaves/my'
-                })));
-            }
+        // Managers see ALL leaves on calendar + notifications; employees see only their own.
+        const leavesFetcher = isManager ? leaveApi.allLeaves() : leaveApi.myLeaves();
+        leavesFetcher.then(({ data }) => {
+            const list = data.leaves || [];
+            setAllLeaves(list);
+            setRecentLeaves(list.slice(0, 3));
+            const pending = list.filter((l) => l.status === 'Pending');
+            setNotificationCount(pending.length);
+            setNotifications(pending.map((l) => ({
+                id: l._id,
+                title: isManager
+                    ? `${l.employee?.name || 'Employee'} requested ${l.leaveType || 'leave'}`
+                    : `${l.leaveType || 'Leave'} - Pending`,
+                subtitle: `${new Date(l.fromDate).toLocaleDateString('en-GB')} → ${new Date(l.toDate).toLocaleDateString('en-GB')} (${l.totalDays} day${l.totalDays > 1 ? 's' : ''})`,
+                link: isManager ? '/approvals' : '/leaves/my'
+            })));
         }).catch(() => {});
 
         // Pull current + next year holidays, pick the earliest one (upcoming preferred).
@@ -85,19 +88,7 @@ function Dashboard() {
             setNextHoliday(upcoming);
         });
 
-        if (isManager) {
-            loadAdminStats();
-            leaveApi.allLeaves().then(({ data }) => {
-                const pending = (data.leaves || []).filter((l) => l.status === 'Pending');
-                setNotificationCount(pending.length);
-                setNotifications(pending.map((l) => ({
-                    id: l._id,
-                    title: `${l.employee?.name || 'Employee'} requested ${l.leaveType || 'leave'}`,
-                    subtitle: `${new Date(l.fromDate).toLocaleDateString('en-GB')} → ${new Date(l.toDate).toLocaleDateString('en-GB')} (${l.totalDays} day${l.totalDays > 1 ? 's' : ''})`,
-                    link: '/approvals'
-                })));
-            }).catch(() => {});
-        }
+        if (isManager) loadAdminStats();
     }, [isManager]);
 
     // Auto-refresh admin stats: on tab focus + every 30 seconds.
