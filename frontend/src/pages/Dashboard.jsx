@@ -250,7 +250,6 @@ function Dashboard() {
                                     onClick={loadAdminStats}
                                     style={{ background: 'transparent', border: '1px solid #d1d5db', borderRadius: 4, padding: '3px 10px', fontSize: 12, color: '#374151', cursor: 'pointer' }}
                                 >🔄 Refresh</button>
-                                <Link to="/admin" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>Open Super Admin</Link>
                             </div>
                         </div>
                         <div style={{ padding: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>

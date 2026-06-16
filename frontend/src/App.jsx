@@ -235,14 +235,7 @@ function App() {
                     </ProtectedRoute>
                 }
             />
-            <Route
-                path="/admin"
-                element={
-                    <ProtectedRoute>
-                        <SuperAdminDashboard />
-                    </ProtectedRoute>
-                }
-            />
+            <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
             <Route
                 path="/admin/:collection"
                 element={

@@ -31,12 +31,6 @@ function Sidebar() {
             </div>
 
             <nav className="sidebar-nav">
-                {user.role === 'super-admin' && (
-                    <Link to="/admin" className="nav-item" style={{ background: 'linear-gradient(90deg, #fee2e2, transparent)' }}>
-                        <span className="nav-item-icon">🛡️</span> Super Admin
-                    </Link>
-                )}
-
                 <Link to="/dashboard" className="nav-item">
                     <span className="nav-item-icon">🏠</span> Dashboard
                 </Link>
