@@ -67,7 +67,6 @@ function ApplyLeave() {
                 toDate: l.toDate ? l.toDate.slice(0, 10) : '',
                 reason: l.reason || ''
             }));
-            setSuccess(`Editing ${l.leaveReferenceNumber || l._id}`);
         }).catch((err) => {
             setError(err.response?.data?.message || 'Failed to load leave');
         });
