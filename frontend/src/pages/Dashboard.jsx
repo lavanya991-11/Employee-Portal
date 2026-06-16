@@ -260,7 +260,7 @@ function Dashboard() {
                     <div className="dash-card">
                         <div className="dash-card-head"><span>Quick Links</span></div>
                         <div className="dash-quicklink-list">
-                            <QuickLink to="/leaves/apply" icon="🗓️" iconBg="#dbeafe" label="Apply Leave" />
+                            <QuickLink to="/leaves/my" icon="🗓️" iconBg="#dbeafe" label="Apply Leave" />
                             <QuickLink to="/overtimes/apply" icon="⏰" iconBg="#fed7aa" label="Request Overtime" />
                             <QuickLink to="/payslip" icon="💰" iconBg="#dcfce7" label="View Payslip" />
                             <QuickLink to="/employee-information" icon="🪪" iconBg="#ede9fe" label="Update Profile" />
