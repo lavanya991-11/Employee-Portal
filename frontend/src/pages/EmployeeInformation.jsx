@@ -109,8 +109,6 @@ function EmployeeInformation() {
                         altAddressEndDate: toDateInput(info.administration?.altAddressEndDate)
                     }
                 });
-                setSuccess('Refreshed.');
-                setTimeout(() => setSuccess(''), 1500);
             }
         } catch (err) {
             setError(err.response?.data?.message || 'Could not load');
