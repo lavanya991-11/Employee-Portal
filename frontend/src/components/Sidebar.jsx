@@ -41,10 +41,6 @@ function Sidebar() {
                     <span className="nav-item-icon">🏠</span> Dashboard
                 </Link>
 
-                <Link to="/leaves/my" className="nav-item">
-                    <span className="nav-item-icon">📅</span> Apply Leave
-                </Link>
-
                 <Link to="/loans/apply" className="nav-item">
                     <span className="nav-item-icon">💰</span> Apply Loan
                 </Link>
