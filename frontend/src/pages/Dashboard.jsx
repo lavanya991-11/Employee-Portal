@@ -468,91 +468,127 @@ function AttendanceCalendar({ leaves, title = 'My Attendance' }) {
                     })}
                 </div>
 
-                {/* Day details panel */}
-                {selectedDate && (() => {
-                    const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
-                    const dayLeaves = (leaves || []).filter((l) => {
-                        const from = new Date(l.fromDate); from.setHours(0, 0, 0, 0);
-                        const to = new Date(l.toDate); to.setHours(0, 0, 0, 0);
-                        return selectedDate >= from && selectedDate <= to;
-                    });
-                    const isToday = selectedDate.getTime() === today.getTime();
-                    let statusLabel = 'Present';
-                    let statusColor = '#15803d';
-                    if (dayLeaves.length > 0) {
-                        const l = dayLeaves[0];
-                        const isHalf = l.payType === 'Half Paid' || l.leaveType?.toLowerCase().includes('half');
-                        statusLabel = isHalf ? 'Half Day Leave' : 'Full Day Leave';
-                        statusColor = isHalf ? '#92400e' : '#b91c1c';
-                    } else if (isWeekend) {
-                        statusLabel = 'Weekly Off';
-                        statusColor = '#6b7280';
-                    }
-                    return (
-                        <div style={{ marginTop: 14, padding: 12, background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            </div>
+
+            {/* Modal — opens when a date is clicked */}
+            {selectedDate && (() => {
+                const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
+                const dayLeaves = (leaves || []).filter((l) => {
+                    const from = new Date(l.fromDate); from.setHours(0, 0, 0, 0);
+                    const to = new Date(l.toDate); to.setHours(0, 0, 0, 0);
+                    return selectedDate >= from && selectedDate <= to;
+                });
+                const isToday = selectedDate.getTime() === today.getTime();
+                let statusLabel = 'Present';
+                let statusColor = '#15803d';
+                if (dayLeaves.length > 0) {
+                    const l = dayLeaves[0];
+                    const isHalf = l.payType === 'Half Paid' || l.leaveType?.toLowerCase().includes('half');
+                    statusLabel = isHalf ? 'Half Day Leave' : 'Full Day Leave';
+                    statusColor = isHalf ? '#92400e' : '#b91c1c';
+                } else if (isWeekend) {
+                    statusLabel = 'Weekly Off';
+                    statusColor = '#6b7280';
+                }
+                return (
+                    <div
+                        onClick={() => setSelectedDate(null)}
+                        style={{
+                            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100
+                        }}
+                    >
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                background: 'white', borderRadius: 12,
+                                width: 560, maxWidth: '94vw', maxHeight: '85vh',
+                                display: 'flex', flexDirection: 'column',
+                                boxShadow: '0 20px 50px rgba(0,0,0,0.25)'
+                            }}
+                        >
+                            {/* Header */}
+                            <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                                 <div>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                                    <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>
                                         {selectedDate.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
                                     </div>
-                                    {isToday && <span style={{ display: 'inline-block', marginTop: 4, padding: '1px 8px', borderRadius: 10, background: '#dbeafe', color: '#1e40af', fontSize: 10, fontWeight: 600 }}>TODAY</span>}
+                                    <div style={{ marginTop: 6, display: 'flex', gap: 6, alignItems: 'center' }}>
+                                        {isToday && <span style={{ padding: '2px 10px', borderRadius: 10, background: '#dbeafe', color: '#1e40af', fontSize: 11, fontWeight: 600 }}>TODAY</span>}
+                                        <span style={{
+                                            padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600,
+                                            background: statusColor + '22', color: statusColor
+                                        }}>{statusLabel}</span>
+                                    </div>
                                 </div>
-                                <span style={{
-                                    padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600,
-                                    background: statusColor + '22', color: statusColor
-                                }}>{statusLabel}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedDate(null)}
+                                    aria-label="Close"
+                                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 22, color: '#6b7280', lineHeight: 1, padding: 0 }}
+                                >×</button>
                             </div>
-                            {dayLeaves.length > 0 ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
-                                    <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{dayLeaves.length} leave record(s) on this date</div>
-                                    {dayLeaves.map((l) => {
-                                        const localUser = JSON.parse(localStorage.getItem('user') || '{}');
-                                        const employeeName = l.employee?.name || l.employee?.email || localUser.name || localUser.email || 'Employee';
-                                        return (
-                                            <div key={l._id} style={{ padding: 10, background: 'white', border: '1px solid #e5e7eb', borderRadius: 6 }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                        <span style={{
-                                                            width: 22, height: 22, borderRadius: '50%', background: '#3b82f6', color: 'white',
-                                                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700
-                                                        }}>{(employeeName[0] || '?').toUpperCase()}</span>
-                                                        <b style={{ fontSize: 13, color: '#111827' }}>{employeeName}</b>
+                            {/* Body */}
+                            <div style={{ padding: '14px 20px', overflowY: 'auto' }}>
+                                {dayLeaves.length === 0 ? (
+                                    <div style={{ padding: '24px 0', textAlign: 'center', color: '#6b7280', fontSize: 13 }}>
+                                        {isWeekend ? 'No work scheduled.' : 'No leave records on this date.'}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600, marginBottom: 10 }}>
+                                            {dayLeaves.length} leave record(s) on this date
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                            {dayLeaves.map((l) => {
+                                                const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+                                                const employeeName = l.employee?.name || l.employee?.email || localUser.name || localUser.email || 'Employee';
+                                                return (
+                                                    <div key={l._id} style={{ padding: 12, background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8 }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                                <span style={{
+                                                                    width: 26, height: 26, borderRadius: '50%', background: '#3b82f6', color: 'white',
+                                                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700
+                                                                }}>{(employeeName[0] || '?').toUpperCase()}</span>
+                                                                <b style={{ fontSize: 14, color: '#111827' }}>{employeeName}</b>
+                                                            </div>
+                                                            <span style={{
+                                                                padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600,
+                                                                background: l.status === 'Approved' ? '#dcfce7' : l.status === 'Rejected' ? '#fee2e2' : '#fef3c7',
+                                                                color: l.status === 'Approved' ? '#15803d' : l.status === 'Rejected' ? '#b91c1c' : '#a16207'
+                                                            }}>{l.status}</span>
+                                                        </div>
+                                                        <div style={{ fontSize: 13, color: '#374151', marginBottom: 4 }}>
+                                                            <b>{l.leaveType}</b>
+                                                            {l.payType ? ` · ${l.payType}` : ''}
+                                                            {l.leaveReferenceNumber ? ` · ${l.leaveReferenceNumber}` : ''}
+                                                        </div>
+                                                        <div style={{ fontSize: 12, color: '#6b7280' }}>
+                                                            {new Date(l.fromDate).toLocaleDateString('en-GB')} → {new Date(l.toDate).toLocaleDateString('en-GB')} · {l.totalDays} day(s)
+                                                        </div>
+                                                        <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>
+                                                            Applied on {new Date(l.createdAt).toLocaleDateString('en-GB')}
+                                                        </div>
                                                     </div>
-                                                    <span style={{
-                                                        padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600,
-                                                        background: l.status === 'Approved' ? '#dcfce7' : l.status === 'Rejected' ? '#fee2e2' : '#fef3c7',
-                                                        color: l.status === 'Approved' ? '#15803d' : l.status === 'Rejected' ? '#b91c1c' : '#a16207'
-                                                    }}>{l.status}</span>
-                                                </div>
-                                                <div style={{ fontSize: 12, color: '#374151' }}>
-                                                    <b>{l.leaveType}</b>
-                                                    {l.payType ? ` · ${l.payType}` : ''}
-                                                    {l.leaveReferenceNumber ? ` · ${l.leaveReferenceNumber}` : ''}
-                                                </div>
-                                                <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
-                                                    {new Date(l.fromDate).toLocaleDateString('en-GB')} → {new Date(l.toDate).toLocaleDateString('en-GB')} · {l.totalDays} day(s)
-                                                </div>
-                                                <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 2 }}>
-                                                    Applied on {new Date(l.createdAt).toLocaleDateString('en-GB')}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            ) : (
-                                <div style={{ fontSize: 12, color: '#6b7280' }}>
-                                    {isWeekend ? 'No work scheduled.' : 'No leave on this day.'}
-                                </div>
-                            )}
-                            <button
-                                type="button"
-                                onClick={() => setSelectedDate(null)}
-                                style={{ marginTop: 8, background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: 11, padding: 0 }}
-                            >Clear selection ✕</button>
+                                                );
+                                            })}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            {/* Footer */}
+                            <div style={{ padding: '12px 20px', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'flex-end' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedDate(null)}
+                                    style={{ background: '#1e3a8a', color: 'white', border: 'none', borderRadius: 6, padding: '7px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                                >Close</button>
+                            </div>
                         </div>
-                    );
-                })()}
-            </div>
+                    </div>
+                );
+            })()}
         </div>
     );
 }
