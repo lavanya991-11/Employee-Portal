@@ -233,6 +233,45 @@ function Dashboard() {
                     </div>
                 </div>
 
+                {/* All Collections — admins / managers / super-admin only — at TOP */}
+                {isManager && adminStats && (
+                    <div className="dash-card" style={{ marginBottom: 14 }}>
+                        <div className="dash-card-head">
+                            <span>All Collections</span>
+                            <Link to="/admin" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>Open Super Admin</Link>
+                        </div>
+                        <div style={{ padding: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+                            {ADMIN_TILES.map((t) => {
+                                const total = adminStats.totals?.[t.key] ?? 0;
+                                const pending = adminStats.pending?.[t.key];
+                                return (
+                                    <Link to={t.path} key={t.key} style={{
+                                        display: 'block', textDecoration: 'none',
+                                        border: '1px solid #e5e7eb', borderTop: `3px solid ${t.color}`,
+                                        borderRadius: 8, padding: 12, background: 'white'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <div style={{
+                                                width: 36, height: 36, borderRadius: 8, background: t.color, color: 'white',
+                                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 18
+                                            }}>{t.icon}</div>
+                                            <div>
+                                                <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{t.title.toUpperCase()}</div>
+                                                <div style={{ fontSize: 22, fontWeight: 700, color: '#111827', lineHeight: 1.1 }}>{total}</div>
+                                                {pending !== undefined && (
+                                                    <div style={{ fontSize: 11, color: '#a16207', marginTop: 2 }}>
+                                                        {pending} pending
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
                 {/* 4 stat cards */}
                 <div className="dash-stats">
                     <StatCard icon="📅" iconBg="#dbeafe" iconColor="#1e40af"
@@ -285,45 +324,6 @@ function Dashboard() {
                         </div>
                     </div>
                 </div>
-
-                {/* All Collections — admins / managers / super-admin only */}
-                {isManager && adminStats && (
-                    <div className="dash-card" style={{ marginTop: 14 }}>
-                        <div className="dash-card-head">
-                            <span>All Collections</span>
-                            <Link to="/admin" style={{ color: '#3b82f6', fontSize: 12, textDecoration: 'none' }}>Open Super Admin</Link>
-                        </div>
-                        <div style={{ padding: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
-                            {ADMIN_TILES.map((t) => {
-                                const total = adminStats.totals?.[t.key] ?? 0;
-                                const pending = adminStats.pending?.[t.key];
-                                return (
-                                    <Link to={t.path} key={t.key} style={{
-                                        display: 'block', textDecoration: 'none',
-                                        border: '1px solid #e5e7eb', borderTop: `3px solid ${t.color}`,
-                                        borderRadius: 8, padding: 12, background: 'white'
-                                    }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <div style={{
-                                                width: 36, height: 36, borderRadius: 8, background: t.color, color: 'white',
-                                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 18
-                                            }}>{t.icon}</div>
-                                            <div>
-                                                <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{t.title.toUpperCase()}</div>
-                                                <div style={{ fontSize: 22, fontWeight: 700, color: '#111827', lineHeight: 1.1 }}>{total}</div>
-                                                {pending !== undefined && (
-                                                    <div style={{ fontSize: 11, color: '#a16207', marginTop: 2 }}>
-                                                        {pending} pending
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
 
                 {/* Recent activities */}
                 <div className="dash-card" style={{ marginTop: 14 }}>
