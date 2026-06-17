@@ -97,6 +97,13 @@ export const holidayApi = {
     list: (year) => api.get('/holidays', { params: year ? { year } : {} })
 };
 
+export const dataMgmtApi = {
+    tables: () => api.get('/data-management/tables'),
+    deleteOne: (key) => api.delete(`/data-management/tables/${key}`),
+    deleteSelected: (keys) => api.post('/data-management/delete-selected', { keys }),
+    deleteAll: () => api.delete('/data-management/all')
+};
+
 export const finElementApi = {
     list: (params) => api.get('/fin-elements', { params }),
     getOne: (id) => api.get(`/fin-elements/${id}`),

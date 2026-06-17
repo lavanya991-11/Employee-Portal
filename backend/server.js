@@ -16,6 +16,7 @@ const expenseRoutes = require('./routes/expenseRoutes');
 const employeeInfoRoutes = require('./routes/employeeInfoRoutes');
 const finElementRoutes = require('./routes/finElementRoutes');
 const holidayRoutes = require('./routes/holidayRoutes');
+const dataManagementRoutes = require('./routes/dataManagementRoutes');
 
 connectDB();
 
@@ -35,6 +36,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/employee-info', employeeInfoRoutes);
 app.use('/api/fin-elements', finElementRoutes);
 app.use('/api/holidays', holidayRoutes);
+app.use('/api/data-management', dataManagementRoutes);
 
 app.get('/', (req, res) => {
     res.status(200).json({

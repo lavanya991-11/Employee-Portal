@@ -16,6 +16,7 @@ import OnDuty from './pages/OnDuty';
 import Holidays from './pages/Holidays';
 import Announcements from './pages/Announcements';
 import SystemSettings from './pages/SystemSettings';
+import DataManagement from './pages/DataManagement';
 import TravelRequest from './pages/TravelRequest';
 import TravelRequests from './pages/TravelRequests';
 import TravelExpenses from './pages/TravelExpenses';
@@ -154,6 +155,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <SystemSettings />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/data-management"
+                element={
+                    <ProtectedRoute>
+                        <DataManagement />
                     </ProtectedRoute>
                 }
             />
