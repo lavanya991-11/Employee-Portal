@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
 
 const SESSION_TIMEOUT_SECONDS = 600; // 10 minutes
-const WARNING_AT_SECONDS = 2;        // last 2 seconds → popup
+const WARNING_AT_SECONDS = 60;       // last 1 minute → popup
 
 const fmtMMSS = (sec) => {
     const m = Math.floor(sec / 60); const s = sec % 60;
