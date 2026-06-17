@@ -49,7 +49,7 @@ function SystemSettings() {
             <Sidebar />
             <main className="main-content">
                 <PageHeader pageName="System Settings" />
-                <div className="erp-page">
+                <div className="erp-page" style={{ maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
                     <div style={{ padding: 20 }}>
                         <h2 style={{ margin: 0, color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: 8 }}>
                             🎨 System Settings
