@@ -129,7 +129,7 @@ function MyLeaves() {
                             }}>🔍</span>
                             <input
                                 type="text"
-                                placeholder="Search by reference no, doc no, status, type, dates..."
+                                placeholder="Search by reference no, doc no, status, type..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{
