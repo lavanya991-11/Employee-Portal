@@ -2,8 +2,9 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
 
-const SESSION_TIMEOUT_SECONDS = 600; // 10 minutes
-const WARNING_AT_SECONDS = 60;       // last 1 minute → popup
+const SESSION_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+const WARNING_AT_SECONDS = 60;              // last 1 minute → popup
+const STORAGE_KEY = 'sessionExpiresAt';
 
 const fmtMMSS = (sec) => {
     const m = Math.floor(sec / 60); const s = sec % 60;
@@ -11,18 +12,39 @@ const fmtMMSS = (sec) => {
 };
 
 const SKIP_PATHS = ['/login', '/register'];
-const SessionContext = createContext({ remaining: SESSION_TIMEOUT_SECONDS });
+const SessionContext = createContext({ remaining: Math.floor(SESSION_DURATION_MS / 1000) });
 
 export function useSession() {
     return useContext(SessionContext);
 }
+
+const readDeadline = () => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? n : null;
+};
+
+const ensureDeadline = () => {
+    if (!localStorage.getItem('accessToken')) return null;
+    let dl = readDeadline();
+    if (!dl || dl <= Date.now()) {
+        dl = Date.now() + SESSION_DURATION_MS;
+        localStorage.setItem(STORAGE_KEY, String(dl));
+    }
+    return dl;
+};
+
+const computeRemaining = (dl) => {
+    if (!dl) return Math.floor(SESSION_DURATION_MS / 1000);
+    return Math.max(0, Math.ceil((dl - Date.now()) / 1000));
+};
 
 export function SessionPill() {
     const { remaining } = useSession();
     const color = remaining <= 10 ? '#dc2626' : remaining <= 60 ? '#f59e0b' : '#16a34a';
     return (
         <span
-            title="Session timer — resets on activity, auto logout at 0"
+            title="Session timer — auto logout at 0"
             style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '6px 12px', borderRadius: 999,
@@ -41,31 +63,22 @@ export function SessionPill() {
 function SessionGuard({ children }) {
     const navigate = useNavigate();
     const location = useLocation();
-    const [remaining, setRemaining] = useState(SESSION_TIMEOUT_SECONDS);
+    const skip = SKIP_PATHS.includes(location.pathname);
+    const [remaining, setRemaining] = useState(() => computeRemaining(readDeadline()));
     const loggedOutRef = useRef(false);
 
-    const skip = SKIP_PATHS.includes(location.pathname);
+    useEffect(() => {
+        if (skip) return;
+        ensureDeadline();
+        const tick = () => setRemaining(computeRemaining(readDeadline()));
+        tick();
+        const interval = setInterval(tick, 1000);
+        return () => clearInterval(interval);
+    }, [skip, location.pathname]);
 
     useEffect(() => {
         if (skip) return;
-        const reset = () => {
-            loggedOutRef.current = false;
-            setRemaining(SESSION_TIMEOUT_SECONDS);
-        };
-        const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
-        events.forEach((e) => window.addEventListener(e, reset));
-        const interval = setInterval(() => {
-            setRemaining((r) => Math.max(0, r - 1));
-        }, 1000);
-        return () => {
-            events.forEach((e) => window.removeEventListener(e, reset));
-            clearInterval(interval);
-        };
-    }, [skip]);
-
-    useEffect(() => {
-        if (skip) return;
-        if (remaining === 0 && !loggedOutRef.current) {
+        if (remaining === 0 && !loggedOutRef.current && localStorage.getItem('accessToken')) {
             loggedOutRef.current = true;
             (async () => {
                 try { await authApi.logout(); } catch (e) {}
@@ -99,7 +112,7 @@ function SessionGuard({ children }) {
                             <span style={{ color: '#d97706', fontWeight: 700 }}>{fmtMMSS(remaining)}</span>
                         </div>
                         <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>
-                            Move your mouse or press any key to stay logged in.
+                            Save your work before the session ends.
                         </div>
                     </div>
                 </div>
