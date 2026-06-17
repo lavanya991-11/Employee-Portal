@@ -90,7 +90,8 @@ function MyLeaves() {
         return leaves.filter((l) => {
             const hay = [
                 docNo(l), l.leaveReferenceNumber, l.leaveType, l.payType,
-                l.reason, l.status, l.approvedByName
+                l.reason, l.status, l.approvedByName,
+                l.fromDate, l.toDate, l.employee?.name
             ].filter(Boolean).join(' ').toLowerCase();
             return hay.includes(q);
         });
@@ -121,13 +122,25 @@ function MyLeaves() {
                 <PageHeader pageName="Apply Leave" />
                 <div className="erp-page" ref={tableRef}>
                     <div className="erp-titlebar" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
-                        <input
-                            type="text"
-                            placeholder="🔍 Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{ padding: '8px 14px', fontSize: 14, border: '1px solid #d1d5db', borderRadius: 8, width: '100%', background: '#fff' }}
-                        />
+                        <div style={{ position: 'relative', width: '100%' }}>
+                            <span style={{
+                                position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+                                color: '#9ca3af', fontSize: 14, pointerEvents: 'none'
+                            }}>🔍</span>
+                            <input
+                                type="text"
+                                placeholder="Search by reference no, doc no, status, type, dates..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{
+                                    padding: '10px 14px 10px 38px', fontSize: 14,
+                                    border: '1px solid #e5e7eb', borderRadius: 10,
+                                    width: '100%', background: '#fff',
+                                    color: '#111827', outline: 'none',
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                                }}
+                            />
+                        </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                             <div className="erp-title">Apply Leave</div>
                             <div className="erp-titlebar-actions">
