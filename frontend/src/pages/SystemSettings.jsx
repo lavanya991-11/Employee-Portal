@@ -70,7 +70,7 @@ function SystemSettings() {
                             </div>
                         </div>
 
-                        <div style={{ marginTop: 16, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                        <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
                             <ColorField label="Primary Color" value={primary} onChange={setPrimary} />
                             <ColorField label="Secondary Color" value={secondary} onChange={setSecondary} />
                         </div>
