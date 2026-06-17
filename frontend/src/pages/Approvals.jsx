@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import PageHeader from '../components/PageHeader';
 import { leaveApi } from '../services/api';
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
@@ -60,6 +61,7 @@ function Approvals() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="Approvals" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">Approvals</div>
