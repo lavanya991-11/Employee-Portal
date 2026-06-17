@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
+import SessionGuard from './components/SessionGuard.jsx';
 import './index.css';
 
 // Apply saved theme colors before render.
@@ -14,6 +15,7 @@ try {
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <BrowserRouter>
+            <SessionGuard />
             <App />
         </BrowserRouter>
     </React.StrictMode>
