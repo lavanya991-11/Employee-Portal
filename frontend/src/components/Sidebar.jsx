@@ -102,7 +102,7 @@ function Sidebar() {
                 )}
                 {user.role === 'super-admin' && (
                     <Link to="/data-management" className="nav-item">
-                        <span className="nav-item-icon">🗄️</span> Data Management
+                        <span className="nav-item-icon">🗑️</span> Data Management
                     </Link>
                 )}
             </nav>

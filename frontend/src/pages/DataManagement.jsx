@@ -88,7 +88,7 @@ function DataManagement() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
                         <div>
                             <h2 style={{ margin: 0, color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: 8 }}>
-                                🗄️ Data Management
+                                🗑️ Data Management
                             </h2>
                             <p style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>
                                 Permanently delete table data — super admin only
