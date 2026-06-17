@@ -1,25 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import UserMenu from './UserMenu';
 import { SessionPill } from './SessionGuard';
-import { leaveApi } from '../services/api';
+import NotificationBell from './NotificationBell';
 
 function PageHeader({ pageName }) {
-    const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const isManager = ['manager', 'admin', 'super-admin'].includes(user.role);
-    const [pending, setPending] = useState(0);
-
-    useEffect(() => {
-        const fetcher = isManager ? leaveApi.allLeaves() : leaveApi.myLeaves();
-        fetcher.then(({ data }) => {
-            const count = (data.leaves || []).filter((l) => l.status === 'Pending').length;
-            setPending(count);
-        }).catch(() => {});
-    }, [isManager]);
-
-    const onBell = () => navigate(isManager ? '/approvals' : '/leaves/my');
-
     return (
         <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -33,24 +17,7 @@ function PageHeader({ pageName }) {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <SessionPill />
-                <button
-                    type="button"
-                    onClick={onBell}
-                    title={isManager ? 'Pending approvals' : 'Your pending leaves'}
-                    style={{
-                        position: 'relative', background: 'transparent', border: 'none',
-                        cursor: 'pointer', fontSize: 20
-                    }}
-                >
-                    🔔
-                    {pending > 0 && (
-                        <span style={{
-                            position: 'absolute', top: -2, right: -4,
-                            background: '#dc2626', color: 'white', fontSize: 10, fontWeight: 700,
-                            borderRadius: 10, padding: '1px 5px', minWidth: 16, textAlign: 'center'
-                        }}>{pending}</span>
-                    )}
-                </button>
+                <NotificationBell />
                 <UserMenu />
             </div>
         </div>

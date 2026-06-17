@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { SessionPill } from '../components/SessionGuard';
+import NotificationBell from '../components/NotificationBell';
 import { authApi, leaveApi, employeeInfoApi, holidayApi, adminApi } from '../services/api';
 
 const ADMIN_TILES = [
@@ -147,58 +148,8 @@ function Dashboard() {
                     <div style={{ marginRight: 12 }}>
                         <SessionPill />
                     </div>
-                    <div style={{ position: 'relative', marginRight: 16 }}>
-                        <button
-                            className="notification-bell"
-                            title={isManager ? 'Pending approvals' : 'Your pending leaves'}
-                            onClick={onBellClick}
-                        >
-                            🔔
-                            {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
-                        </button>
-                        {bellOpen && (
-                            <div style={{
-                                position: 'absolute', top: '100%', right: 0, marginTop: 6,
-                                background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8,
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.08)', minWidth: 320, maxWidth: 380,
-                                maxHeight: 400, overflowY: 'auto', zIndex: 50
-                            }}>
-                                <div style={{ padding: '10px 14px', borderBottom: '1px solid #f3f4f6', fontWeight: 600, color: '#111827' }}>
-                                    Notifications {notificationCount > 0 && <span style={{ color: '#6b7280', fontWeight: 400, fontSize: 12 }}>({notificationCount})</span>}
-                                </div>
-                                {notifications.length === 0 ? (
-                                    <div style={{ padding: '20px 14px', textAlign: 'center', color: '#6b7280', fontSize: 13 }}>
-                                        No new notifications
-                                    </div>
-                                ) : (
-                                    notifications.map((n) => (
-                                        <button
-                                            key={n.id}
-                                            type="button"
-                                            onClick={() => { setBellOpen(false); navigate(n.link); }}
-                                            style={{
-                                                display: 'block', width: '100%', textAlign: 'left',
-                                                padding: '10px 14px', background: 'transparent',
-                                                border: 'none', borderBottom: '1px solid #f3f4f6',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            <div style={{ fontWeight: 600, color: '#111827', fontSize: 13 }}>{n.title}</div>
-                                            <div style={{ color: '#6b7280', fontSize: 12, marginTop: 2 }}>{n.subtitle}</div>
-                                        </button>
-                                    ))
-                                )}
-                                {notifications.length > 0 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => { setBellOpen(false); navigate(isManager ? '/approvals' : '/leaves/my'); }}
-                                        style={{ display: 'block', width: '100%', padding: '10px 14px', background: '#f9fafb', border: 'none', cursor: 'pointer', color: '#3b82f6', fontWeight: 600, fontSize: 13 }}
-                                    >
-                                        View all →
-                                    </button>
-                                )}
-                            </div>
-                        )}
+                    <div style={{ marginRight: 16 }}>
+                        <NotificationBell />
                     </div>
                     <div style={{ position: 'relative' }}>
                         <button
