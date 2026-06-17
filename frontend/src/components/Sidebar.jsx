@@ -35,6 +35,12 @@ function Sidebar() {
                     <span className="nav-item-icon">🏠</span> Dashboard
                 </Link>
 
+                {user.role === 'super-admin' && (
+                    <Link to="/system-settings" className="nav-item">
+                        <span className="nav-item-icon">🎨</span> System Settings
+                    </Link>
+                )}
+
                 <Link to="/loans/apply" className="nav-item">
                     <span className="nav-item-icon">💰</span> Apply Loan
                 </Link>
@@ -95,11 +101,6 @@ function Sidebar() {
                     <span className="nav-item-icon">🪪</span> My Information
                 </Link>
 
-                {user.role === 'super-admin' && (
-                    <Link to="/system-settings" className="nav-item">
-                        <span className="nav-item-icon">🎨</span> System Settings
-                    </Link>
-                )}
                 {user.role === 'super-admin' && (
                     <Link to="/data-management" className="nav-item">
                         <span className="nav-item-icon">🗑️</span> Data Management
