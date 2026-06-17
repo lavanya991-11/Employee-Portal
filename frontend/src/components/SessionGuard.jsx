@@ -52,7 +52,7 @@ function SessionGuard({ children }) {
             loggedOutRef.current = false;
             setRemaining(SESSION_TIMEOUT_SECONDS);
         };
-        const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+        const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
         events.forEach((e) => window.addEventListener(e, reset));
         const interval = setInterval(() => {
             setRemaining((r) => Math.max(0, r - 1));
