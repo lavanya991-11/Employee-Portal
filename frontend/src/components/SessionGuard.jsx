@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
 
-const SESSION_TIMEOUT_SECONDS = 10;
-const WARNING_AT_SECONDS = 2;
+const SESSION_TIMEOUT_SECONDS = 600; // 10 minutes
+const WARNING_AT_SECONDS = 2;        // last 2 seconds → popup
 
 const fmtMMSS = (sec) => {
     const m = Math.floor(sec / 60); const s = sec % 60;
@@ -11,8 +11,34 @@ const fmtMMSS = (sec) => {
 };
 
 const SKIP_PATHS = ['/login', '/register'];
+const SessionContext = createContext({ remaining: SESSION_TIMEOUT_SECONDS });
 
-function SessionGuard() {
+export function useSession() {
+    return useContext(SessionContext);
+}
+
+export function SessionPill() {
+    const { remaining } = useSession();
+    const color = remaining <= 10 ? '#dc2626' : remaining <= 60 ? '#f59e0b' : '#16a34a';
+    return (
+        <span
+            title="Session timer — resets on activity, auto logout at 0"
+            style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '6px 12px', borderRadius: 999,
+                background: 'white', border: '1px solid #e5e7eb',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                fontFamily: 'monospace', fontWeight: 700, fontSize: 13,
+                color
+            }}
+        >
+            <span style={{ fontSize: 14 }}>🛡</span>
+            {fmtMMSS(remaining)}
+        </span>
+    );
+}
+
+function SessionGuard({ children }) {
     const navigate = useNavigate();
     const location = useLocation();
     const [remaining, setRemaining] = useState(SESSION_TIMEOUT_SECONDS);
@@ -49,26 +75,10 @@ function SessionGuard() {
         }
     }, [remaining, navigate, skip]);
 
-    if (skip) return null;
-
-    const timerColor = remaining <= 2 ? '#dc2626' : remaining <= 5 ? '#f59e0b' : '#16a34a';
-
     return (
-        <>
-            <div style={{
-                position: 'fixed', top: 14, right: 200, zIndex: 9998,
-                background: 'white', border: '1px solid #e5e7eb', borderRadius: 999,
-                padding: '6px 12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                fontFamily: 'monospace', fontWeight: 700, fontSize: 13,
-                color: timerColor,
-                pointerEvents: 'none'
-            }}>
-                <span style={{ fontSize: 14 }}>🛡</span>
-                <span>{fmtMMSS(remaining)}</span>
-            </div>
-
-            {remaining > 0 && remaining <= WARNING_AT_SECONDS && (
+        <SessionContext.Provider value={{ remaining }}>
+            {children}
+            {!skip && remaining > 0 && remaining <= WARNING_AT_SECONDS && (
                 <div style={{
                     position: 'fixed', bottom: 20, right: 20, zIndex: 9999,
                     background: '#fffbeb', border: '1px solid #fcd34d',
@@ -94,7 +104,7 @@ function SessionGuard() {
                     </div>
                 </div>
             )}
-        </>
+        </SessionContext.Provider>
     );
 }
 

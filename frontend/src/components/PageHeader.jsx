@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import UserMenu from './UserMenu';
+import { SessionPill } from './SessionGuard';
 import { leaveApi } from '../services/api';
 
 function PageHeader({ pageName }) {
@@ -31,6 +32,7 @@ function PageHeader({ pageName }) {
                 <span style={{ color: '#111827', fontWeight: 600 }}>{pageName}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <SessionPill />
                 <button
                     type="button"
                     onClick={onBell}

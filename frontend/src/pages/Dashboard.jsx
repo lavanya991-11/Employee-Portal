@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { SessionPill } from '../components/SessionGuard';
 import { authApi, leaveApi, employeeInfoApi, holidayApi, adminApi } from '../services/api';
 
 const ADMIN_TILES = [
@@ -142,6 +143,9 @@ function Dashboard() {
                     <div className="greeting">
                         <h2>Good {timeOfDay}, {displayName} 👋</h2>
                         <p>{displayDesignation} • {displayDepartment}</p>
+                    </div>
+                    <div style={{ marginRight: 12 }}>
+                        <SessionPill />
                     </div>
                     <div style={{ position: 'relative', marginRight: 16 }}>
                         <button

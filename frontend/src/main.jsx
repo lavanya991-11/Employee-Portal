@@ -15,8 +15,9 @@ try {
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <BrowserRouter>
-            <SessionGuard />
-            <App />
+            <SessionGuard>
+                <App />
+            </SessionGuard>
         </BrowserRouter>
     </React.StrictMode>
 );
