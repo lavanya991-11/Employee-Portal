@@ -4,6 +4,13 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import './index.css';
 
+// Apply saved theme colors before render.
+try {
+    const t = JSON.parse(localStorage.getItem('themeColors') || '{}');
+    if (t.primary) document.documentElement.style.setProperty('--primary-color', t.primary);
+    if (t.secondary) document.documentElement.style.setProperty('--secondary-color', t.secondary);
+} catch (e) { /* ignore */ }
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <BrowserRouter>

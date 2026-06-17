@@ -94,6 +94,12 @@ function Sidebar() {
                 <Link to="/my-information" className="nav-item">
                     <span className="nav-item-icon">🪪</span> My Information
                 </Link>
+
+                {user.role === 'super-admin' && (
+                    <Link to="/system-settings" className="nav-item">
+                        <span className="nav-item-icon">🎨</span> System Settings
+                    </Link>
+                )}
             </nav>
         </aside>
     );

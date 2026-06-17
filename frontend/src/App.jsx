@@ -15,6 +15,7 @@ import Attendance from './pages/Attendance';
 import OnDuty from './pages/OnDuty';
 import Holidays from './pages/Holidays';
 import Announcements from './pages/Announcements';
+import SystemSettings from './pages/SystemSettings';
 import TravelRequest from './pages/TravelRequest';
 import TravelRequests from './pages/TravelRequests';
 import TravelExpenses from './pages/TravelExpenses';
@@ -145,6 +146,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <Announcements />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/system-settings"
+                element={
+                    <ProtectedRoute>
+                        <SystemSettings />
                     </ProtectedRoute>
                 }
             />
