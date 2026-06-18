@@ -17,12 +17,13 @@ const employeeInfoRoutes = require('./routes/employeeInfoRoutes');
 const finElementRoutes = require('./routes/finElementRoutes');
 const holidayRoutes = require('./routes/holidayRoutes');
 const dataManagementRoutes = require('./routes/dataManagementRoutes');
+const imageRoutes = require('./routes/imageRoutes');
 
 connectDB();
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 
 app.use('/api/auth', authRoutes);
@@ -37,6 +38,7 @@ app.use('/api/employee-info', employeeInfoRoutes);
 app.use('/api/fin-elements', finElementRoutes);
 app.use('/api/holidays', holidayRoutes);
 app.use('/api/data-management', dataManagementRoutes);
+app.use('/api/images', imageRoutes);
 
 app.get('/', (req, res) => {
     res.status(200).json({
