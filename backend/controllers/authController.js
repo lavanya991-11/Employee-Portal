@@ -2,6 +2,30 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const EmployeeInfo = require('../models/employeeInfo');
+const ImageRegister = require('../models/imageRegister');
+
+const ALLOWED_IMAGE_MIME = new Set(['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif']);
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+function decodeBase64Image(input) {
+    if (typeof input !== 'string' || !input.length) {
+        throw new Error('base64 payload is required');
+    }
+    let contentType = 'image/png';
+    let payload = input.trim();
+    const match = payload.match(/^data:([a-zA-Z0-9/+.-]+);base64,(.+)$/);
+    if (match) {
+        contentType = match[1].toLowerCase();
+        payload = match[2];
+    }
+    if (!ALLOWED_IMAGE_MIME.has(contentType)) {
+        throw new Error(`Unsupported image type: ${contentType}`);
+    }
+    const buffer = Buffer.from(payload, 'base64');
+    if (buffer.length === 0) throw new Error('Decoded image is empty — invalid base64 string');
+    if (buffer.length > MAX_IMAGE_BYTES) throw new Error(`Image too large (${buffer.length} bytes, max ${MAX_IMAGE_BYTES})`);
+    return { contentType, buffer };
+}
 
 const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY = '7d';
@@ -93,7 +117,7 @@ exports.register = async (req, res) => {
             return res.status(400).json({ success: false, message: "Wrong token type" });
         }
 
-        const { name, email, password, empId, department, designation, role, employeeInfo } = req.body;
+        const { name, email, password, empId, department, designation, role, employeeInfo, image } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({ success: false, message: "name, email, and password are required" });
@@ -136,6 +160,30 @@ exports.register = async (req, res) => {
             return res.status(400).json({ success: false, message: "Failed to create employee info", error: err.message });
         }
 
+        let imageDoc = null;
+        if (image) {
+            try {
+                const base64Input = typeof image === 'string' ? image : image.base64;
+                if (base64Input) {
+                    const { contentType, buffer } = decodeBase64Image(base64Input);
+                    imageDoc = await ImageRegister.create({
+                        user: user._id,
+                        purpose: 'profile',
+                        contentType,
+                        size: buffer.length,
+                        filename: (image && image.filename) ? String(image.filename).slice(0, 200) : '',
+                        data: buffer
+                    });
+                    user.profilePicture = `/api/images/${imageDoc._id}`;
+                    await user.save();
+                }
+            } catch (err) {
+                await EmployeeInfo.findByIdAndDelete(info._id);
+                await User.findByIdAndDelete(user._id);
+                return res.status(400).json({ success: false, message: `Failed to decode/store image: ${err.message}` });
+            }
+        }
+
         res.status(201).json({
             success: true,
             message: "User registered with employee information",
@@ -146,9 +194,17 @@ exports.register = async (req, res) => {
                 role: user.role,
                 empId: user.empId,
                 department: user.department,
-                designation: user.designation
+                designation: user.designation,
+                profilePicture: user.profilePicture
             },
-            employeeInfo: info
+            employeeInfo: info,
+            image: imageDoc ? {
+                id: imageDoc._id,
+                url: `/api/images/${imageDoc._id}`,
+                contentType: imageDoc.contentType,
+                size: imageDoc.size,
+                filename: imageDoc.filename
+            } : null
         });
     } catch (err) {
         res.status(500).json({ success: false, message: "Server error", error: err.message });
