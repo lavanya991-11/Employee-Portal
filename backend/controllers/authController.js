@@ -117,7 +117,14 @@ exports.register = async (req, res) => {
             return res.status(400).json({ success: false, message: "Wrong token type" });
         }
 
-        const { name, email, password, empId, department, designation, role, employeeInfo, image } = req.body;
+        const { name, email, password, empId, department, designation, role, employeeInfo } = req.body;
+        // image can sit at the top level OR inside employeeInfo.administration (right after oldEmployeeCode).
+        const image = req.body.image
+            || (employeeInfo && employeeInfo.administration && employeeInfo.administration.image)
+            || null;
+        if (employeeInfo && employeeInfo.administration && employeeInfo.administration.image) {
+            delete employeeInfo.administration.image;
+        }
 
         if (!name || !email || !password) {
             return res.status(400).json({ success: false, message: "name, email, and password are required" });
