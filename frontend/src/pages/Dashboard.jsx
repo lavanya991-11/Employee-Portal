@@ -138,9 +138,6 @@ function Dashboard() {
             <Sidebar />
             <main className="main-content">
                 <div className="dashboard-header">
-                    <div className="avatar">
-                        {user.profilePicture ? <img src={resolveImageUrl(user.profilePicture)} alt="" /> : avatarInitial}
-                    </div>
                     <div className="greeting">
                         <h2>Good {timeOfDay}, {displayName} 👋</h2>
                         <p>{displayDesignation} • {displayDepartment}</p>
