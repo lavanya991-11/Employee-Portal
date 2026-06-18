@@ -113,6 +113,15 @@ export const finElementApi = {
     scanFromBc: () => api.post('/fin-elements/scan-from-bc')
 };
 
+export const imageApi = {
+    upload: (base64, opts = {}) =>
+        api.post('/images/upload', { base64, filename: opts.filename, purpose: opts.purpose || 'profile' }),
+    me: () => api.get('/images/me'),
+    list: () => api.get('/images'),
+    remove: (id) => api.delete(`/images/${id}`),
+    urlFor: (id) => `${API_BASE_URL}/images/${id}`
+};
+
 export const adminApi = {
     stats: () => api.get('/users/admin/stats'),
     users: () => api.get('/users'),
