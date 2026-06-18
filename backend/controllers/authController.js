@@ -252,7 +252,9 @@ exports.login = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 department: user.department,
-                designation: user.designation
+                designation: user.designation,
+                empId: user.empId,
+                profilePicture: user.profilePicture
             }
         });
     } catch (err) {

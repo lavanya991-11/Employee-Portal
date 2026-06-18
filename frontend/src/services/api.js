@@ -1,6 +1,15 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Backend origin (drops the trailing /api), used to resolve relative /api/... URLs from the DB.
+const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
+
+export function resolveImageUrl(url) {
+    if (!url) return '';
+    if (/^https?:\/\//i.test(url)) return url;
+    if (url.startsWith('/')) return `${BACKEND_ORIGIN}${url}`;
+    return url;
+}
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -119,7 +128,7 @@ export const imageApi = {
     me: () => api.get('/images/me'),
     list: () => api.get('/images'),
     remove: (id) => api.delete(`/images/${id}`),
-    urlFor: (id) => `${API_BASE_URL}/images/${id}`
+    urlFor: (id) => `${BACKEND_ORIGIN}/api/images/${id}`
 };
 
 export const adminApi = {

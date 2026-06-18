@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { employeeInfoApi } from '../services/api';
+import { employeeInfoApi, resolveImageUrl } from '../services/api';
 
 function Sidebar() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -23,7 +23,9 @@ function Sidebar() {
         <aside className="sidebar">
             <div className="sidebar-profile">
                 <div className="avatar">
-                    {user.profilePicture ? <img src={user.profilePicture} alt="" /> : '👤'}
+                    {user.profilePicture
+                        ? <img src={resolveImageUrl(user.profilePicture)} alt="" />
+                        : '👤'}
                 </div>
                 <div className="user-id">
                     {displayCode ? `${displayCode} - ${displayName}` : displayName}

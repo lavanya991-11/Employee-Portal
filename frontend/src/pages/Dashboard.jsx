@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { SessionPill } from '../components/SessionGuard';
 import NotificationBell from '../components/NotificationBell';
-import { authApi, leaveApi, employeeInfoApi, holidayApi, adminApi } from '../services/api';
+import { authApi, leaveApi, employeeInfoApi, holidayApi, adminApi, resolveImageUrl } from '../services/api';
 
 const ADMIN_TILES = [
     { key: 'users', title: 'Users', icon: '👥', color: '#3b82f6', path: '/admin/users' },
@@ -139,7 +139,7 @@ function Dashboard() {
             <main className="main-content">
                 <div className="dashboard-header">
                     <div className="avatar">
-                        {user.profilePicture ? <img src={user.profilePicture} alt="" /> : avatarInitial}
+                        {user.profilePicture ? <img src={resolveImageUrl(user.profilePicture)} alt="" /> : avatarInitial}
                     </div>
                     <div className="greeting">
                         <h2>Good {timeOfDay}, {displayName} 👋</h2>
