@@ -103,12 +103,15 @@ function ApplyLeave() {
         });
     }, [form.leaveFinId, form.docDate]);
 
-    // Find an overlapping existing leave (if any).
+    // Find an overlapping existing leave (if any). Rejected leaves stay in
+    // the system as history but do NOT block a new application on the same
+    // dates — only Pending and Approved leaves are treated as blocking.
     const findOverlap = (fromStr, toStr) => {
         if (!fromStr || !toStr) return null;
         const from = new Date(fromStr);
         const to = new Date(toStr);
         return existingLeaves.find((l) => {
+            if (l.status === 'Rejected') return false;
             const lf = new Date(l.fromDate);
             const lt = new Date(l.toDate);
             return lf <= to && lt >= from;
