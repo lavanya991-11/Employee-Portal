@@ -1,4 +1,4 @@
-const { getHolidays, bcConfigured } = require('../services/bcClient');
+const { getHolidays, getAllHolidays, bcConfigured } = require('../services/bcClient');
 
 // Fallback list (used when BC has no holidays endpoint published).
 const FALLBACK_HOLIDAYS = [
@@ -54,4 +54,40 @@ exports.list = async (req, res) => {
     holidays.sort((a, b) => new Date(a.fromDate) - new Date(b.fromDate));
 
     res.json({ success: true, source, count: holidays.length, year: yearFilter || null, holidays });
+};
+
+// GET /api/holidays/years — distinct list of years that BC actually has
+// public holidays for, so the ESS Year dropdown can stay in sync with BC.
+exports.years = async (req, res) => {
+    let items = [];
+    let source = 'bc';
+
+    if (bcConfigured()) {
+        try {
+            items = await getAllHolidays();
+        } catch (err) {
+            if (err.bcNotFound) {
+                items = [...FALLBACK_HOLIDAYS];
+                source = 'fallback';
+            } else {
+                return res.status(500).json({ success: false, message: 'Failed to fetch holiday years from BC', error: err.message });
+            }
+        }
+    } else {
+        items = [...FALLBACK_HOLIDAYS];
+        source = 'fallback';
+    }
+
+    const yearSet = new Set();
+    for (const h of items) {
+        const y = Number(h.year);
+        if (Number.isFinite(y) && y > 0) { yearSet.add(y); continue; }
+        const d = h.fromDate || h.startDate || h.date || h.holidayDate || h.day;
+        if (d) {
+            const fy = new Date(d).getFullYear();
+            if (Number.isFinite(fy)) yearSet.add(fy);
+        }
+    }
+    const years = [...yearSet].sort((a, b) => a - b);
+    res.json({ success: true, source, count: years.length, years });
 };
