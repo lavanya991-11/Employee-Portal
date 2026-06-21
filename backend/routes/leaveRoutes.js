@@ -8,6 +8,7 @@ const {
     updateLeaveStatus,
     bcLeaveBalance,
     updateMyLeave,
+    deleteMyLeave,
     getOneMyLeave,
     updateLeaveStatusByRef
 } = require('../controllers/leaveController');
@@ -18,6 +19,7 @@ router.get('/all', protect, getAllLeaves);
 router.get('/bc-balance', protect, bcLeaveBalance);
 router.get('/:id', protect, getOneMyLeave);
 router.put('/:id', protect, updateMyLeave);
+router.delete('/:id', protect, deleteMyLeave);
 router.put('/:id/status', protect, updateLeaveStatus);
 router.patch('/by-ref/:refNumber/status', protect, updateLeaveStatusByRef);
 

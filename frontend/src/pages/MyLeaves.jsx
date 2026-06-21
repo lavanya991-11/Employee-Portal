@@ -56,6 +56,21 @@ function MyLeaves() {
         navigate(`/leaves/apply?edit=${selected._id}`);
     };
 
+    const onDelete = async () => {
+        if (!selected) return;
+        if (selected.isPosted || selected.status !== 'Pending') return;
+        if (!window.confirm(`Delete this draft leave request? This cannot be undone.`)) return;
+        try {
+            await leaveApi.remove(selected._id);
+            setSelected(null);
+            setMessage('Leave request deleted.');
+            setTimeout(() => setMessage(''), 2500);
+            load();
+        } catch (err) {
+            setError(err.response?.data?.message || 'Delete failed');
+        }
+    };
+
     const onRegenerate = async () => {
         setMessage('Regenerating from server…');
         try {
@@ -147,6 +162,13 @@ function MyLeaves() {
                                 <button className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
                                 <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
                                 <button className="erp-action-btn" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>✏️ Edit</button>
+                                <button
+                                    className="erp-action-btn"
+                                    onClick={onDelete}
+                                    disabled={!selected || selected.isPosted || selected.status !== 'Pending'}
+                                    style={{ color: (selected && !selected.isPosted && selected.status === 'Pending') ? '#b91c1c' : undefined }}
+                                    title={(selected && !selected.isPosted && selected.status === 'Pending') ? 'Delete this draft' : 'Only draft (unposted, pending) leaves can be deleted'}
+                                >🗑 Delete</button>
                                 <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
                                 <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
                             </div>

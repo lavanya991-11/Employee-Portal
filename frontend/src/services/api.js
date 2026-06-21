@@ -58,6 +58,7 @@ export const leaveApi = {
     bcBalance: (finId, asOfDate) => api.get('/leaves/bc-balance', { params: { finId, asOfDate } }),
     getOne: (id) => api.get(`/leaves/${id}`),
     update: (id, data) => api.put(`/leaves/${id}`, data),
+    remove: (id) => api.delete(`/leaves/${id}`),
     updateStatusByRef: (refNumber, data) => api.patch(`/leaves/by-ref/${refNumber}/status`, data)
 };
 

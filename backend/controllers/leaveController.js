@@ -240,6 +240,26 @@ exports.updateMyLeave = async (req, res) => {
     }
 };
 
+exports.deleteMyLeave = async (req, res) => {
+    try {
+        const leave = await Leave.findById(req.params.id);
+        if (!leave) return res.status(404).json({ message: 'Leave not found' });
+        if (String(leave.employee) !== String(req.user.id)) {
+            return res.status(403).json({ message: 'You can only delete your own leaves' });
+        }
+        if (leave.isPosted) {
+            return res.status(400).json({ message: 'Cannot delete a leave that has been posted to Business Central.' });
+        }
+        if (leave.status !== 'Pending') {
+            return res.status(400).json({ message: `Cannot delete a ${leave.status.toLowerCase()} leave` });
+        }
+        await leave.deleteOne();
+        res.json({ message: 'Leave deleted' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+};
+
 exports.getOneMyLeave = async (req, res) => {
     try {
         const leave = await Leave.findById(req.params.id);
