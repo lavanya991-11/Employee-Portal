@@ -16,10 +16,24 @@ function Holidays() {
     const [error, setError] = useState('');
     const [selected, setSelected] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [yearOptions, setYearOptions] = useState(() => {
+        const c = new Date().getFullYear();
+        return [c - 1, c, c + 1, c + 2, c + 3];
+    });
 
-    const yearOptions = useMemo(() => {
-        const current = new Date().getFullYear();
-        return [current - 1, current, current + 1, current + 2, current + 3];
+    // Pull the actual list of years from BC so the dropdown reflects what
+    // BC really has (e.g. 2030 added in BC shows up automatically). Fallback
+    // to the local default range if the years endpoint is unavailable.
+    useEffect(() => {
+        holidayApi.years().then(({ data }) => {
+            const fromBc = (data.years || []).filter((y) => Number.isFinite(y));
+            const c = new Date().getFullYear();
+            const merged = Array.from(new Set([
+                ...fromBc,
+                c - 1, c, c + 1, c + 2, c + 3
+            ])).sort((a, b) => a - b);
+            if (merged.length) setYearOptions(merged);
+        }).catch(() => {});
     }, []);
 
     const importFromBC = (y) => {

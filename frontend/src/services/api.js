@@ -104,7 +104,8 @@ export const employeeInfoApi = {
 };
 
 export const holidayApi = {
-    list: (year) => api.get('/holidays', { params: year ? { year } : {} })
+    list: (year) => api.get('/holidays', { params: year ? { year } : {} }),
+    years: () => api.get('/holidays/years')
 };
 
 export const dataMgmtApi = {
