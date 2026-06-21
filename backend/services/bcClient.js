@@ -229,24 +229,4 @@ const getHolidays = async (year) => {
     return data.value || [];
 };
 
-// Returns every public holiday in BC (no year filter). Used to derive the
-// distinct list of years available in BC so the ESS dropdown can stay in
-// sync with whatever has actually been entered.
-const getAllHolidays = async () => {
-    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
-    const token = await getAccessToken();
-    const url = `${basePayrollCompanyUrl()}/publicHolidays`;
-    const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
-    });
-    if (!res.ok) {
-        const text = await res.text();
-        const err = new Error(`BC publicHolidays (all) failed: ${res.status} ${text}`);
-        if (res.status === 404) err.bcNotFound = true;
-        throw err;
-    }
-    const data = await res.json();
-    return data.value || [];
-};
-
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays };
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays };
