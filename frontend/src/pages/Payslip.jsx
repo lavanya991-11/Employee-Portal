@@ -12,6 +12,13 @@ const periodLabel = (p) =>
 const inr = (n) => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 
+// Inline styles so the payslip renders identically wherever it's deployed
+// (matches the BC "Employee Payslip" report layout).
+const TBL = { borderCollapse: 'collapse', width: '100%', fontSize: 12 };
+const TH = { border: '1px solid #b9c4d4', padding: '5px 8px', background: '#4472a4', color: '#fff', textAlign: 'left' };
+const TD = { border: '1px solid #cbd5e1', padding: '5px 8px' };
+const labelCell = { width: 135, fontWeight: 700 };
+
 function Payslip() {
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
     const [info, setInfo] = useState(null);
@@ -112,9 +119,10 @@ function Payslip() {
     const payslip = useMemo(() => {
         if (!bcPayslip) return null;
         const lines = bcPayslip.lines || [];
+        const label = (l) => `${l.payCode != null ? l.payCode + '-' : ''}${l.payCodeDescription || ''}`;
         return {
-            earnings: lines.filter((l) => l.isEarning).map((l) => ({ label: l.payCodeDescription, amount: l.amount, days: l.days })),
-            deductions: lines.filter((l) => !l.isEarning).map((l) => ({ label: l.payCodeDescription, amount: l.amount, days: l.days })),
+            earnings: lines.filter((l) => l.isEarning).map((l) => ({ label: label(l), amount: l.amount, days: l.days })),
+            deductions: lines.filter((l) => !l.isEarning).map((l) => ({ label: label(l), amount: l.amount, days: l.days })),
             gross: bcPayslip.totalEarnings || 0,
             totalDeductions: bcPayslip.totalDeductions || 0,
             net: bcPayslip.netSalary || 0,
@@ -269,58 +277,65 @@ function Payslip() {
                             {showPreview && payslip && !payslipLoading && (
                                 <div className="erp-section">
                                     <div className="erp-section-header">Payslip Preview — {periodText || '—'}</div>
-                                    <div className="payslip-preview">
-                                        <div className="payslip-header">
+                                    <div className="payslip-report" style={{ background: '#fff', padding: '20px 28px', border: '1px solid #e5e7eb' }}>
+                                        <h2 style={{ textAlign: 'center', color: '#1f4e9c', margin: '4px 0 22px', fontSize: 22 }}>Employee Payslip</h2>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', rowGap: 8, columnGap: 24, fontSize: 13, marginBottom: 18 }}>
+                                            <div style={{ display: 'flex' }}><span style={labelCell}>Employee Code :</span><span style={{ color: '#1f4e9c' }}>{bcPayslip.employeeCode || ''}</span></div>
+                                            <div style={{ display: 'flex' }}><span style={labelCell}>Payroll Period :</span><span style={{ color: '#1f4e9c' }}>{bcPayslip.payrollPeriod ?? ''}</span></div>
+                                            <div style={{ display: 'flex' }}><span style={labelCell}>Employee Name :</span><span style={{ color: '#1f4e9c' }}>{bcPayslip.employeeName || ''}</span></div>
+                                            <div style={{ display: 'flex' }}><span style={labelCell}>From Date :</span><span>{fmtDate(fromDate)}</span></div>
+                                            <div style={{ display: 'flex' }}><span style={labelCell}>Job Title :</span><span style={{ color: '#1f4e9c' }}>{bcPayslip.jobTitle || ''}</span></div>
+                                            <div style={{ display: 'flex' }}><span style={labelCell}>To Date :</span><span>{fmtDate(toDate)}</span></div>
+                                        </div>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
                                             <div>
-                                                <div style={{ fontWeight: 700, fontSize: 16 }}>{bcPayslip.employeeName || ''}</div>
-                                                <div style={{ color: '#6b7280', fontSize: 12 }}>
-                                                    Code: {bcPayslip.employeeCode || '—'} · {bcPayslip.jobTitle || '—'}{bcPayslip.currency ? ` · ${bcPayslip.currency}` : ''}
-                                                </div>
+                                                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4, textDecoration: 'underline' }}>Earnings Details :</div>
+                                                <table style={TBL}>
+                                                    <thead><tr><th style={TH}>Pay Code Description</th><th style={{ ...TH, width: 110, textAlign: 'right' }}>Amount</th></tr></thead>
+                                                    <tbody>
+                                                        {payslip.earnings.map((e) => (
+                                                            <tr key={e.label}><td style={TD}>{e.label}</td><td style={{ ...TD, textAlign: 'right' }}>{inr(e.amount)}</td></tr>
+                                                        ))}
+                                                        <tr><td style={{ ...TD, textAlign: 'right', fontWeight: 700 }}>Sub Total</td><td style={{ ...TD, textAlign: 'right', fontWeight: 700 }}>{inr(payslip.gross)}</td></tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
-                                            <div style={{ textAlign: 'right' }}>
-                                                <div style={{ fontSize: 12, color: '#6b7280' }}>Pay Period</div>
-                                                <div style={{ fontWeight: 700 }}>{periodText || '—'}</div>
-                                                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>
-                                                    {fromDate ? `${fmtDate(fromDate)} → ${fmtDate(toDate)}` : ''}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="payslip-grid">
-                                            <div className="payslip-col">
-                                                <div className="payslip-col-title">Earnings</div>
-                                                {payslip.earnings.map((e) => (
-                                                    <div className="payslip-row" key={e.label}>
-                                                        <span>{e.label}</span><span>{money(e.amount)}</span>
-                                                    </div>
-                                                ))}
-                                                <div className="payslip-row payslip-total">
-                                                    <span>Gross</span><span>{money(payslip.gross)}</span>
-                                                </div>
-                                            </div>
-                                            <div className="payslip-col">
-                                                <div className="payslip-col-title">Deductions</div>
-                                                {payslip.deductions.length === 0 && (
-                                                    <div className="payslip-row"><span style={{ color: '#9ca3af' }}>None</span><span></span></div>
-                                                )}
-                                                {payslip.deductions.map((d) => (
-                                                    <div className="payslip-row" key={d.label}>
-                                                        <span>{d.label}</span><span>{money(d.amount)}</span>
-                                                    </div>
-                                                ))}
-                                                <div className="payslip-row payslip-total">
-                                                    <span>Total Deductions</span><span>{money(payslip.totalDeductions)}</span>
-                                                </div>
+                                            <div>
+                                                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4, textDecoration: 'underline' }}>Deductions Details :</div>
+                                                <table style={TBL}>
+                                                    <thead><tr><th style={TH}>Pay Code Description</th><th style={{ ...TH, width: 110, textAlign: 'right' }}>Amount</th></tr></thead>
+                                                    <tbody>
+                                                        {payslip.deductions.map((d) => (
+                                                            <tr key={d.label}><td style={TD}>{d.label}</td><td style={{ ...TD, textAlign: 'right' }}>{inr(d.amount)}</td></tr>
+                                                        ))}
+                                                        <tr><td style={{ ...TD, textAlign: 'right', fontWeight: 700 }}>Sub Total</td><td style={{ ...TD, textAlign: 'right', fontWeight: 700 }}>{inr(payslip.totalDeductions)}</td></tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
 
-                                        <div className="payslip-net">
-                                            <span>Net Pay</span>
-                                            <span>{money(payslip.net)}</span>
-                                        </div>
-                                        <div style={{ marginTop: 10, fontSize: 11, color: '#9ca3af' }}>
-                                            Live figures from Business Central (NOVAPAY GeneratePaySlip).
-                                            {bcPayslip.isPosted ? ' Posted.' : ' Not posted.'}
+                                        <table style={{ ...TBL, marginTop: 14 }}>
+                                            <tbody>
+                                                <tr>
+                                                    <td style={{ ...TD, textAlign: 'right', fontWeight: 700 }}>Net Salary</td>
+                                                    <td style={{ ...TD, width: 110, textAlign: 'right', fontWeight: 700 }}>{inr(payslip.net)}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 64, fontSize: 13 }}>
+                                            <div>
+                                                <div style={{ borderTop: '1px solid #111', width: 190, marginBottom: 6 }} />
+                                                <div style={{ fontWeight: 700 }}>Manager Signature</div>
+                                                <div style={{ fontWeight: 700, marginTop: 12 }}>Date</div>
+                                            </div>
+                                            <div>
+                                                <div style={{ borderTop: '1px solid #111', width: 190, marginBottom: 6 }} />
+                                                <div style={{ fontWeight: 700 }}>Receiver Signature</div>
+                                                <div style={{ fontWeight: 700, marginTop: 12 }}>Date</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
