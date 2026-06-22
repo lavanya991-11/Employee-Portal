@@ -131,6 +131,7 @@ function Payslip() {
     }, [bcPayslip]);
 
     const money = (n) => `${payslip?.currency ? payslip.currency + ' ' : ''}${inr(n)}`;
+    const printDate = useMemo(() => new Date().toLocaleString('en-US'), [bcPayslip]);
 
     // A previewed payslip becomes stale once the selection changes — hide it.
     useEffect(() => {
@@ -277,7 +278,14 @@ function Payslip() {
                             {showPreview && payslip && !payslipLoading && (
                                 <div className="erp-section">
                                     <div className="erp-section-header">Payslip Preview — {periodText || '—'}</div>
-                                    <div className="payslip-report" style={{ background: '#fff', padding: '20px 28px', border: '1px solid #e5e7eb' }}>
+                                    <div className="payslip-print" style={{ background: '#fff', padding: '32px 36px', border: '1px solid #e5e7eb', minHeight: 1000, display: 'flex', flexDirection: 'column', maxWidth: 900, margin: '0 auto' }}>
+                                        {/* Print only this sheet — hide the app chrome (sidebar, filters, actions). */}
+                                        <style>{`@media print {
+                                            body * { visibility: hidden !important; }
+                                            .payslip-print, .payslip-print * { visibility: visible !important; }
+                                            .payslip-print { position: absolute; left: 0; top: 0; width: 100%; min-height: 0 !important; border: none !important; margin: 0 !important; }
+                                            @page { size: A4; margin: 16mm; }
+                                        }`}</style>
                                         <h2 style={{ textAlign: 'center', color: '#1f4e9c', margin: '4px 0 22px', fontSize: 22 }}>Employee Payslip</h2>
 
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', rowGap: 8, columnGap: 24, fontSize: 13, marginBottom: 18 }}>
@@ -325,7 +333,7 @@ function Payslip() {
                                             </tbody>
                                         </table>
 
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 64, fontSize: 13 }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 72, fontSize: 13 }}>
                                             <div>
                                                 <div style={{ borderTop: '1px solid #111', width: 190, marginBottom: 6 }} />
                                                 <div style={{ fontWeight: 700 }}>Manager Signature</div>
@@ -336,6 +344,12 @@ function Payslip() {
                                                 <div style={{ fontWeight: 700 }}>Receiver Signature</div>
                                                 <div style={{ fontWeight: 700, marginTop: 12 }}>Date</div>
                                             </div>
+                                        </div>
+
+                                        {/* Footer pinned to the bottom of the page sheet */}
+                                        <div style={{ marginTop: 'auto', paddingTop: 24, display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700 }}>
+                                            <span>Print Date : {printDate}</span>
+                                            <span>Page : 1 of 1</span>
                                         </div>
                                     </div>
                                 </div>
