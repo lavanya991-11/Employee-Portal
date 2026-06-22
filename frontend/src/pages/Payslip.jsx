@@ -161,22 +161,76 @@ function Payslip() {
         }
     };
     const onPrint = () => { if (payslip) setTimeout(() => window.print(), 250); else onPreview(); };
+    // Build a self-contained HTML document of the payslip (same data/layout as
+    // the on-screen report) for PDF export via the browser's print dialog.
+    const buildPayslipHtml = () => {
+        const row = (label, amount) => `<tr><td>${label}</td><td class="r">${inr(amount)}</td></tr>`;
+        const earnRows = payslip.earnings.map((e) => row(e.label, e.amount)).join('');
+        const dedRows = payslip.deductions.map((d) => row(d.label, d.amount)).join('');
+        return `<!DOCTYPE html><html><head><meta charset="utf-8" />
+<title>Payslip-${bcPayslip.employeeCode || ''}-Period${bcPayslip.payrollPeriod ?? ''}</title>
+<style>
+  *{box-sizing:border-box;}
+  body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:0;padding:28px 32px;}
+  h1{text-align:center;color:#1f4e9c;font-size:24px;margin:4px 0 22px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;column-gap:24px;}
+  .head{row-gap:8px;font-size:13px;margin-bottom:18px;}
+  .head .row{display:flex;}
+  .lbl{font-weight:700;width:135px;}
+  .blue{color:#1f4e9c;}
+  .sec{font-weight:700;font-size:13px;margin-bottom:4px;text-decoration:underline;}
+  table{border-collapse:collapse;width:100%;font-size:12px;}
+  th{border:1px solid #b9c4d4;padding:5px 8px;background:#4472a4;color:#fff;text-align:left;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  td{border:1px solid #cbd5e1;padding:5px 8px;}
+  th.r,td.r{text-align:right;}
+  .b{font-weight:700;}
+  .net{margin-top:14px;}
+  .sign{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:72px;font-size:13px;}
+  .line{border-top:1px solid #111;width:190px;margin-bottom:6px;}
+  .right{text-align:right;}
+  .right .line{margin-left:auto;}
+  .foot{display:flex;justify-content:space-between;margin-top:64px;font-size:11px;font-weight:700;}
+  @page{size:A4;margin:16mm;}
+</style></head><body>
+  <h1>Employee Payslip</h1>
+  <div class="grid2 head">
+    <div class="row"><span class="lbl">Employee Code :</span><span class="blue">${bcPayslip.employeeCode || ''}</span></div>
+    <div class="row"><span class="lbl">Payroll Period :</span><span class="blue">${bcPayslip.payrollPeriod ?? ''}</span></div>
+    <div class="row"><span class="lbl">Employee Name :</span><span class="blue">${bcPayslip.employeeName || ''}</span></div>
+    <div class="row"><span class="lbl">From Date :</span><span>${fmtDate(fromDate)}</span></div>
+    <div class="row"><span class="lbl">Job Title :</span><span class="blue">${bcPayslip.jobTitle || ''}</span></div>
+    <div class="row"><span class="lbl">To Date :</span><span>${fmtDate(toDate)}</span></div>
+  </div>
+  <div class="grid2">
+    <div>
+      <div class="sec">Earnings Details :</div>
+      <table><thead><tr><th>Pay Code Description</th><th class="r" style="width:110px">Amount</th></tr></thead>
+      <tbody>${earnRows}<tr><td class="r b">Sub Total</td><td class="r b">${inr(payslip.gross)}</td></tr></tbody></table>
+    </div>
+    <div>
+      <div class="sec">Deductions Details :</div>
+      <table><thead><tr><th>Pay Code Description</th><th class="r" style="width:110px">Amount</th></tr></thead>
+      <tbody>${dedRows}<tr><td class="r b">Sub Total</td><td class="r b">${inr(payslip.totalDeductions)}</td></tr></tbody></table>
+    </div>
+  </div>
+  <table class="net"><tbody><tr><td class="r b">Net Salary</td><td class="r b" style="width:110px">${inr(payslip.net)}</td></tr></tbody></table>
+  <div class="sign">
+    <div><div class="line"></div><div class="b">Manager Signature</div><div class="b" style="margin-top:12px">Date</div></div>
+    <div class="right"><div class="line"></div><div class="b">Receiver Signature</div><div class="b" style="margin-top:12px">Date</div></div>
+  </div>
+  <div class="foot"><span>Print Date : ${printDate}</span><span>Page : 1 of 1</span></div>
+</body></html>`;
+    };
+
     const onExport = () => {
         if (!payslip) { setStatus('Click Preview first to load the payslip.'); return; }
-        const csv = [
-            'Section,Item,Amount',
-            ...payslip.earnings.map((e) => `Earnings,${e.label},${e.amount}`),
-            ...payslip.deductions.map((d) => `Deductions,${d.label},${d.amount}`),
-            `Totals,Gross,${payslip.gross}`,
-            `Totals,Deductions,${payslip.totalDeductions}`,
-            `Totals,Net Pay,${payslip.net}`
-        ].join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `payslip-${selectedEmployee?.employeeCode || 'me'}-${periodText || 'period'}.csv`;
-        a.click();
-        URL.revokeObjectURL(a.href);
+        const w = window.open('', '_blank');
+        if (!w) { setStatus('Allow pop-ups for this site to export the payslip PDF.'); return; }
+        w.document.write(buildPayslipHtml());
+        w.document.close();
+        w.focus();
+        // Let the new window render, then open the print dialog (Save as PDF).
+        setTimeout(() => { w.print(); }, 350);
     };
     const onEmail = () => {
         if (!payslip) { setStatus('Click Preview first to load the payslip.'); return; }
