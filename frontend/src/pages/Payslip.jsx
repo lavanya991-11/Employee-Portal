@@ -1,18 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
-import { authApi, employeeInfoApi } from '../services/api';
+import { authApi, employeeInfoApi, calendarApi, calendarPeriodApi } from '../services/api';
 
-const monthOptions = (() => {
-    const arr = [];
-    const now = new Date();
-    for (let i = 0; i < 12; i++) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const label = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }).replace(' ', '/');
-        arr.push({ value: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`, label });
-    }
-    return arr;
-})();
+const MONTHS = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// Readable label for a payroll period row coming from BC's Calendar Period data.
+const periodLabel = (p) =>
+    p ? `Period ${p.periodNo} — ${MONTHS[p.month] || p.month || ''}${p.year ? `/${p.year}` : ''}`.trim() : '';
 
 const inr = (n) => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
 
@@ -21,9 +16,10 @@ function Payslip() {
     const [info, setInfo] = useState(null);
     const [allEmployees, setAllEmployees] = useState([]);
 
-    const [payrollMonth, setPayrollMonth] = useState(monthOptions[0].value);
-    const [layout, setLayout] = useState('FDM_Payslip');
-    const [sortOn, setSortOn] = useState('EmpCode');
+    const [calendars, setCalendars] = useState([]);
+    const [periods, setPeriods] = useState([]);
+    const [calendarCode, setCalendarCode] = useState('');
+    const [payrollPeriod, setPayrollPeriod] = useState('');
 
     const [showFilter, setShowFilter] = useState(false);
     const [filterEmp, setFilterEmp] = useState('');
@@ -45,7 +41,42 @@ function Payslip() {
             if (data.employeeInfo?.employeeCode) setFilterEmp(data.employeeInfo.employeeCode);
         }).catch(() => {});
         employeeInfoApi.getAll().then(({ data }) => setAllEmployees(data.employees || [])).catch(() => {});
+        calendarApi.list().then(({ data }) => {
+            const list = data.items || [];
+            setCalendars(list);
+            if (list.length) setCalendarCode(list[0].calendarCode);
+        }).catch(() => {});
+        calendarPeriodApi.list().then(({ data }) => setPeriods(data.items || [])).catch(() => {});
     }, []);
+
+    // Calendar Code -> calendar year; the Payroll Period lookup only shows
+    // periods belonging to that year.
+    const selectedCalendar = useMemo(
+        () => calendars.find((c) => c.calendarCode === calendarCode) || null,
+        [calendars, calendarCode]
+    );
+    const filteredPeriods = useMemo(() => {
+        const year = selectedCalendar?.calendarYear;
+        if (!year) return [];
+        return periods.filter((p) => Number(p.year) === Number(year));
+    }, [periods, selectedCalendar]);
+
+    // Keep the selected period valid for the chosen calendar year.
+    useEffect(() => {
+        if (filteredPeriods.length === 0) {
+            if (payrollPeriod) setPayrollPeriod('');
+            return;
+        }
+        if (!filteredPeriods.some((p) => p._id === payrollPeriod)) {
+            setPayrollPeriod(filteredPeriods[0]._id);
+        }
+    }, [filteredPeriods]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const selectedPeriod = useMemo(
+        () => filteredPeriods.find((p) => p._id === payrollPeriod) || null,
+        [filteredPeriods, payrollPeriod]
+    );
+    const periodText = periodLabel(selectedPeriod);
 
     const selectedEmployee = useMemo(() => {
         return allEmployees.find((e) => e.employeeCode === filterEmp)
@@ -76,7 +107,7 @@ function Payslip() {
             ],
             gross, totalDeductions, net
         };
-    }, [payrollMonth, filterEmp]);
+    }, [payrollPeriod, filterEmp]);
 
     const onPreview = () => {
         if (!selectedEmployee?.employeeCode) {
@@ -100,13 +131,13 @@ function Payslip() {
         const blob = new Blob([csv], { type: 'text/csv' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `payslip-${selectedEmployee?.employeeCode || 'me'}-${payrollMonth}.csv`;
+        a.download = `payslip-${selectedEmployee?.employeeCode || 'me'}-${periodText || 'period'}.csv`;
         a.click();
         URL.revokeObjectURL(a.href);
     };
     const onEmail = () => {
         const to = user.email || '';
-        const subject = encodeURIComponent(`Payslip ${payrollMonth} — ${selectedEmployee?.employeeCode || ''}`);
+        const subject = encodeURIComponent(`Payslip ${periodText} — ${selectedEmployee?.employeeCode || ''}`);
         const body = encodeURIComponent(`Net Pay: ${inr(payslip.net)}\nGross: ${inr(payslip.gross)}\nDeductions: ${inr(payslip.totalDeductions)}`);
         window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
     };
@@ -150,25 +181,27 @@ function Payslip() {
                                 <div className="erp-section-header">Filters</div>
                                 <div className="erp-grid">
                                     <div className="erp-field">
-                                        <label>Payroll Month</label>
-                                        <select value={payrollMonth} onChange={(e) => setPayrollMonth(e.target.value)}>
-                                            {monthOptions.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                        <label>Calendar Code</label>
+                                        <select value={calendarCode} onChange={(e) => setCalendarCode(e.target.value)}>
+                                            {calendars.length === 0 && <option value="">No calendars</option>}
+                                            {calendars.map((c) => (
+                                                <option key={c._id} value={c.calendarCode}>
+                                                    {c.calendarCode}{c.description ? ` — ${c.description}` : ''}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="erp-field">
-                                        <label>Payslip Layout</label>
-                                        <select value={layout} onChange={(e) => setLayout(e.target.value)}>
-                                            <option>FDM_Payslip</option>
-                                            <option>Standard</option>
-                                            <option>Detailed</option>
-                                        </select>
-                                    </div>
-                                    <div className="erp-field">
-                                        <label>Sort On</label>
-                                        <select value={sortOn} onChange={(e) => setSortOn(e.target.value)}>
-                                            <option>EmpCode</option>
-                                            <option>Name</option>
-                                            <option>Department</option>
+                                        <label>Payroll Period</label>
+                                        <select
+                                            value={payrollPeriod}
+                                            onChange={(e) => setPayrollPeriod(e.target.value)}
+                                            disabled={filteredPeriods.length === 0}
+                                        >
+                                            {filteredPeriods.length === 0 && <option value="">No periods for this calendar</option>}
+                                            {filteredPeriods.map((p) => (
+                                                <option key={p._id} value={p._id}>{periodLabel(p)}</option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="erp-field">
@@ -180,7 +213,7 @@ function Payslip() {
 
                             {showPreview && selectedEmployee && (
                                 <div className="erp-section">
-                                    <div className="erp-section-header">Payslip Preview — {payrollMonth}</div>
+                                    <div className="erp-section-header">Payslip Preview — {periodText || '—'}</div>
                                     <div className="payslip-preview">
                                         <div className="payslip-header">
                                             <div>
@@ -191,7 +224,7 @@ function Payslip() {
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
                                                 <div style={{ fontSize: 12, color: '#6b7280' }}>Pay Period</div>
-                                                <div style={{ fontWeight: 700 }}>{payrollMonth}</div>
+                                                <div style={{ fontWeight: 700 }}>{periodText || '—'}</div>
                                             </div>
                                         </div>
 
