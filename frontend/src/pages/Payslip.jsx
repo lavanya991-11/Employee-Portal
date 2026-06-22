@@ -187,8 +187,8 @@ function Payslip() {
   .net{margin-top:14px;}
   .sign{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:72px;font-size:13px;}
   .line{border-top:1px solid #111;width:190px;margin-bottom:6px;}
-  .right{text-align:right;}
-  .right .line{margin-left:auto;}
+  .rwrap{display:flex;justify-content:flex-end;}
+  .rcol{width:190px;}
   /* Fixed footer repeats at the bottom of every printed page. */
   .foot{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:6px 32px;font-size:11px;font-weight:700;border-top:1px solid #d1d5db;background:#fff;}
   body{padding-bottom:48px;}
@@ -218,7 +218,7 @@ function Payslip() {
   <table class="net"><tbody><tr><td class="r b">Net Salary</td><td class="r b" style="width:110px">${inr(payslip.net)}</td></tr></tbody></table>
   <div class="sign">
     <div><div class="line"></div><div class="b">Manager Signature</div><div class="b" style="margin-top:12px">Date</div></div>
-    <div class="right"><div class="line"></div><div class="b">Receiver Signature</div><div class="b" style="margin-top:12px">Date</div></div>
+    <div class="rwrap"><div class="rcol"><div class="line"></div><div class="b">Receiver Signature</div><div class="b" style="margin-top:12px">Date</div></div></div>
   </div>
   <div class="foot"><span>Print Date : ${printDate}</span><span>Page : 1 of 1</span></div>
 </body></html>`;
@@ -395,10 +395,12 @@ function Payslip() {
                                                 <div style={{ fontWeight: 700 }}>Manager Signature</div>
                                                 <div style={{ fontWeight: 700, marginTop: 12 }}>Date</div>
                                             </div>
-                                            <div style={{ textAlign: 'right' }}>
-                                                <div style={{ borderTop: '1px solid #111', width: 190, marginBottom: 6, marginLeft: 'auto' }} />
-                                                <div style={{ fontWeight: 700 }}>Receiver Signature</div>
-                                                <div style={{ fontWeight: 700, marginTop: 12 }}>Date</div>
+                                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                                <div style={{ width: 190 }}>
+                                                    <div style={{ borderTop: '1px solid #111', marginBottom: 6 }} />
+                                                    <div style={{ fontWeight: 700 }}>Receiver Signature</div>
+                                                    <div style={{ fontWeight: 700, marginTop: 12 }}>Date</div>
+                                                </div>
                                             </div>
                                         </div>
 
