@@ -189,7 +189,9 @@ function Payslip() {
   .line{border-top:1px solid #111;width:190px;margin-bottom:6px;}
   .right{text-align:right;}
   .right .line{margin-left:auto;}
-  .foot{display:flex;justify-content:space-between;margin-top:64px;font-size:11px;font-weight:700;}
+  /* Fixed footer repeats at the bottom of every printed page. */
+  .foot{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:6px 32px;font-size:11px;font-weight:700;border-top:1px solid #d1d5db;background:#fff;}
+  body{padding-bottom:48px;}
   @page{size:A4;margin:16mm;}
 </style></head><body>
   <h1>Employee Payslip</h1>
