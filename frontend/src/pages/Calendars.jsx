@@ -45,6 +45,34 @@ function Calendars() {
         );
     }, [items, search]);
 
+    const onDeleteSelected = async () => {
+        if (!selected) { alert('Select a calendar row first.'); return; }
+        if (!window.confirm(`Delete calendar "${selected.calendarCode}"? This cannot be undone.`)) return;
+        setError(''); setSuccess('');
+        try {
+            await calendarApi.remove(selected._id);
+            setSelected(null);
+            await load();
+            setSuccess('Calendar deleted.');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Delete failed');
+        }
+    };
+
+    const onDeleteAll = async () => {
+        if (items.length === 0) { alert('No calendars to delete.'); return; }
+        if (!window.confirm(`Delete ALL ${items.length} calendar(s)? This cannot be undone.`)) return;
+        setError(''); setSuccess('');
+        try {
+            const { data } = await calendarApi.removeAll();
+            setSelected(null);
+            await load();
+            setSuccess(data.message || 'All calendars deleted.');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Delete failed');
+        }
+    };
+
     // Scan Calendars: call BC, wipe the local table, re-insert the latest rows.
     const onScanCalendars = async () => {
         if (!window.confirm('Scan Calendars from Business Central?\n\nThis deletes all existing calendar records and replaces them with the latest data from BC.')) return;
@@ -73,6 +101,8 @@ function Calendars() {
                             <button className="erp-action-btn" onClick={onScanCalendars} disabled={scanning}>
                                 {scanning ? 'Scanning…' : '📡 Scan Calendars'}
                             </button>
+                            <button className="erp-action-btn" onClick={onDeleteSelected} disabled={!selected || scanning}>🗑️ Delete</button>
+                            <button className="erp-action-btn" onClick={onDeleteAll} disabled={items.length === 0 || scanning} style={{ color: '#b91c1c' }}>🗑 Delete All</button>
                             <button className="erp-action-btn" onClick={load} disabled={loading || scanning}>🔄 Refresh</button>
                         </div>
                     </div>

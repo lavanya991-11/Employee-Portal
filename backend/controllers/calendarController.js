@@ -54,3 +54,24 @@ exports.scan = async (req, res) => {
         res.status(500).json({ success: false, message: 'Calendar scan failed', error: err.message });
     }
 };
+
+// DELETE /api/calendars/all — remove every calendar record.
+exports.removeAll = async (req, res) => {
+    try {
+        const result = await Calendar.deleteMany({});
+        res.json({ success: true, message: `Deleted ${result.deletedCount} calendar(s).`, deleted: result.deletedCount });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
+
+// DELETE /api/calendars/:id — remove a single calendar record.
+exports.remove = async (req, res) => {
+    try {
+        const item = await Calendar.findByIdAndDelete(req.params.id);
+        if (!item) return res.status(404).json({ success: false, message: 'Not found' });
+        res.json({ success: true, message: 'Calendar deleted' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};

@@ -110,12 +110,16 @@ export const holidayApi = {
 
 export const calendarApi = {
     list: () => api.get('/calendars'),
-    scan: () => api.post('/calendars/scan')
+    scan: () => api.post('/calendars/scan'),
+    remove: (id) => api.delete(`/calendars/${id}`),
+    removeAll: () => api.delete('/calendars/all')
 };
 
 export const calendarPeriodApi = {
     list: () => api.get('/calendar-periods'),
-    scan: () => api.post('/calendar-periods/scan')
+    scan: () => api.post('/calendar-periods/scan'),
+    remove: (id) => api.delete(`/calendar-periods/${id}`),
+    removeAll: () => api.delete('/calendar-periods/all')
 };
 
 export const payslipApi = {

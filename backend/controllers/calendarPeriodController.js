@@ -53,3 +53,24 @@ exports.scan = async (req, res) => {
         res.status(500).json({ success: false, message: 'Calendar periods scan failed', error: err.message });
     }
 };
+
+// DELETE /api/calendar-periods/all — remove every calendar period record.
+exports.removeAll = async (req, res) => {
+    try {
+        const result = await CalendarPeriod.deleteMany({});
+        res.json({ success: true, message: `Deleted ${result.deletedCount} calendar period(s).`, deleted: result.deletedCount });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
+
+// DELETE /api/calendar-periods/:id — remove a single calendar period record.
+exports.remove = async (req, res) => {
+    try {
+        const item = await CalendarPeriod.findByIdAndDelete(req.params.id);
+        if (!item) return res.status(404).json({ success: false, message: 'Not found' });
+        res.json({ success: true, message: 'Calendar period deleted' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
