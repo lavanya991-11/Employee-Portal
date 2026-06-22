@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
-import { authApi, employeeInfoApi, calendarApi, calendarPeriodApi } from '../services/api';
+import { authApi, employeeInfoApi, calendarApi, calendarPeriodApi, payslipApi } from '../services/api';
 
 const MONTHS = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -34,6 +34,8 @@ function Payslip() {
 
     const [showPreview, setShowPreview] = useState(false);
     const [status, setStatus] = useState('');
+    const [bcPayslip, setBcPayslip] = useState(null);
+    const [payslipLoading, setPayslipLoading] = useState(false);
 
     useEffect(() => {
         authApi.me().then(({ data }) => setUser(data.user || data)).catch(() => {});
@@ -90,43 +92,53 @@ function Payslip() {
             || (info && info.employeeCode === filterEmp ? info : info);
     }, [allEmployees, filterEmp, info]);
 
-    // Mock payslip numbers (real values would come from a payroll backend / Business Central).
+    // Real payslip built from the BC GeneratePaySlip response. `lines` are
+    // split into earnings/deductions by the isEarning flag.
     const payslip = useMemo(() => {
-        const basic = 8000;
-        const hra = 3000;
-        const transport = 1000;
-        const other = 500;
-        const gross = basic + hra + transport + other;
-        const tax = Math.round(gross * 0.05);
-        const pf = Math.round(basic * 0.12);
-        const totalDeductions = tax + pf;
-        const net = gross - totalDeductions;
+        if (!bcPayslip) return null;
+        const lines = bcPayslip.lines || [];
         return {
-            earnings: [
-                { label: 'Basic', amount: basic },
-                { label: 'HRA', amount: hra },
-                { label: 'Transport Allowance', amount: transport },
-                { label: 'Other Allowance', amount: other }
-            ],
-            deductions: [
-                { label: 'Income Tax', amount: tax },
-                { label: 'Provident Fund', amount: pf }
-            ],
-            gross, totalDeductions, net
+            earnings: lines.filter((l) => l.isEarning).map((l) => ({ label: l.payCodeDescription, amount: l.amount, days: l.days })),
+            deductions: lines.filter((l) => !l.isEarning).map((l) => ({ label: l.payCodeDescription, amount: l.amount, days: l.days })),
+            gross: bcPayslip.totalEarnings || 0,
+            totalDeductions: bcPayslip.totalDeductions || 0,
+            net: bcPayslip.netSalary || 0,
+            currency: bcPayslip.currency || ''
         };
-    }, [payrollPeriod, filterEmp]);
+    }, [bcPayslip]);
 
-    const onPreview = () => {
-        if (!selectedEmployee?.employeeCode) {
-            setStatus('Select an employee via Filter first.');
-            return;
+    const money = (n) => `${payslip?.currency ? payslip.currency + ' ' : ''}${inr(n)}`;
+
+    // A previewed payslip becomes stale once the selection changes — hide it.
+    useEffect(() => {
+        setShowPreview(false);
+        setBcPayslip(null);
+    }, [calendarCode, payrollPeriod, filterEmp]);
+
+    const onPreview = async () => {
+        if (!filterEmp) { setStatus('Select an employee via Filter first.'); return; }
+        if (!selectedPeriod) { setStatus('Select a Calendar Code and Payroll Period first.'); return; }
+        setStatus(''); setPayslipLoading(true);
+        try {
+            const { data } = await payslipApi.generate({
+                calendarCode,
+                year: calendarYear,
+                payrollPeriod: selectedPeriod.periodNo,
+                employeeCode: filterEmp
+            });
+            setBcPayslip(data.payslip);
+            setShowPreview(true);
+        } catch (err) {
+            setBcPayslip(null);
+            setShowPreview(false);
+            setStatus(err.response?.data?.message || err.response?.data?.error || 'Failed to generate payslip from BC');
+        } finally {
+            setPayslipLoading(false);
         }
-        setStatus('');
-        setShowPreview(true);
     };
-    const onPrint = () => { setShowPreview(true); setTimeout(() => window.print(), 250); };
+    const onPrint = () => { if (payslip) setTimeout(() => window.print(), 250); else onPreview(); };
     const onExport = () => {
-        if (!showPreview) onPreview();
+        if (!payslip) { setStatus('Click Preview first to load the payslip.'); return; }
         const csv = [
             'Section,Item,Amount',
             ...payslip.earnings.map((e) => `Earnings,${e.label},${e.amount}`),
@@ -143,9 +155,10 @@ function Payslip() {
         URL.revokeObjectURL(a.href);
     };
     const onEmail = () => {
+        if (!payslip) { setStatus('Click Preview first to load the payslip.'); return; }
         const to = user.email || '';
         const subject = encodeURIComponent(`Payslip ${periodText} — ${selectedEmployee?.employeeCode || ''}`);
-        const body = encodeURIComponent(`Net Pay: ${inr(payslip.net)}\nGross: ${inr(payslip.gross)}\nDeductions: ${inr(payslip.totalDeductions)}`);
+        const body = encodeURIComponent(`Net Pay: ${money(payslip.net)}\nGross: ${money(payslip.gross)}\nDeductions: ${money(payslip.totalDeductions)}`);
         window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
     };
 
@@ -230,15 +243,19 @@ function Payslip() {
                                 </div>
                             </div>
 
-                            {showPreview && selectedEmployee && (
+                            {payslipLoading && (
+                                <div className="erp-section"><p style={{ padding: 16 }}>Generating payslip from Business Central…</p></div>
+                            )}
+
+                            {showPreview && payslip && !payslipLoading && (
                                 <div className="erp-section">
                                     <div className="erp-section-header">Payslip Preview — {periodText || '—'}</div>
                                     <div className="payslip-preview">
                                         <div className="payslip-header">
                                             <div>
-                                                <div style={{ fontWeight: 700, fontSize: 16 }}>{selectedEmployee.firstName} {selectedEmployee.lastName}</div>
+                                                <div style={{ fontWeight: 700, fontSize: 16 }}>{bcPayslip.employeeName || ''}</div>
                                                 <div style={{ color: '#6b7280', fontSize: 12 }}>
-                                                    Code: {selectedEmployee.employeeCode} · {selectedEmployee.department || '—'} · {selectedEmployee.jobTitle || selectedEmployee.designation || '—'}
+                                                    Code: {bcPayslip.employeeCode || '—'} · {bcPayslip.jobTitle || '—'}{bcPayslip.currency ? ` · ${bcPayslip.currency}` : ''}
                                                 </div>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
@@ -255,32 +272,36 @@ function Payslip() {
                                                 <div className="payslip-col-title">Earnings</div>
                                                 {payslip.earnings.map((e) => (
                                                     <div className="payslip-row" key={e.label}>
-                                                        <span>{e.label}</span><span>{inr(e.amount)}</span>
+                                                        <span>{e.label}</span><span>{money(e.amount)}</span>
                                                     </div>
                                                 ))}
                                                 <div className="payslip-row payslip-total">
-                                                    <span>Gross</span><span>{inr(payslip.gross)}</span>
+                                                    <span>Gross</span><span>{money(payslip.gross)}</span>
                                                 </div>
                                             </div>
                                             <div className="payslip-col">
                                                 <div className="payslip-col-title">Deductions</div>
+                                                {payslip.deductions.length === 0 && (
+                                                    <div className="payslip-row"><span style={{ color: '#9ca3af' }}>None</span><span></span></div>
+                                                )}
                                                 {payslip.deductions.map((d) => (
                                                     <div className="payslip-row" key={d.label}>
-                                                        <span>{d.label}</span><span>{inr(d.amount)}</span>
+                                                        <span>{d.label}</span><span>{money(d.amount)}</span>
                                                     </div>
                                                 ))}
                                                 <div className="payslip-row payslip-total">
-                                                    <span>Total Deductions</span><span>{inr(payslip.totalDeductions)}</span>
+                                                    <span>Total Deductions</span><span>{money(payslip.totalDeductions)}</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="payslip-net">
                                             <span>Net Pay</span>
-                                            <span>{inr(payslip.net)}</span>
+                                            <span>{money(payslip.net)}</span>
                                         </div>
                                         <div style={{ marginTop: 10, fontSize: 11, color: '#9ca3af' }}>
-                                            Sample numbers — real payroll figures come from your payroll system (e.g., Business Central).
+                                            Live figures from Business Central (NOVAPAY GeneratePaySlip).
+                                            {bcPayslip.isPosted ? ' Posted.' : ' Not posted.'}
                                         </div>
                                     </div>
                                 </div>

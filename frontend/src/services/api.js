@@ -118,6 +118,10 @@ export const calendarPeriodApi = {
     scan: () => api.post('/calendar-periods/scan')
 };
 
+export const payslipApi = {
+    generate: (params) => api.get('/payslip', { params })
+};
+
 export const dataMgmtApi = {
     tables: () => api.get('/data-management/tables'),
     deleteOne: (key) => api.delete(`/data-management/tables/${key}`),

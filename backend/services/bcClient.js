@@ -326,4 +326,46 @@ const getCalendarPeriods = async ({ calendarCode = 'ALL', year = 0 } = {}) => {
     return Array.isArray(parsed) ? parsed : [];
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods };
+// Generate an employee payslip from the NOVAPAY web service. Takes an
+// `inputJson` parameter and returns a single payslip object (with earning/
+// deduction `lines`) as a stringified JSON in `value`.
+const generatePayslip = async ({ calendarCode, year = 0, payrollPeriod, employeeCode } = {}) => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    const url = `${odataV4Root()}/NOVAPAYWebService_GeneratePaySlip?company=${process.env.BC_COMPANY_ID}`;
+    const body = JSON.stringify({
+        inputJson: JSON.stringify({ calendarCode, year: Number(year) || 0, payrollPeriod: Number(payrollPeriod), employeeCode })
+    });
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        // Surface BC's own dialog message (e.g. "Please provide an employee code.") if present.
+        let msg = text;
+        try { msg = JSON.parse(text)?.error?.message || text; } catch (e) { /* keep raw text */ }
+        const err = new Error(`BC GeneratePaySlip failed: ${res.status} ${msg}`);
+        err.bcMessage = msg;
+        if (res.status === 404) err.bcNotFound = true;
+        throw err;
+    }
+
+    const data = await res.json();
+    // BC returns { value: "<stringified-json-object>" } — parse it.
+    let parsed = data.value;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { parsed = null; }
+    }
+    return parsed;
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, generatePayslip };
