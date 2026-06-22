@@ -15,7 +15,8 @@ const ADMIN_TILES = [
     { key: 'overtimes', title: 'Overtime', icon: '⏰', color: '#ef4444', path: '/admin/overtimes' },
     { key: 'assets', title: 'Asset Requests', icon: '🛠️', color: '#14b8a6', path: '/admin/assets' },
     { key: 'finElements', title: 'FIN Elements', icon: '⚙️', color: '#6b7280', path: '/fin-elements' },
-    { key: 'calendars', title: 'Calendars', icon: '🗓️', color: '#8b5cf6', path: '/calendars' }
+    { key: 'calendars', title: 'Calendars', icon: '🗓️', color: '#8b5cf6', path: '/calendars' },
+    { key: 'calendarPeriods', title: 'Calendar Periods', icon: '📆', color: '#ec4899', path: '/calendar-periods' }
 ];
 
 function Dashboard() {

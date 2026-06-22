@@ -113,6 +113,11 @@ export const calendarApi = {
     scan: () => api.post('/calendars/scan')
 };
 
+export const calendarPeriodApi = {
+    list: () => api.get('/calendar-periods'),
+    scan: () => api.post('/calendar-periods/scan')
+};
+
 export const dataMgmtApi = {
     tables: () => api.get('/data-management/tables'),
     deleteOne: (key) => api.delete(`/data-management/tables/${key}`),

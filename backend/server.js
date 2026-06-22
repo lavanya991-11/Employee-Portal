@@ -17,6 +17,7 @@ const employeeInfoRoutes = require('./routes/employeeInfoRoutes');
 const finElementRoutes = require('./routes/finElementRoutes');
 const holidayRoutes = require('./routes/holidayRoutes');
 const calendarRoutes = require('./routes/calendarRoutes');
+const calendarPeriodRoutes = require('./routes/calendarPeriodRoutes');
 const dataManagementRoutes = require('./routes/dataManagementRoutes');
 const imageRoutes = require('./routes/imageRoutes');
 
@@ -39,6 +40,7 @@ app.use('/api/employee-info', employeeInfoRoutes);
 app.use('/api/fin-elements', finElementRoutes);
 app.use('/api/holidays', holidayRoutes);
 app.use('/api/calendars', calendarRoutes);
+app.use('/api/calendar-periods', calendarPeriodRoutes);
 app.use('/api/data-management', dataManagementRoutes);
 app.use('/api/images', imageRoutes);
 

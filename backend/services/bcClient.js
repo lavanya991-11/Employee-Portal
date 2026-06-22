@@ -290,4 +290,40 @@ const getCalendars = async () => {
     return Array.isArray(parsed) ? parsed : [];
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars };
+// Fetch the calendar periods from the NOVAPAY web service. The action takes an
+// `inputJson` parameter and returns the rows as a stringified JSON array in
+// `value`, so we parse it before handing it back.
+const getCalendarPeriods = async ({ calendarCode = 'ALL', year = 0 } = {}) => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    const url = `${odataV4Root()}/NOVAPAYWebService_GetCalendarPeriods?company=${process.env.BC_COMPANY_ID}`;
+    const body = JSON.stringify({ inputJson: JSON.stringify({ calendarCode, year }) });
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        const err = new Error(`BC GetCalendarPeriods failed: ${res.status} ${text}`);
+        if (res.status === 404) err.bcNotFound = true;
+        throw err;
+    }
+
+    const data = await res.json();
+    // BC returns { value: "<stringified-json-array>" } — parse it.
+    let parsed = data.value;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { parsed = []; }
+    }
+    return Array.isArray(parsed) ? parsed : [];
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods };
