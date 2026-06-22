@@ -339,8 +339,8 @@ function Payslip() {
                                                 <div style={{ fontWeight: 700 }}>Manager Signature</div>
                                                 <div style={{ fontWeight: 700, marginTop: 12 }}>Date</div>
                                             </div>
-                                            <div>
-                                                <div style={{ borderTop: '1px solid #111', width: 190, marginBottom: 6 }} />
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ borderTop: '1px solid #111', width: 190, marginBottom: 6, marginLeft: 'auto' }} />
                                                 <div style={{ fontWeight: 700 }}>Receiver Signature</div>
                                                 <div style={{ fontWeight: 700, marginTop: 12 }}>Date</div>
                                             </div>
