@@ -108,6 +108,11 @@ export const holidayApi = {
     years: () => api.get('/holidays/years')
 };
 
+export const calendarApi = {
+    list: () => api.get('/calendars'),
+    scan: () => api.post('/calendars/scan')
+};
+
 export const dataMgmtApi = {
     tables: () => api.get('/data-management/tables'),
     deleteOne: (key) => api.delete(`/data-management/tables/${key}`),

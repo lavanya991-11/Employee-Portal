@@ -63,6 +63,12 @@ const basePayrollCompanyUrl = () =>
     `/${process.env.BC_ENVIRONMENT}/${process.env.BC_PAYROLL_API_PATH || 'api/novasoft/novapay/v1.0'}` +
     `/companies(${process.env.BC_COMPANY_ID})`;
 
+// Environment root for ODataV4 web-service (codeunit/page) endpoints, e.g.
+// {root}/ODataV4/NOVAPAYWebService_GetCalendars?company={companyId}
+const odataV4Root = () =>
+    `https://api.businesscentral.dynamics.com/v2.0/${process.env.BC_TENANT_ID}` +
+    `/${process.env.BC_ENVIRONMENT}/ODataV4`;
+
 const updateEmployee = async (systemId, payload) => {
     if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
     if (!systemId) throw new Error('systemId is required.');
@@ -249,4 +255,39 @@ const getAllHolidays = async () => {
     return data.value || [];
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays };
+// Fetch the calendar master from the NOVAPAY web service. The codeunit returns
+// the rows as a stringified JSON array inside `value`, so we parse it before
+// handing it back.
+const getCalendars = async () => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    const url = `${odataV4Root()}/NOVAPAYWebService_GetCalendars?company=${process.env.BC_COMPANY_ID}`;
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: '{}'
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        const err = new Error(`BC GetCalendars failed: ${res.status} ${text}`);
+        if (res.status === 404) err.bcNotFound = true;
+        throw err;
+    }
+
+    const data = await res.json();
+    // BC returns { value: "<stringified-json-array>" } — parse it.
+    let parsed = data.value;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { parsed = []; }
+    }
+    return Array.isArray(parsed) ? parsed : [];
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars };

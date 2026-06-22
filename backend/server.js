@@ -16,6 +16,7 @@ const expenseRoutes = require('./routes/expenseRoutes');
 const employeeInfoRoutes = require('./routes/employeeInfoRoutes');
 const finElementRoutes = require('./routes/finElementRoutes');
 const holidayRoutes = require('./routes/holidayRoutes');
+const calendarRoutes = require('./routes/calendarRoutes');
 const dataManagementRoutes = require('./routes/dataManagementRoutes');
 const imageRoutes = require('./routes/imageRoutes');
 

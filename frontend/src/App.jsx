@@ -25,6 +25,7 @@ import ExpensesList from './pages/ExpensesList';
 import OvertimeRequest from './pages/OvertimeRequest';
 import FinElements from './pages/FinElements';
 import FinElementForm from './pages/FinElementForm';
+import Calendars from './pages/Calendars';
 import IncomeTaxDeclarations from './pages/IncomeTaxDeclarations';
 import IncomeTaxComputation from './pages/IncomeTaxComputation';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
@@ -243,6 +244,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <FinElementForm />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/calendars"
+                element={
+                    <ProtectedRoute>
+                        <Calendars />
                     </ProtectedRoute>
                 }
             />
