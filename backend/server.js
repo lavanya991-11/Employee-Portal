@@ -38,6 +38,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/employee-info', employeeInfoRoutes);
 app.use('/api/fin-elements', finElementRoutes);
 app.use('/api/holidays', holidayRoutes);
+app.use('/api/calendars', calendarRoutes);
 app.use('/api/data-management', dataManagementRoutes);
 app.use('/api/images', imageRoutes);
 
