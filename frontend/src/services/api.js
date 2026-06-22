@@ -117,6 +117,7 @@ export const calendarApi = {
 
 export const calendarPeriodApi = {
     list: () => api.get('/calendar-periods'),
+    byCalendar: (calendarCode, year) => api.get('/calendar-periods/by-calendar', { params: { calendarCode, year } }),
     scan: () => api.post('/calendar-periods/scan'),
     remove: (id) => api.delete(`/calendar-periods/${id}`),
     removeAll: () => api.delete('/calendar-periods/all')

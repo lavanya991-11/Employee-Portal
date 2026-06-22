@@ -19,6 +19,8 @@ function Payslip() {
 
     const [calendars, setCalendars] = useState([]);
     const [periods, setPeriods] = useState([]);
+    const [periodsLoading, setPeriodsLoading] = useState(false);
+    const [periodsError, setPeriodsError] = useState('');
     const [calendarCode, setCalendarCode] = useState('');
     const [payrollPeriod, setPayrollPeriod] = useState('');
 
@@ -49,41 +51,54 @@ function Payslip() {
             setCalendars(list);
             if (list.length) setCalendarCode(list[0].calendarCode);
         }).catch(() => {});
-        calendarPeriodApi.list().then(({ data }) => setPeriods(data.items || [])).catch(() => {});
     }, []);
 
-    // Calendar Code -> calendar year; the Payroll Period lookup only shows
-    // periods belonging to that year.
+    // Calendar Code -> calendar year.
     const selectedCalendar = useMemo(
         () => calendars.find((c) => c.calendarCode === calendarCode) || null,
         [calendars, calendarCode]
     );
-    const filteredPeriods = useMemo(() => {
-        const year = selectedCalendar?.calendarYear;
-        if (!year) return [];
-        return periods.filter((p) => Number(p.year) === Number(year));
-    }, [periods, selectedCalendar]);
+    const calendarYear = selectedCalendar?.calendarYear || '';
 
-    // Keep the selected period valid for the chosen calendar year.
+    // The Payroll Period lookup is fetched from BC filtered by BOTH the selected
+    // Calendar Code and its year, so it only shows periods for that calendar.
     useEffect(() => {
-        if (filteredPeriods.length === 0) {
+        if (!calendarCode || !calendarYear) {
+            setPeriods([]);
+            return;
+        }
+        let cancelled = false;
+        setPeriodsLoading(true); setPeriodsError('');
+        calendarPeriodApi.byCalendar(calendarCode, calendarYear)
+            .then(({ data }) => { if (!cancelled) setPeriods(data.items || []); })
+            .catch((err) => {
+                if (cancelled) return;
+                setPeriods([]);
+                setPeriodsError(err.response?.data?.message || 'Failed to load payroll periods');
+            })
+            .finally(() => { if (!cancelled) setPeriodsLoading(false); });
+        return () => { cancelled = true; };
+    }, [calendarCode, calendarYear]);
+
+    // Keep the selected period valid for the currently loaded list.
+    useEffect(() => {
+        if (periods.length === 0) {
             if (payrollPeriod) setPayrollPeriod('');
             return;
         }
-        if (!filteredPeriods.some((p) => p._id === payrollPeriod)) {
-            setPayrollPeriod(filteredPeriods[0]._id);
+        if (!periods.some((p) => String(p.periodNo) === String(payrollPeriod))) {
+            setPayrollPeriod(String(periods[0].periodNo));
         }
-    }, [filteredPeriods]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [periods]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const selectedPeriod = useMemo(
-        () => filteredPeriods.find((p) => p._id === payrollPeriod) || null,
-        [filteredPeriods, payrollPeriod]
+        () => periods.find((p) => String(p.periodNo) === String(payrollPeriod)) || null,
+        [periods, payrollPeriod]
     );
     const periodText = periodLabel(selectedPeriod);
 
-    // Mirror BC's "Employee Monthly Salaries" request page: year + the
-    // period's start/end dates auto-populate from the selections above.
-    const calendarYear = selectedCalendar?.calendarYear || '';
+    // Mirror BC's "Employee Monthly Salaries" request page: the period's
+    // start/end dates auto-populate from the selections above.
     const fromDate = selectedPeriod?.calendarStartDate || null;
     const toDate = selectedPeriod?.calendarEndDate || null;
 
@@ -220,13 +235,17 @@ function Payslip() {
                                         <select
                                             value={payrollPeriod}
                                             onChange={(e) => setPayrollPeriod(e.target.value)}
-                                            disabled={filteredPeriods.length === 0}
+                                            disabled={periodsLoading || periods.length === 0}
                                         >
-                                            {filteredPeriods.length === 0 && <option value="">No periods for this calendar</option>}
-                                            {filteredPeriods.map((p) => (
-                                                <option key={p._id} value={p._id}>{periodLabel(p)}</option>
+                                            {periodsLoading && <option value="">Loading periods…</option>}
+                                            {!periodsLoading && periods.length === 0 && (
+                                                <option value="">{periodsError || 'No periods for this calendar'}</option>
+                                            )}
+                                            {periods.map((p) => (
+                                                <option key={p.periodNo} value={p.periodNo}>{periodLabel(p)}</option>
                                             ))}
                                         </select>
+                                        {periodsError && <span className="error" style={{ fontSize: 11 }}>{periodsError}</span>}
                                     </div>
                                     <div className="erp-field">
                                         <label>Calendar Start Date</label>

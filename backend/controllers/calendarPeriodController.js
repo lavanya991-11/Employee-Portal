@@ -12,6 +12,32 @@ const mapBcToModel = (bc) => ({
     isPosted: Boolean(bc.isPosted)
 });
 
+// GET /api/calendar-periods/by-calendar?calendarCode=2026&year=2026
+// Fetch periods live from BC filtered by BOTH calendar code and year. Used by
+// the Payslip page's Payroll Period lookup, which must show only the periods
+// belonging to the selected calendar/year (the local table has no calendarCode).
+exports.byCalendar = async (req, res) => {
+    try {
+        if (!bcConfigured()) {
+            return res.status(400).json({ success: false, message: 'BC not configured (set BC_* env vars on the backend).' });
+        }
+        const { calendarCode, year } = req.query;
+        if (!calendarCode) {
+            return res.status(400).json({ success: false, message: 'calendarCode is required.' });
+        }
+
+        const rows = await getCalendarPeriods({ calendarCode, year: Number(year) || 0 });
+        const items = rows
+            .filter(Boolean)
+            .map(mapBcToModel)
+            .sort((a, b) => a.periodNo - b.periodNo);
+
+        res.json({ success: true, count: items.length, items });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to load calendar periods from BC', error: err.message });
+    }
+};
+
 // GET /api/calendar-periods — list the locally stored calendar period records.
 exports.list = async (req, res) => {
     try {
