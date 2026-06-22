@@ -10,6 +10,7 @@ const periodLabel = (p) =>
     p ? `Period ${p.periodNo} — ${MONTHS[p.month] || p.month || ''}${p.year ? `/${p.year}` : ''}`.trim() : '';
 
 const inr = (n) => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 
 function Payslip() {
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
@@ -77,6 +78,12 @@ function Payslip() {
         [filteredPeriods, payrollPeriod]
     );
     const periodText = periodLabel(selectedPeriod);
+
+    // Mirror BC's "Employee Monthly Salaries" request page: year + the
+    // period's start/end dates auto-populate from the selections above.
+    const calendarYear = selectedCalendar?.calendarYear || '';
+    const fromDate = selectedPeriod?.calendarStartDate || null;
+    const toDate = selectedPeriod?.calendarEndDate || null;
 
     const selectedEmployee = useMemo(() => {
         return allEmployees.find((e) => e.employeeCode === filterEmp)
@@ -192,6 +199,10 @@ function Payslip() {
                                         </select>
                                     </div>
                                     <div className="erp-field">
+                                        <label>Calendar Year</label>
+                                        <input value={calendarYear} readOnly className="erp-readonly" />
+                                    </div>
+                                    <div className="erp-field">
                                         <label>Payroll Period</label>
                                         <select
                                             value={payrollPeriod}
@@ -203,6 +214,14 @@ function Payslip() {
                                                 <option key={p._id} value={p._id}>{periodLabel(p)}</option>
                                             ))}
                                         </select>
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Calendar Start Date</label>
+                                        <input value={fmtDate(fromDate)} readOnly className="erp-readonly" />
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Calendar End Date</label>
+                                        <input value={fmtDate(toDate)} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Employee</label>
@@ -225,6 +244,9 @@ function Payslip() {
                                             <div style={{ textAlign: 'right' }}>
                                                 <div style={{ fontSize: 12, color: '#6b7280' }}>Pay Period</div>
                                                 <div style={{ fontWeight: 700 }}>{periodText || '—'}</div>
+                                                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>
+                                                    {fromDate ? `${fmtDate(fromDate)} → ${fmtDate(toDate)}` : ''}
+                                                </div>
                                             </div>
                                         </div>
 
