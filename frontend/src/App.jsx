@@ -28,6 +28,7 @@ import FinElementForm from './pages/FinElementForm';
 import Calendars from './pages/Calendars';
 import CalendarPeriods from './pages/CalendarPeriods';
 import LoanProducts from './pages/LoanProducts';
+import LoanRequests from './pages/LoanRequests';
 import IncomeTaxDeclarations from './pages/IncomeTaxDeclarations';
 import IncomeTaxComputation from './pages/IncomeTaxComputation';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
@@ -270,6 +271,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <LoanProducts />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/loan-requests"
+                element={
+                    <ProtectedRoute>
+                        <LoanRequests />
                     </ProtectedRoute>
                 }
             />

@@ -129,9 +129,15 @@ export const payslipApi = {
 
 export const loanProductApi = {
     list: () => api.get('/loan-products'),
+    lookup: () => api.get('/loan-products/lookup'),
     sync: () => api.post('/loan-products/sync'),
     remove: (id) => api.delete(`/loan-products/${id}`),
     removeAll: () => api.delete('/loan-products/all')
+};
+
+export const loanRequestApi = {
+    submit: (data) => api.post('/loan-requests', data),
+    my: () => api.get('/loan-requests/my')
 };
 
 export const dataMgmtApi = {

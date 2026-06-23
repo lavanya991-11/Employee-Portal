@@ -6,6 +6,9 @@ const { list, sync, removeAll, remove } = require('../controllers/loanProductCon
 // Admin-only: loan products are management data.
 const adminOnly = [protect, authorize('admin', 'super-admin')];
 
+// Lookup is available to any authenticated user (used by the Apply Loan dropdown).
+router.get('/lookup', protect, list);
+
 router.get('/', adminOnly, list);
 router.post('/sync', adminOnly, sync);
 router.delete('/all', adminOnly, removeAll);

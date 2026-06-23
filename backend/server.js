@@ -20,6 +20,7 @@ const calendarRoutes = require('./routes/calendarRoutes');
 const calendarPeriodRoutes = require('./routes/calendarPeriodRoutes');
 const payslipRoutes = require('./routes/payslipRoutes');
 const loanProductRoutes = require('./routes/loanProductRoutes');
+const loanRequestRoutes = require('./routes/loanRequestRoutes');
 const dataManagementRoutes = require('./routes/dataManagementRoutes');
 const imageRoutes = require('./routes/imageRoutes');
 
@@ -45,6 +46,7 @@ app.use('/api/calendars', calendarRoutes);
 app.use('/api/calendar-periods', calendarPeriodRoutes);
 app.use('/api/payslip', payslipRoutes);
 app.use('/api/loan-products', loanProductRoutes);
+app.use('/api/loan-requests', loanRequestRoutes);
 app.use('/api/data-management', dataManagementRoutes);
 app.use('/api/images', imageRoutes);
 

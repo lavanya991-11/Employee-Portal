@@ -401,4 +401,50 @@ const getLoanProducts = async () => {
     return Array.isArray(parsed) ? parsed : [];
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, generatePayslip, getLoanProducts };
+// Submit a loan request to the NOVAPAY web service. Returns { requestNo, status }
+// (BC sends it as a stringified JSON object in `value`).
+const submitLoanRequest = async ({ employeeCode, loanPayCode, loanAmount, installmentCalculation = 0, noOfInstallments, comments = '' } = {}) => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    const url = `${odataV4Root()}/NOVAPAYWebService_SubmitLoanRequest?company=${process.env.BC_COMPANY_ID}`;
+    const body = JSON.stringify({
+        inputJson: JSON.stringify({
+            employeeCode: String(employeeCode),
+            loanPayCode: Number(loanPayCode),
+            loanAmount: Number(loanAmount),
+            installmentCalculation: Number(installmentCalculation) || 0,
+            noOfInstallments: Number(noOfInstallments) || 0,
+            comments: comments || ''
+        })
+    });
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        let msg = text;
+        try { msg = JSON.parse(text)?.error?.message || text; } catch (e) { /* keep raw */ }
+        const err = new Error(`BC SubmitLoanRequest failed: ${res.status} ${msg}`);
+        err.bcMessage = msg;
+        if (res.status === 404) err.bcNotFound = true;
+        throw err;
+    }
+
+    const data = await res.json();
+    let parsed = data.value;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { parsed = null; }
+    }
+    return parsed;
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, generatePayslip, getLoanProducts, submitLoanRequest };

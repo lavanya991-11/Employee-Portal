@@ -1,42 +1,47 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
-import { loanApi } from '../services/api';
+import { loanProductApi, loanRequestApi, employeeInfoApi } from '../services/api';
 
-const today = () => new Date().toISOString().slice(0, 10);
-const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
+const fmtDateTime = (d) => d ? new Date(d).toLocaleString('en-GB') : '';
 
-const STATUS_COLOR = { Pending: '#f59e0b', Approved: '#22c55e', Rejected: '#ef4444' };
+const blankForm = {
+    loanPayCode: '',
+    loanAmount: '',
+    installmentCalculation: 0,
+    noOfInstallments: '',
+    comments: ''
+};
 
 function ApplyLoan() {
-    const user = useMemo(() => JSON.parse(localStorage.getItem('user') || '{}'), []);
+    const navigate = useNavigate();
 
-    const [form, setForm] = useState({
-        docDate: today(),
-        docSeries: 'FDM/24-25',
-        docNumber: 1,
-        narration: '',
-        employee: user.name || '',
-        loanType: 'Salary Advance',
-        loanAmount: 0,
-        approvedAmount: 0,
-        instAmount: 0,
-        noOfInstallments: 0,
-        deductionMonth: today().slice(0, 7) + '-01'
-    });
-    const [loans, setLoans] = useState([]);
+    const [employeeCode, setEmployeeCode] = useState('');
+    const [products, setProducts] = useState([]);
+    const [form, setForm] = useState(blankForm);
+    const [requests, setRequests] = useState([]);
+    const [posted, setPosted] = useState(null); // { requestNo, status, documentNo }
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [saving, setSaving] = useState(false);
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => {
+        employeeInfoApi.getMy()
+            .then(({ data }) => setEmployeeCode(data.employeeInfo?.employeeCode || ''))
+            .catch(() => {});
+        loanProductApi.lookup()
+            .then(({ data }) => setProducts(data.items || []))
+            .catch(() => {});
+        loadRequests();
+    }, []);
 
-    const load = async () => {
+    const loadRequests = async () => {
         try {
-            const { data } = await loanApi.myLoans();
-            setLoans(data.loans || []);
+            const { data } = await loanRequestApi.my();
+            setRequests(data.items || []);
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to load loans');
+            setError(err.response?.data?.message || 'Failed to load loan requests');
         }
     };
 
@@ -46,70 +51,37 @@ function ApplyLoan() {
         setError(''); setSuccess('');
     };
 
-    const netTotal = useMemo(() => {
-        const n = Number(form.instAmount) * Number(form.noOfInstallments);
-        return isNaN(n) ? 0 : n;
-    }, [form.instAmount, form.noOfInstallments]);
+    const onNew = () => {
+        setForm(blankForm);
+        setPosted(null);
+        setError(''); setSuccess('');
+    };
 
-    // Auto-derive Approved Amount, No Of Installments, Inst Amount from Loan Amount.
-    useEffect(() => {
-        const amount = Number(form.loanAmount) || 0;
-        const installments = 12; // default monthly EMIs
-        const inst = installments > 0 ? +(amount / installments).toFixed(2) : 0;
-        setForm((f) => ({
-            ...f,
-            approvedAmount: amount,
-            noOfInstallments: amount > 0 ? installments : 0,
-            instAmount: inst
-        }));
-    }, [form.loanAmount]);
-
-    const onSubmit = async (e) => {
+    const onPost = async (e) => {
         e?.preventDefault?.();
         setError(''); setSuccess('');
-        if (!form.loanType || !form.loanAmount) {
-            setError('Loan Type and Loan Amount are required.');
-            return;
-        }
-        if (!form.instAmount || !form.noOfInstallments) {
-            setError('Inst Amount and No Of Installments are required.');
+        if (form.loanPayCode === '' || form.loanAmount === '' || !Number(form.loanAmount)) {
+            setError('Loan Pay Code and Amount are required.');
             return;
         }
         setSaving(true);
         try {
-            const reason = `Narration: ${form.narration || '-'} | InstAmount: ${form.instAmount} | NoOfInstallments: ${form.noOfInstallments} | DeductionMonth: ${form.deductionMonth}`;
-            await loanApi.apply({
-                loanType: form.loanType,
-                amount: Number(form.loanAmount),
-                reason
+            const { data } = await loanRequestApi.submit({
+                loanPayCode: Number(form.loanPayCode),
+                loanAmount: Number(form.loanAmount),
+                installmentCalculation: Number(form.installmentCalculation) || 0,
+                noOfInstallments: Number(form.noOfInstallments) || 0,
+                comments: form.comments || ''
             });
-            setSuccess('Loan request submitted.');
-            load();
+            setPosted({ requestNo: data.requestNo, status: data.status, documentNo: data.request?.documentNo });
+            setSuccess(data.message || `Request No: ${data.requestNo} (${data.status}).`);
+            setForm(blankForm);
+            loadRequests();
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to apply loan');
+            setError(err.response?.data?.message || err.response?.data?.error || 'Failed to submit loan request');
         } finally {
             setSaving(false);
         }
-    };
-
-    const onNew = () => {
-        setForm({
-            docDate: today(), docSeries: 'FDM/24-25', docNumber: 1, narration: '',
-            employee: user.name || '', loanType: 'Salary Advance',
-            loanAmount: 0, approvedAmount: 0, instAmount: 0, noOfInstallments: 0,
-            deductionMonth: today().slice(0, 7) + '-01'
-        });
-        setError(''); setSuccess('');
-    };
-
-    const onDistribute = () => {
-        if (!form.loanAmount || !form.noOfInstallments) {
-            setError('Enter Loan Amount and No Of Installments to distribute.');
-            return;
-        }
-        const inst = +(Number(form.loanAmount) / Number(form.noOfInstallments)).toFixed(2);
-        setForm({ ...form, instAmount: inst });
-        setSuccess(`Distributed: ${inst} per installment.`);
     };
 
     return (
@@ -122,80 +94,75 @@ function ApplyLoan() {
                         <div className="erp-title">Apply Loan <span className="erp-badge">Draft</span></div>
                         <div className="erp-titlebar-actions">
                             <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
-                            <button type="button" className="erp-action-btn" onClick={onSubmit} disabled={saving}>
+                            <button type="button" className="erp-action-btn" onClick={onPost} disabled={saving}>
                                 {saving ? 'Posting…' : '📤 Post'}
                             </button>
-                            <button type="button" className="erp-action-btn" onClick={onDistribute}>🧮 Distribute</button>
+                            <button type="button" className="erp-action-btn" onClick={() => navigate('/loan-requests')}>📋 Loan Requests</button>
                         </div>
                     </div>
 
                     <div className="erp-body">
-                        <form className="erp-form" onSubmit={onSubmit}>
+                        <form className="erp-form" onSubmit={onPost}>
                             {error && <div className="error">{error}</div>}
                             {success && <div className="success">{success}</div>}
 
-                            <div className="erp-section">
-                                <div className="erp-section-header">Primary Information</div>
-                                <div className="erp-grid">
-                                    <div className="erp-field">
-                                        <label>Doc Date</label>
-                                        <input type="date" name="docDate" value={form.docDate} onChange={onChange} />
-                                    </div>
-                                    <div className="erp-field">
-                                        <label>Doc No</label>
-                                        <div className="erp-docno">
-                                            <input value={form.docSeries} readOnly className="erp-readonly" style={{ width: 100 }} />
-                                            <input type="number" name="docNumber" value={form.docNumber} onChange={onChange} className="erp-docno-num" min="1" />
+                            {posted && (
+                                <div className="erp-section">
+                                    <div className="erp-section-header">Submission Result</div>
+                                    <div className="erp-grid">
+                                        <div className="erp-field">
+                                            <label>Request No.</label>
+                                            <input value={posted.requestNo || ''} readOnly className="erp-readonly" />
+                                        </div>
+                                        <div className="erp-field">
+                                            <label>Status</label>
+                                            <input value={posted.status || ''} readOnly className="erp-readonly" />
+                                        </div>
+                                        <div className="erp-field">
+                                            <label>Document No.</label>
+                                            <input value={posted.documentNo || ''} readOnly className="erp-readonly" />
                                         </div>
                                     </div>
-                                    <div className="erp-field erp-field-wide">
-                                        <label>Narration</label>
-                                        <input name="narration" value={form.narration} onChange={onChange} />
-                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             <div className="erp-section">
-                                <div className="erp-section-header">General</div>
+                                <div className="erp-section-header">Loan Request</div>
                                 <div className="erp-grid">
                                     <div className="erp-field">
-                                        <label>Employee</label>
-                                        <input name="employee" value={form.employee} readOnly className="erp-readonly" />
+                                        <label>Document No.</label>
+                                        <input value="(auto-generated on Post)" readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
-                                        <label>Loan Type</label>
-                                        <select name="loanType" value={form.loanType} onChange={onChange}>
-                                            <option>Salary Advance</option>
-                                            <option>Personal</option>
-                                            <option>Medical</option>
-                                            <option>Education</option>
+                                        <label>Employee Code</label>
+                                        <input value={employeeCode} readOnly className="erp-readonly" />
+                                    </div>
+                                    <div className="erp-field">
+                                        <label>Loan Pay Code</label>
+                                        <select name="loanPayCode" value={form.loanPayCode} onChange={onChange}>
+                                            <option value="">-- Select loan product --</option>
+                                            {products.map((p) => (
+                                                <option key={p._id || p.finId} value={p.finId}>
+                                                    {p.finId} — {p.description}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="erp-field">
-                                        <label>Loan Amount</label>
+                                        <label>Amount</label>
                                         <input type="number" name="loanAmount" value={form.loanAmount} onChange={onChange} min="0" step="0.01" />
                                     </div>
                                     <div className="erp-field">
-                                        <label>Approved Amount</label>
-                                        <input type="number" name="approvedAmount" value={form.approvedAmount} readOnly className="erp-readonly" />
+                                        <label>Installment Calculation</label>
+                                        <input type="number" name="installmentCalculation" value={form.installmentCalculation} onChange={onChange} min="0" />
                                     </div>
                                     <div className="erp-field">
-                                        <label>Inst Amount</label>
-                                        <input type="number" name="instAmount" value={form.instAmount} readOnly className="erp-readonly" />
+                                        <label>No. of Installments</label>
+                                        <input type="number" name="noOfInstallments" value={form.noOfInstallments} onChange={onChange} min="0" />
                                     </div>
-                                    <div className="erp-field">
-                                        <label>No Of Installments</label>
-                                        <input type="number" name="noOfInstallments" value={form.noOfInstallments} readOnly className="erp-readonly" />
-                                    </div>
-                                    <div className="erp-field">
-                                        <label>Deduction Month</label>
-                                        <input type="date" name="deductionMonth" value={form.deductionMonth} onChange={onChange} />
-                                    </div>
-                                    <div className="erp-field" style={{ alignSelf: 'end' }}>
-                                        <label style={{ visibility: 'hidden' }}>Net Total</label>
-                                        <div style={{ background: '#a7f3d0', padding: '6px 10px', borderRadius: 3, fontWeight: 600, textAlign: 'right' }}>
-                                            Net Total : {netTotal}
-                                        </div>
+                                    <div className="erp-field erp-field-wide">
+                                        <label>Comments</label>
+                                        <input name="comments" value={form.comments} onChange={onChange} placeholder="Additional remarks" />
                                     </div>
                                 </div>
                             </div>
@@ -204,20 +171,20 @@ function ApplyLoan() {
                                 <div style={{ padding: 10, fontWeight: 600, borderBottom: '1px solid #e5e7eb', color: '#1e3a8a' }}>
                                     My Loan Requests
                                 </div>
-                                {loans.length === 0 && <p style={{ padding: 12, color: '#888' }}>No loan requests yet.</p>}
-                                {loans.length > 0 && (
+                                {requests.length === 0 && <p style={{ padding: 12, color: '#888' }}>No loan requests yet.</p>}
+                                {requests.length > 0 && (
                                     <table className="erp-table">
                                         <thead>
-                                            <tr><th>Doc Date</th><th>Type</th><th>Amount</th><th>Reason</th><th>Status</th></tr>
+                                            <tr><th>Request No.</th><th>Status</th><th>Loan Pay Code</th><th>Amount</th><th>Created</th></tr>
                                         </thead>
                                         <tbody>
-                                            {loans.map((l) => (
-                                                <tr key={l._id}>
-                                                    <td>{fmtDate(l.createdAt)}</td>
-                                                    <td>{l.loanType}</td>
-                                                    <td>{l.amount}</td>
-                                                    <td style={{ fontSize: 11 }}>{l.reason}</td>
-                                                    <td><span style={{ color: STATUS_COLOR[l.status], fontWeight: 600 }}>{l.status}</span></td>
+                                            {requests.slice(0, 5).map((r) => (
+                                                <tr key={r._id}>
+                                                    <td>{r.requestNo}</td>
+                                                    <td>{r.status}</td>
+                                                    <td>{r.loanPayCode}</td>
+                                                    <td>{r.loanAmount}</td>
+                                                    <td style={{ fontSize: 11 }}>{fmtDateTime(r.createdAt)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -229,9 +196,10 @@ function ApplyLoan() {
                         <aside className="erp-actions-panel">
                             <div className="erp-actions-header"><span>Actions</span></div>
                             <ul className="erp-actions-list">
-                                <li onClick={() => window.print()}>🖨️ Print</li>
-                                <li onClick={onDistribute}>🧮 Distribute</li>
-                                <li onClick={load}>🔄 Refresh</li>
+                                <li onClick={onPost}>📤 Post</li>
+                                <li onClick={onNew}>📄 New</li>
+                                <li onClick={() => navigate('/loan-requests')}>📋 Loan Requests</li>
+                                <li onClick={loadRequests}>🔄 Refresh</li>
                             </ul>
                             <div className="erp-side-tabs">
                                 <span>Actions</span><span>Info</span><span>Reports</span><span>Shortcut</span>

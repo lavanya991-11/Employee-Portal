@@ -47,6 +47,10 @@ function Sidebar() {
                     <span className="nav-item-icon">💰</span> Apply Loan
                 </Link>
 
+                <Link to="/loan-requests" className="nav-item">
+                    <span className="nav-item-icon">📋</span> Loan Requests
+                </Link>
+
                 <div className="nav-item" onClick={() => toggle('payroll')}>
                     <span className="nav-item-icon">💼</span> Payroll
                     <span className="nav-item-caret">{openMenu === 'payroll' ? '▼' : '▶'}</span>
