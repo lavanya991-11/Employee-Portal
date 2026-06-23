@@ -9,9 +9,10 @@ exports.submit = async (req, res) => {
             return res.status(400).json({ success: false, message: 'BC not configured (set BC_* env vars on the backend).' });
         }
 
-        // Employee Code comes from the logged-in employee (not editable by the client).
+        // Employee Code (employee number): use the value sent in the body if
+        // provided, otherwise fall back to the logged-in employee's code.
         const info = await EmployeeInfo.findOne({ user: req.user.id });
-        const employeeCode = info?.employeeCode || req.body.employeeCode;
+        const employeeCode = req.body.employeeCode || info?.employeeCode;
         if (!employeeCode) {
             return res.status(400).json({ success: false, message: 'No Employee Code found for your account. Set it on the Employee Information page first.' });
         }

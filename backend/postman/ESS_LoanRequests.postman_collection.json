@@ -58,7 +58,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"loanPayCode\": 12,\n  \"loanAmount\": 12000,\n  \"installmentCalculation\": 0,\n  \"noOfInstallments\": 12,\n  \"comments\": \"Home renovation\"\n}"
+          "raw": "{\n  \"employeeCode\": \"1100\",\n  \"loanPayCode\": 12,\n  \"loanAmount\": 12000,\n  \"installmentCalculation\": 0,\n  \"noOfInstallments\": 12,\n  \"comments\": \"Home renovation\"\n}"
         }
       }
     },
