@@ -79,12 +79,12 @@ function LoanRequests() {
             <Sidebar />
             <main className="main-content">
                 <PageHeader pageName="Loan Requests" />
-                <div className="erp-page">
+                <div className="erp-page" onClick={() => setSelected(null)}>
                     <div className="erp-titlebar">
                         <div className="erp-title">Loan Requests</div>
                         <div className="erp-titlebar-actions">
                             <button className="erp-action-btn" onClick={() => navigate('/loans/apply')}>➕ Apply Loan</button>
-                            <button className="erp-action-btn" onClick={onView} disabled={!selected}>👁️ View</button>
+                            <button className="erp-action-btn" onClick={(e) => { e.stopPropagation(); onView(); }} disabled={!selected}>👁️ View</button>
                             <button className="erp-action-btn" onClick={load} disabled={loading}>🔄 Refresh</button>
                         </div>
                     </div>
@@ -123,8 +123,8 @@ function LoanRequests() {
                                             return (
                                                 <tr key={it._id}
                                                     className={isSel ? 'erp-row-selected' : ''}
-                                                    onClick={() => setSelected(it)}
-                                                    onDoubleClick={() => { setSelected(it); setShowView(true); }}>
+                                                    onClick={(e) => { e.stopPropagation(); setSelected(isSel ? null : it); }}
+                                                    onDoubleClick={(e) => { e.stopPropagation(); setSelected(it); setShowView(true); }}>
                                                     <td><input type="checkbox" checked={isSel} readOnly /></td>
                                                     {COLUMNS.map((c) => (
                                                         <td key={c.key}>
