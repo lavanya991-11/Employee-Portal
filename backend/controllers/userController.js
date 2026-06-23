@@ -9,6 +9,9 @@ const Overtime = require('../models/overtime');
 const Travel = require('../models/travel');
 const Expense = require('../models/expense');
 const FinElement = require('../models/finElement');
+const Calendar = require('../models/calendar');
+const CalendarPeriod = require('../models/calendarPeriod');
+const LoanProduct = require('../models/loanProduct');
 
 exports.listAll = async (req, res) => {
     try {
@@ -21,7 +24,7 @@ exports.listAll = async (req, res) => {
 
 exports.adminStats = async (req, res) => {
     try {
-        const [users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements] = await Promise.all([
+        const [users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements, calendars, calendarPeriods, loanProducts] = await Promise.all([
             User.countDocuments(),
             EmployeeInfo.countDocuments(),
             Leave.countDocuments(),
@@ -30,7 +33,10 @@ exports.adminStats = async (req, res) => {
             Overtime.countDocuments(),
             Travel.countDocuments(),
             Expense.countDocuments(),
-            FinElement.countDocuments()
+            FinElement.countDocuments(),
+            Calendar.countDocuments(),
+            CalendarPeriod.countDocuments(),
+            LoanProduct.countDocuments()
         ]);
         const [pendingLeaves, pendingLoans, pendingTravels, pendingExpenses, pendingAssets, pendingOvertimes] = await Promise.all([
             Leave.countDocuments({ status: 'Pending' }),
@@ -42,7 +48,7 @@ exports.adminStats = async (req, res) => {
         ]);
         res.json({
             success: true,
-            totals: { users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements },
+            totals: { users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements, calendars, calendarPeriods, loanProducts },
             pending: { leaves: pendingLeaves, loans: pendingLoans, travels: pendingTravels, expenses: pendingExpenses, assets: pendingAssets, overtimes: pendingOvertimes }
         });
     } catch (err) {
