@@ -137,7 +137,8 @@ export const loanProductApi = {
 
 export const loanRequestApi = {
     submit: (data) => api.post('/loan-requests', data),
-    my: () => api.get('/loan-requests/my')
+    my: () => api.get('/loan-requests/my'),
+    updateByRef: (requestNo, data) => api.patch(`/loan-requests/by-ref/${requestNo}`, data)
 };
 
 export const dataMgmtApi = {

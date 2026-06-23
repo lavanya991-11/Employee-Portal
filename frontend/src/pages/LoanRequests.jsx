@@ -16,6 +16,7 @@ const COLUMNS = [
     { key: 'installmentCalculation', header: 'Installment Calculation' },
     { key: 'noOfInstallments', header: 'No. of Installments' },
     { key: 'comments', header: 'Comments' },
+    { key: 'approvedBy', header: 'Approved By' },
     { key: 'createdAt', header: 'Created Date/Time', type: 'datetime' }
 ];
 

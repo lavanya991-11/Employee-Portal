@@ -56,6 +56,31 @@ exports.submit = async (req, res) => {
     }
 };
 
+// PATCH /api/loan-requests/by-ref/:requestNo — update status, comments and
+// approvedBy for the loan request matching the given Request No.
+exports.updateByRef = async (req, res) => {
+    try {
+        const { requestNo } = req.params;
+        const { status, comments, approvedBy } = req.body;
+
+        const update = {};
+        if (status !== undefined) update.status = status;
+        if (comments !== undefined) update.comments = comments;
+        if (approvedBy !== undefined) update.approvedBy = approvedBy;
+        if (Object.keys(update).length === 0) {
+            return res.status(400).json({ success: false, message: 'Provide at least one of: status, comments, approvedBy.' });
+        }
+
+        const item = await LoanRequest.findOneAndUpdate({ requestNo }, { $set: update }, { new: true });
+        if (!item) {
+            return res.status(404).json({ success: false, message: `No loan request found with Request No ${requestNo}.` });
+        }
+        res.json({ success: true, message: `Loan request ${requestNo} updated.`, request: item });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
+
 // GET /api/loan-requests/my — loan requests submitted by the logged-in employee.
 exports.listMine = async (req, res) => {
     try {
