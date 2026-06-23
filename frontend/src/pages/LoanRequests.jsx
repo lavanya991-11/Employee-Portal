@@ -5,6 +5,7 @@ import PageHeader from '../components/PageHeader';
 import { loanRequestApi } from '../services/api';
 
 const fmtDateTime = (d) => d ? new Date(d).toLocaleString('en-GB') : '';
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 
 const COLUMNS = [
     { key: 'requestNo', header: 'Request No.' },
@@ -17,11 +18,15 @@ const COLUMNS = [
     { key: 'noOfInstallments', header: 'No. of Installments' },
     { key: 'comments', header: 'Comments' },
     { key: 'approvedBy', header: 'Approved By' },
-    { key: 'approvedDate', header: 'Approved Date', type: 'datetime' },
+    { key: 'approvedDate', header: 'Approved Date', type: 'date' },
     { key: 'createdAt', header: 'Created Date/Time', type: 'datetime' }
 ];
 
-const cellValue = (c, it) => (c.type === 'datetime' ? fmtDateTime(it[c.key]) : (it[c.key] ?? ''));
+const cellValue = (c, it) => {
+    if (c.type === 'date') return fmtDate(it[c.key]);
+    if (c.type === 'datetime') return fmtDateTime(it[c.key]);
+    return it[c.key] ?? '';
+};
 
 // Status text colour: Pending (Approval) = yellow, Approved = green, Rejected = red.
 const statusColor = (s) => {
