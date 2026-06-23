@@ -127,6 +127,13 @@ export const payslipApi = {
     generate: (params) => api.get('/payslip', { params })
 };
 
+export const loanProductApi = {
+    list: () => api.get('/loan-products'),
+    sync: () => api.post('/loan-products/sync'),
+    remove: (id) => api.delete(`/loan-products/${id}`),
+    removeAll: () => api.delete('/loan-products/all')
+};
+
 export const dataMgmtApi = {
     tables: () => api.get('/data-management/tables'),
     deleteOne: (key) => api.delete(`/data-management/tables/${key}`),

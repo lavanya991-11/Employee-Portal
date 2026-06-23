@@ -27,6 +27,7 @@ import FinElements from './pages/FinElements';
 import FinElementForm from './pages/FinElementForm';
 import Calendars from './pages/Calendars';
 import CalendarPeriods from './pages/CalendarPeriods';
+import LoanProducts from './pages/LoanProducts';
 import IncomeTaxDeclarations from './pages/IncomeTaxDeclarations';
 import IncomeTaxComputation from './pages/IncomeTaxComputation';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
@@ -261,6 +262,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <CalendarPeriods />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/loan-products"
+                element={
+                    <ProtectedRoute>
+                        <LoanProducts />
                     </ProtectedRoute>
                 }
             />

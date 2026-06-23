@@ -368,4 +368,37 @@ const generatePayslip = async ({ calendarCode, year = 0, payrollPeriod, employee
     return parsed;
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, generatePayslip };
+// Fetch loan products from the NOVAPAY web service. Returns the rows as a
+// stringified JSON array inside `value`, so we parse it before returning.
+const getLoanProducts = async () => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    const url = `${odataV4Root()}/NOVAPAYWebService_GetLoanProducts?company=${process.env.BC_COMPANY_ID}`;
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: '{}'
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        const err = new Error(`BC GetLoanProducts failed: ${res.status} ${text}`);
+        if (res.status === 404) err.bcNotFound = true;
+        throw err;
+    }
+
+    const data = await res.json();
+    let parsed = data.value;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { parsed = []; }
+    }
+    return Array.isArray(parsed) ? parsed : [];
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, generatePayslip, getLoanProducts };
