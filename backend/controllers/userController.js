@@ -48,7 +48,7 @@ exports.adminStats = async (req, res) => {
         ]);
         res.json({
             success: true,
-            totals: { users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements, calendars, calendarPeriods, loanProducts },
+            totals: { users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements, calendars, calendarPeriods, loanProducts, credentials: users },
             pending: { leaves: pendingLeaves, loans: pendingLoans, travels: pendingTravels, expenses: pendingExpenses, assets: pendingAssets, overtimes: pendingOvertimes }
         });
     } catch (err) {
