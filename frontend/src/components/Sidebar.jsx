@@ -37,15 +37,22 @@ function Sidebar() {
                     <span className="nav-item-icon">🏠</span> Dashboard
                 </Link>
 
+                <div className="nav-item" onClick={() => toggle('apply')}>
+                    <span className="nav-item-icon">📝</span> Apply
+                    <span className="nav-item-caret">{openMenu === 'apply' ? '▼' : '▶'}</span>
+                </div>
+                {openMenu === 'apply' && (
+                    <>
+                        <Link to="/leaves/apply" className="nav-subitem">Leave</Link>
+                        <Link to="/loan-requests" className="nav-subitem">Loan</Link>
+                    </>
+                )}
+
                 {user.role === 'super-admin' && (
                     <Link to="/system-settings" className="nav-item">
                         <span className="nav-item-icon">🎨</span> System Settings
                     </Link>
                 )}
-
-                <Link to="/loan-requests" className="nav-item">
-                    <span className="nav-item-icon">💰</span> Apply Loan
-                </Link>
 
                 <div className="nav-item" onClick={() => toggle('payroll')}>
                     <span className="nav-item-icon">💼</span> Payroll
