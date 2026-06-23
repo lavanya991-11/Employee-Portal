@@ -43,7 +43,7 @@ function Sidebar() {
                 </div>
                 {openMenu === 'apply' && (
                     <>
-                        <Link to="/leaves/apply" className="nav-subitem">Leave</Link>
+                        <Link to="/leaves/my" className="nav-subitem">Leave</Link>
                         <Link to="/loan-requests" className="nav-subitem">Loan</Link>
                     </>
                 )}
