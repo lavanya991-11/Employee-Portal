@@ -22,6 +22,15 @@ const COLUMNS = [
 
 const cellValue = (c, it) => (c.type === 'datetime' ? fmtDateTime(it[c.key]) : (it[c.key] ?? ''));
 
+// Status text colour: Pending (Approval) = yellow, Approved = green, Rejected = red.
+const statusColor = (s) => {
+    const v = (s || '').toLowerCase();
+    if (v.includes('reject')) return '#ef4444';
+    if (v.includes('pending')) return '#f59e0b';
+    if (v.includes('approv')) return '#22c55e';
+    return undefined;
+};
+
 function LoanRequests() {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
@@ -111,7 +120,13 @@ function LoanRequests() {
                                                     onClick={() => setSelected(it)}
                                                     onDoubleClick={() => { setSelected(it); setShowView(true); }}>
                                                     <td><input type="checkbox" checked={isSel} readOnly /></td>
-                                                    {COLUMNS.map((c) => <td key={c.key}>{cellValue(c, it)}</td>)}
+                                                    {COLUMNS.map((c) => (
+                                                        <td key={c.key}>
+                                                            {c.key === 'status'
+                                                                ? <span style={{ color: statusColor(it.status), fontWeight: 600 }}>{it.status}</span>
+                                                                : cellValue(c, it)}
+                                                        </td>
+                                                    ))}
                                                 </tr>
                                             );
                                         })}
@@ -135,7 +150,12 @@ function LoanRequests() {
                                     {COLUMNS.map((c) => (
                                         <div className="erp-field" key={c.key}>
                                             <label>{c.header}</label>
-                                            <input value={cellValue(c, selected)} readOnly className="erp-readonly" />
+                                            <input
+                                                value={cellValue(c, selected)}
+                                                readOnly
+                                                className="erp-readonly"
+                                                style={c.key === 'status' ? { color: statusColor(selected.status), fontWeight: 600 } : undefined}
+                                            />
                                         </div>
                                     ))}
                                 </div>
