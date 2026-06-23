@@ -13,7 +13,8 @@ const loanRequestSchema = new mongoose.Schema({
     comments: { type: String, default: '' },
     requestNo: { type: String, default: '' },
     status: { type: String, default: '' },
-    approvedBy: { type: String, default: '' }
+    approvedBy: { type: String, default: '' },
+    approvedDate: { type: Date }
 }, { timestamps: true });
 
 module.exports = mongoose.model('LoanRequest', loanRequestSchema);

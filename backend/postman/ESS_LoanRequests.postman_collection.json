@@ -91,7 +91,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"status\": \"Approved\",\n  \"comments\": \"Approved by manager\",\n  \"approvedBy\": \"Vishwanath\"\n}"
+          "raw": "{\n  \"status\": \"Approved\",\n  \"comments\": \"Approved by manager\",\n  \"approvedBy\": \"Vishwanath\",\n  \"approvedDate\": \"2026-06-23\"\n}"
         }
       }
     }

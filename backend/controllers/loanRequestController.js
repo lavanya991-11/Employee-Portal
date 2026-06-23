@@ -61,14 +61,24 @@ exports.submit = async (req, res) => {
 exports.updateByRef = async (req, res) => {
     try {
         const { requestNo } = req.params;
-        const { status, comments, approvedBy } = req.body;
+        const { status, comments, approvedBy, approvedDate } = req.body;
 
         const update = {};
         if (status !== undefined) update.status = status;
         if (comments !== undefined) update.comments = comments;
         if (approvedBy !== undefined) update.approvedBy = approvedBy;
+        if (approvedDate !== undefined) update.approvedDate = approvedDate ? new Date(approvedDate) : null;
+
+        // Auto-stamp the approved date when the status becomes Approved/Rejected
+        // and no explicit approvedDate was sent.
+        const s = (status || '').toLowerCase();
+        const isFinal = (s.includes('approv') && !s.includes('pending')) || s.includes('reject');
+        if (approvedDate === undefined && status !== undefined && isFinal) {
+            update.approvedDate = new Date();
+        }
+
         if (Object.keys(update).length === 0) {
-            return res.status(400).json({ success: false, message: 'Provide at least one of: status, comments, approvedBy.' });
+            return res.status(400).json({ success: false, message: 'Provide at least one of: status, comments, approvedBy, approvedDate.' });
         }
 
         const item = await LoanRequest.findOneAndUpdate({ requestNo }, { $set: update }, { new: true });
