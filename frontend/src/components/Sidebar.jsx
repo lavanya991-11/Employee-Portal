@@ -61,8 +61,6 @@ function Sidebar() {
                 {openMenu === 'payroll' && (
                     <>
                         <Link to="/payslip" className="nav-subitem">Payslip</Link>
-                        <Link to="/attendance" className="nav-subitem">Attendance</Link>
-                        <Link to="/on-duty" className="nav-subitem">On Duty</Link>
                     </>
                 )}
 
@@ -92,17 +90,6 @@ function Sidebar() {
                         <Link to="/travels" className="nav-subitem">Travel Request</Link>
                         <Link to="/expenses/travel" className="nav-subitem">Travel Expenses</Link>
                         <Link to="/expenses/non-travel" className="nav-subitem">Non-Travel Expenses</Link>
-                    </>
-                )}
-
-                <div className="nav-item" onClick={() => toggle('tax')}>
-                    <span className="nav-item-icon">📊</span> Income Tax
-                    <span className="nav-item-caret">{openMenu === 'tax' ? '▼' : '▶'}</span>
-                </div>
-                {openMenu === 'tax' && (
-                    <>
-                        <Link to="/tax/declarations" className="nav-subitem">Income Tax Declarations</Link>
-                        <Link to="/tax/computation" className="nav-subitem">Income Tax Computation</Link>
                     </>
                 )}
 
