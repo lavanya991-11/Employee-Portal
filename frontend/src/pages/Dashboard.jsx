@@ -17,7 +17,8 @@ const ADMIN_TILES = [
     { key: 'finElements', title: 'FIN Elements', icon: '⚙️', color: '#6b7280', path: '/fin-elements' },
     { key: 'calendars', title: 'Calendars', icon: '🗓️', color: '#8b5cf6', path: '/calendars' },
     { key: 'calendarPeriods', title: 'Calendar Periods', icon: '📆', color: '#ec4899', path: '/calendar-periods' },
-    { key: 'loanProducts', title: 'Loan Products', icon: '🏦', color: '#0d9488', path: '/loan-products' }
+    { key: 'loanProducts', title: 'Loan Products', icon: '🏦', color: '#0d9488', path: '/loan-products' },
+    { key: 'credentials', title: 'Employee Credentials', icon: '🪪', color: '#64748b', path: '/employee-credentials' }
 ];
 
 function Dashboard() {

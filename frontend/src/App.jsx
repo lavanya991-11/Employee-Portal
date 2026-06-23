@@ -29,6 +29,7 @@ import Calendars from './pages/Calendars';
 import CalendarPeriods from './pages/CalendarPeriods';
 import LoanProducts from './pages/LoanProducts';
 import LoanRequests from './pages/LoanRequests';
+import EmployeeCredentials from './pages/EmployeeCredentials';
 import IncomeTaxDeclarations from './pages/IncomeTaxDeclarations';
 import IncomeTaxComputation from './pages/IncomeTaxComputation';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
@@ -279,6 +280,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <LoanRequests />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/employee-credentials"
+                element={
+                    <ProtectedRoute>
+                        <EmployeeCredentials />
                     </ProtectedRoute>
                 }
             />
