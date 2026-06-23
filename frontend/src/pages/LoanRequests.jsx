@@ -19,12 +19,16 @@ const COLUMNS = [
     { key: 'createdAt', header: 'Created Date/Time', type: 'datetime' }
 ];
 
+const cellValue = (c, it) => (c.type === 'datetime' ? fmtDateTime(it[c.key]) : (it[c.key] ?? ''));
+
 function LoanRequests() {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [search, setSearch] = useState('');
+    const [selected, setSelected] = useState(null);
+    const [showView, setShowView] = useState(false);
 
     useEffect(() => { load(); }, []);
 
@@ -49,6 +53,11 @@ function LoanRequests() {
         );
     }, [items, search]);
 
+    const onView = () => {
+        if (!selected) { alert('Select a loan request row first.'); return; }
+        setShowView(true);
+    };
+
     return (
         <div className="app-layout">
             <Sidebar />
@@ -59,6 +68,7 @@ function LoanRequests() {
                         <div className="erp-title">Loan Requests</div>
                         <div className="erp-titlebar-actions">
                             <button className="erp-action-btn" onClick={() => navigate('/loans/apply')}>➕ Apply Loan</button>
+                            <button className="erp-action-btn" onClick={onView} disabled={!selected}>👁️ View</button>
                             <button className="erp-action-btn" onClick={load} disabled={loading}>🔄 Refresh</button>
                         </div>
                     </div>
@@ -81,27 +91,61 @@ function LoanRequests() {
                             <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
                                 <table className="erp-table">
                                     <thead>
-                                        <tr>{COLUMNS.map((c) => <th key={c.key}>{c.header}</th>)}</tr>
+                                        <tr>
+                                            <th style={{ width: 50 }}>Select</th>
+                                            {COLUMNS.map((c) => <th key={c.key}>{c.header}</th>)}
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         {!loading && filtered.length === 0 && (
-                                            <tr><td colSpan={COLUMNS.length} style={{ padding: 20, color: '#888' }}>
+                                            <tr><td colSpan={COLUMNS.length + 1} style={{ padding: 20, color: '#888' }}>
                                                 No loan requests yet. Click <b>Apply Loan</b> to submit one.
                                             </td></tr>
                                         )}
-                                        {filtered.map((it) => (
-                                            <tr key={it._id}>
-                                                {COLUMNS.map((c) => (
-                                                    <td key={c.key}>{c.type === 'datetime' ? fmtDateTime(it[c.key]) : (it[c.key] ?? '')}</td>
-                                                ))}
-                                            </tr>
-                                        ))}
+                                        {filtered.map((it) => {
+                                            const isSel = selected?._id === it._id;
+                                            return (
+                                                <tr key={it._id}
+                                                    className={isSel ? 'erp-row-selected' : ''}
+                                                    onClick={() => setSelected(it)}
+                                                    onDoubleClick={() => { setSelected(it); setShowView(true); }}>
+                                                    <td><input type="checkbox" checked={isSel} readOnly /></td>
+                                                    {COLUMNS.map((c) => <td key={c.key}>{cellValue(c, it)}</td>)}
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                {/* Read-only view of a single request — existing requests cannot be edited. */}
+                {showView && selected && (
+                    <div className="erp-modal-backdrop" onClick={() => setShowView(false)}>
+                        <div className="erp-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 560 }}>
+                            <div className="erp-modal-header">
+                                Loan Request — {selected.requestNo || selected.documentNo}
+                                <button className="erp-actions-close" onClick={() => setShowView(false)}>×</button>
+                            </div>
+                            <div className="erp-modal-body">
+                                <div className="erp-grid">
+                                    {COLUMNS.map((c) => (
+                                        <div className="erp-field" key={c.key}>
+                                            <label>{c.header}</label>
+                                            <input value={cellValue(c, selected)} readOnly className="erp-readonly" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="erp-modal-footer">
+                                <div style={{ flex: 1 }} />
+                                <button className="btn" onClick={() => setShowView(false)}>Close</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );

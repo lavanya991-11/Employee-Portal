@@ -43,12 +43,8 @@ function Sidebar() {
                     </Link>
                 )}
 
-                <Link to="/loans/apply" className="nav-item">
-                    <span className="nav-item-icon">💰</span> Apply Loan
-                </Link>
-
                 <Link to="/loan-requests" className="nav-item">
-                    <span className="nav-item-icon">📋</span> Loan Requests
+                    <span className="nav-item-icon">💰</span> Apply Loan
                 </Link>
 
                 <div className="nav-item" onClick={() => toggle('payroll')}>

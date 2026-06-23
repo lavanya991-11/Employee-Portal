@@ -4,8 +4,6 @@ import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
 import { loanProductApi, loanRequestApi, employeeInfoApi } from '../services/api';
 
-const fmtDateTime = (d) => d ? new Date(d).toLocaleString('en-GB') : '';
-
 const blankForm = {
     loanPayCode: '',
     loanAmount: '',
@@ -20,8 +18,7 @@ function ApplyLoan() {
     const [employeeCode, setEmployeeCode] = useState('');
     const [products, setProducts] = useState([]);
     const [form, setForm] = useState(blankForm);
-    const [requests, setRequests] = useState([]);
-    const [posted, setPosted] = useState(null); // { requestNo, status, documentNo }
+    const [posted, setPosted] = useState(null); // { requestNo, status }
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [saving, setSaving] = useState(false);
@@ -33,17 +30,7 @@ function ApplyLoan() {
         loanProductApi.lookup()
             .then(({ data }) => setProducts(data.items || []))
             .catch(() => {});
-        loadRequests();
     }, []);
-
-    const loadRequests = async () => {
-        try {
-            const { data } = await loanRequestApi.my();
-            setRequests(data.items || []);
-        } catch (err) {
-            setError(err.response?.data?.message || 'Failed to load loan requests');
-        }
-    };
 
     const onChange = (e) => {
         const { name, value, type } = e.target;
@@ -73,10 +60,9 @@ function ApplyLoan() {
                 noOfInstallments: Number(form.noOfInstallments) || 0,
                 comments: form.comments || ''
             });
-            setPosted({ requestNo: data.requestNo, status: data.status, documentNo: data.request?.documentNo });
+            setPosted({ requestNo: data.requestNo, status: data.status });
             setSuccess(data.message || `Request No: ${data.requestNo} (${data.status}).`);
             setForm(blankForm);
-            loadRequests();
         } catch (err) {
             setError(err.response?.data?.message || err.response?.data?.error || 'Failed to submit loan request');
         } finally {
@@ -93,11 +79,11 @@ function ApplyLoan() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Apply Loan <span className="erp-badge">Draft</span></div>
                         <div className="erp-titlebar-actions">
+                            <button type="button" className="erp-action-btn" onClick={() => navigate('/loan-requests')}>← Back</button>
                             <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
                             <button type="button" className="erp-action-btn" onClick={onPost} disabled={saving}>
                                 {saving ? 'Posting…' : '📤 Post'}
                             </button>
-                            <button type="button" className="erp-action-btn" onClick={() => navigate('/loan-requests')}>📋 Loan Requests</button>
                         </div>
                     </div>
 
@@ -118,10 +104,6 @@ function ApplyLoan() {
                                             <label>Status</label>
                                             <input value={posted.status || ''} readOnly className="erp-readonly" />
                                         </div>
-                                        <div className="erp-field">
-                                            <label>Document No.</label>
-                                            <input value={posted.documentNo || ''} readOnly className="erp-readonly" />
-                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -129,10 +111,6 @@ function ApplyLoan() {
                             <div className="erp-section">
                                 <div className="erp-section-header">Loan Request</div>
                                 <div className="erp-grid">
-                                    <div className="erp-field">
-                                        <label>Document No.</label>
-                                        <input value="(auto-generated on Post)" readOnly className="erp-readonly" />
-                                    </div>
                                     <div className="erp-field">
                                         <label>Employee Code</label>
                                         <input value={employeeCode} readOnly className="erp-readonly" />
@@ -166,31 +144,6 @@ function ApplyLoan() {
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="erp-list-card" style={{ marginTop: 0 }}>
-                                <div style={{ padding: 10, fontWeight: 600, borderBottom: '1px solid #e5e7eb', color: '#1e3a8a' }}>
-                                    My Loan Requests
-                                </div>
-                                {requests.length === 0 && <p style={{ padding: 12, color: '#888' }}>No loan requests yet.</p>}
-                                {requests.length > 0 && (
-                                    <table className="erp-table">
-                                        <thead>
-                                            <tr><th>Request No.</th><th>Status</th><th>Loan Pay Code</th><th>Amount</th><th>Created</th></tr>
-                                        </thead>
-                                        <tbody>
-                                            {requests.slice(0, 5).map((r) => (
-                                                <tr key={r._id}>
-                                                    <td>{r.requestNo}</td>
-                                                    <td>{r.status}</td>
-                                                    <td>{r.loanPayCode}</td>
-                                                    <td>{r.loanAmount}</td>
-                                                    <td style={{ fontSize: 11 }}>{fmtDateTime(r.createdAt)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                )}
-                            </div>
                         </form>
 
                         <aside className="erp-actions-panel">
@@ -198,8 +151,7 @@ function ApplyLoan() {
                             <ul className="erp-actions-list">
                                 <li onClick={onPost}>📤 Post</li>
                                 <li onClick={onNew}>📄 New</li>
-                                <li onClick={() => navigate('/loan-requests')}>📋 Loan Requests</li>
-                                <li onClick={loadRequests}>🔄 Refresh</li>
+                                <li onClick={() => navigate('/loan-requests')}>← Back to List</li>
                             </ul>
                             <div className="erp-side-tabs">
                                 <span>Actions</span><span>Info</span><span>Reports</span><span>Shortcut</span>
