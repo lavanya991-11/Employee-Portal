@@ -162,7 +162,7 @@ function Login() {
                     {mode === 'login' ? (
                         <form onSubmit={handleLogin}>
                             <div className="login-field">
-                                <label>Username</label>
+                                <label>Email</label>
                                 <input
                                     type="email"
                                     placeholder="Enter your email"
@@ -209,7 +209,7 @@ function Login() {
                     ) : (
                         <form onSubmit={handleChangePassword}>
                             <div className="login-field">
-                                <label>Username</label>
+                                <label>Email</label>
                                 <input
                                     type="email"
                                     placeholder="Enter your email"
