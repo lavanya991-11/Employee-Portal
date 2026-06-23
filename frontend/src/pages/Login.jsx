@@ -153,7 +153,7 @@ function Login() {
             <div className="login-panel">
                 <div className="login-card">
                     <div className="login-brand">
-                        <span className="login-brand-accent">HR</span> PORTAL
+                        <span className="login-brand-accent">Employee</span> Portal
                     </div>
 
                     {error && <div className="login-alert login-alert-error">{error}</div>}
