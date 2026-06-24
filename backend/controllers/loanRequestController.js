@@ -16,7 +16,7 @@ exports.submit = async (req, res) => {
             return res.status(400).json({ success: false, message: 'No Employee Code found for your account. Set it on the Employee Information page first.' });
         }
 
-        const { loanPayCode, loanAmount, installmentCalculation, noOfInstallments, comments } = req.body;
+        const { loanPayCode, loanAmount, installmentCalculation, noOfInstallments, comments, transactionNo } = req.body;
         if (loanPayCode == null || loanAmount == null) {
             return res.status(400).json({ success: false, message: 'Loan Pay Code and Amount are required.' });
         }
@@ -34,6 +34,7 @@ exports.submit = async (req, res) => {
         const saved = await LoanRequest.create({
             employee: req.user.id,
             documentNo,
+            transactionNo: transactionNo || '',
             employeeCode,
             loanPayCode: Number(loanPayCode),
             loanAmount: Number(loanAmount),
@@ -61,12 +62,13 @@ exports.submit = async (req, res) => {
 exports.updateByRef = async (req, res) => {
     try {
         const { requestNo } = req.params;
-        const { status, comments, approvedBy, approvedDate } = req.body;
+        const { status, comments, approvedBy, approvedDate, transactionNo } = req.body;
 
         const update = {};
         if (status !== undefined) update.status = status;
         if (comments !== undefined) update.comments = comments;
         if (approvedBy !== undefined) update.approvedBy = approvedBy;
+        if (transactionNo !== undefined) update.transactionNo = transactionNo;
         if (approvedDate !== undefined) update.approvedDate = approvedDate ? new Date(approvedDate) : null;
 
         // Auto-stamp the approved date when the status becomes Approved/Rejected
@@ -78,7 +80,7 @@ exports.updateByRef = async (req, res) => {
         }
 
         if (Object.keys(update).length === 0) {
-            return res.status(400).json({ success: false, message: 'Provide at least one of: status, comments, approvedBy, approvedDate.' });
+            return res.status(400).json({ success: false, message: 'Provide at least one of: status, comments, approvedBy, approvedDate, transactionNo.' });
         }
 
         const item = await LoanRequest.findOneAndUpdate({ requestNo }, { $set: update }, { new: true });

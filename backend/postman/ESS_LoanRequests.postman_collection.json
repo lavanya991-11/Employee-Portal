@@ -58,7 +58,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"loanPayCode\": 12,\n  \"loanAmount\": 12000,\n  \"installmentCalculation\": 0,\n  \"noOfInstallments\": 12,\n  \"comments\": \"Home renovation\"\n}"
+          "raw": "{\n  \"loanPayCode\": 12,\n  \"loanAmount\": 12000,\n  \"installmentCalculation\": 0,\n  \"noOfInstallments\": 12,\n  \"comments\": \"Home renovation\",\n  \"transactionNo\": \"TXN-0001\"\n}"
         }
       }
     },
@@ -91,7 +91,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"status\": \"Approved\",\n  \"comments\": \"Approved by manager\",\n  \"approvedBy\": \"Vishwanath\",\n  \"approvedDate\": \"2026-06-23\"\n}"
+          "raw": "{\n  \"status\": \"Approved\",\n  \"comments\": \"Approved by manager\",\n  \"approvedBy\": \"Vishwanath\",\n  \"approvedDate\": \"2026-06-23\",\n  \"transactionNo\": \"TXN-0001\"\n}"
         }
       }
     }

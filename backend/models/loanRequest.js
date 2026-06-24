@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const loanRequestSchema = new mongoose.Schema({
     employee: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     documentNo: { type: String, default: '' },
+    transactionNo: { type: String, default: '', maxlength: 20 },
     employeeCode: { type: String, default: '' },
     loanPayCode: { type: Number, default: 0 },
     loanAmount: { type: Number, default: 0 },
