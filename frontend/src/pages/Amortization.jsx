@@ -11,15 +11,12 @@ const bool = (v) => (v ? '✓' : '');
 const COLUMNS = [
     { key: 'serialNumber', header: 'Serial No.' },
     { key: 'transactionNo', header: 'Transaction No.' },
-    { key: 'finId', header: 'FIN Id' },
     { key: 'payCodeDescription', header: 'Pay Code Description' },
     { key: 'dueDate', header: 'Due Date', type: 'date' },
     { key: 'deductionDate', header: 'Deduction Date', type: 'date' },
     { key: 'amount', header: 'Amount', type: 'num' },
     { key: 'isPaid', header: 'Paid', type: 'bool' },
-    { key: 'isShifted', header: 'Shifted', type: 'bool' },
-    { key: 'isDisabled', header: 'Disabled', type: 'bool' },
-    { key: 'loanEncashmentNo', header: 'Loan Encashment No.' }
+    { key: 'isShifted', header: 'Shifted', type: 'bool' }
 ];
 
 const cell = (c, it) => {
