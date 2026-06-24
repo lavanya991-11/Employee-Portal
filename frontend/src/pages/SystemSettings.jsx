@@ -66,6 +66,17 @@ function SystemSettings() {
         }
     };
 
+    const onDeleteLogo = async () => {
+        if (!logoUrl) return;
+        if (!window.confirm('Delete the company logo?')) return;
+        const id = logoUrl.split('/').pop();
+        try { await imageApi.remove(id); } catch (e) { /* image may already be gone */ }
+        localStorage.removeItem('companyLogo');
+        setLogoUrl('');
+        setSuccess('Company logo removed.');
+        setTimeout(() => setSuccess(''), 2500);
+    };
+
     return (
         <div className="app-layout">
             <Sidebar />
@@ -128,12 +139,19 @@ function SystemSettings() {
 
                         {logoUrl && (
                             <div style={{ marginTop: 14 }}>
-                                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>Current Logo</div>
-                                <img
-                                    src={resolveImageUrl(logoUrl)}
-                                    alt="Company logo"
-                                    style={{ maxHeight: 80, maxWidth: 240, border: '1px solid #e5e7eb', borderRadius: 6, padding: 6, background: '#fff' }}
-                                />
+                                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>Current Logo:</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+                                    <img
+                                        src={resolveImageUrl(logoUrl)}
+                                        alt="Company logo"
+                                        style={{ maxHeight: 90, maxWidth: 240, border: '1px solid #e5e7eb', borderRadius: 8, padding: 8, background: '#fff' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={onDeleteLogo}
+                                        style={{ background: 'transparent', color: '#b91c1c', border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                                    >🗑 Delete Logo</button>
+                                </div>
                             </div>
                         )}
 
@@ -156,6 +174,17 @@ function SystemSettings() {
                             <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>
                                 Supported formats: JPG, PNG, JPEG, WEBP (Max 5 MB)
                             </div>
+
+                            {logoData && (
+                                <div style={{ marginTop: 14, background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, padding: 14 }}>
+                                    <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>Preview:</div>
+                                    <img
+                                        src={logoData}
+                                        alt="Logo preview"
+                                        style={{ maxHeight: 110, maxWidth: 240, border: '1px solid #e5e7eb', borderRadius: 8, padding: 8, background: '#fff' }}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div style={{ marginTop: 18 }}>
