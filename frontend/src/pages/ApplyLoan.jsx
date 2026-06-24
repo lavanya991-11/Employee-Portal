@@ -139,10 +139,6 @@ function ApplyLoan() {
                                         <input type="number" name="loanAmount" value={form.loanAmount} onChange={onChange} min="0" step="0.01" />
                                     </div>
                                     <div className="erp-field">
-                                        <label>Installment Calculation</label>
-                                        <input type="number" name="installmentCalculation" value={form.installmentCalculation} onChange={onChange} min="0" />
-                                    </div>
-                                    <div className="erp-field">
                                         <label>No. of Installments</label>
                                         <input type="number" name="noOfInstallments" value={form.noOfInstallments} onChange={onChange} min="0" />
                                     </div>

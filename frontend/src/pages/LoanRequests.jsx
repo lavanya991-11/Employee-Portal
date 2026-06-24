@@ -15,7 +15,6 @@ const COLUMNS = [
     { key: 'employeeCode', header: 'Employee Code' },
     { key: 'loanPayCode', header: 'Loan Pay Code' },
     { key: 'loanAmount', header: 'Amount' },
-    { key: 'installmentCalculation', header: 'Installment Calculation' },
     { key: 'noOfInstallments', header: 'No. of Installments' },
     { key: 'comments', header: 'Comments' },
     { key: 'approvedBy', header: 'Approved By' },
