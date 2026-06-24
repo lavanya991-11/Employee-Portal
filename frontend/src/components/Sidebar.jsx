@@ -48,12 +48,6 @@ function Sidebar() {
                     </>
                 )}
 
-                {user.role === 'super-admin' && (
-                    <Link to="/system-settings" className="nav-item">
-                        <span className="nav-item-icon">🎨</span> System Settings
-                    </Link>
-                )}
-
                 <div className="nav-item" onClick={() => toggle('payroll')}>
                     <span className="nav-item-icon">💼</span> Payroll
                     <span className="nav-item-caret">{openMenu === 'payroll' ? '▼' : '▶'}</span>
@@ -93,9 +87,11 @@ function Sidebar() {
                     </>
                 )}
 
-                <Link to="/my-information" className="nav-item">
-                    <span className="nav-item-icon">🪪</span> My Information
-                </Link>
+                {user.role === 'super-admin' && (
+                    <Link to="/system-settings" className="nav-item">
+                        <span className="nav-item-icon">🎨</span> System Settings
+                    </Link>
+                )}
 
                 {user.role === 'super-admin' && (
                     <Link to="/data-management" className="nav-item">
