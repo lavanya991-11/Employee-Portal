@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
+import { imageApi, resolveImageUrl } from '../services/api';
 
 const DEFAULTS = { primary: '#1976d2', secondary: '#dc004e' };
 
@@ -19,6 +20,9 @@ function SystemSettings() {
     const [secondary, setSecondary] = useState(stored.secondary || DEFAULTS.secondary);
     const [success, setSuccess] = useState('');
     const [logoName, setLogoName] = useState('');
+    const [logoData, setLogoData] = useState('');   // base64 of a newly chosen file
+    const [logoUrl, setLogoUrl] = useState(() => localStorage.getItem('companyLogo') || '');
+    const [uploading, setUploading] = useState(false);
 
     const onUpdateTheme = () => {
         applyTheme({ primary, secondary });
@@ -36,12 +40,30 @@ function SystemSettings() {
 
     const onLogoChange = (e) => {
         const f = e.target.files?.[0];
-        if (f) setLogoName(f.name);
+        if (!f) return;
+        setLogoName(f.name);
+        const reader = new FileReader();
+        reader.onload = () => setLogoData(reader.result); // data URI (data:image/...;base64,...)
+        reader.readAsDataURL(f);
     };
 
-    const onUploadLogo = () => {
-        if (!logoName) { alert('Please choose a file first.'); return; }
-        alert(`Upload not yet wired to a storage backend. Selected: ${logoName}`);
+    const onUploadLogo = async () => {
+        if (!logoData) { alert('Please choose a file first.'); return; }
+        setUploading(true);
+        try {
+            const { data } = await imageApi.upload(logoData, { purpose: 'logo', filename: logoName });
+            const url = data.image?.url || '';
+            localStorage.setItem('companyLogo', url);
+            setLogoUrl(url);
+            setLogoData('');
+            setLogoName('');
+            setSuccess('Company logo uploaded.');
+            setTimeout(() => setSuccess(''), 2500);
+        } catch (err) {
+            alert(err.response?.data?.message || 'Logo upload failed');
+        } finally {
+            setUploading(false);
+        }
     };
 
     return (
@@ -104,6 +126,17 @@ function SystemSettings() {
                             </div>
                         </div>
 
+                        {logoUrl && (
+                            <div style={{ marginTop: 14 }}>
+                                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>Current Logo</div>
+                                <img
+                                    src={resolveImageUrl(logoUrl)}
+                                    alt="Company logo"
+                                    style={{ maxHeight: 80, maxWidth: 240, border: '1px solid #e5e7eb', borderRadius: 6, padding: 6, background: '#fff' }}
+                                />
+                            </div>
+                        )}
+
                         <div style={{ marginTop: 16 }}>
                             <label style={{ display: 'block', fontSize: 12, color: '#6b7280', marginBottom: 6 }}>Upload New Logo</label>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 12, background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 6 }}>
@@ -121,7 +154,7 @@ function SystemSettings() {
                                 <span style={{ fontSize: 12, color: '#6b7280' }}>{logoName || 'No file chosen'}</span>
                             </div>
                             <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>
-                                Supported formats: JPG, PNG, JPEG, WEBP (Max 10 MB)
+                                Supported formats: JPG, PNG, JPEG, WEBP (Max 5 MB)
                             </div>
                         </div>
 
@@ -129,8 +162,9 @@ function SystemSettings() {
                             <button
                                 type="button"
                                 onClick={onUploadLogo}
-                                style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: 6, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                            >📤 Upload Logo</button>
+                                disabled={uploading}
+                                style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: 6, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: uploading ? 'default' : 'pointer', opacity: uploading ? 0.7 : 1, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                            >📤 {uploading ? 'Uploading…' : 'Upload Logo'}</button>
                         </div>
                     </div>
                 </div>
