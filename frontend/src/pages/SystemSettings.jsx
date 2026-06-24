@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
-import { imageApi, resolveImageUrl } from '../services/api';
+import { imageApi, resolveImageUrl, settingsApi } from '../services/api';
 
 const DEFAULTS = { primary: '#1976d2', secondary: '#dc004e' };
 
@@ -23,6 +23,16 @@ function SystemSettings() {
     const [logoData, setLogoData] = useState('');   // base64 of a newly chosen file
     const [logoUrl, setLogoUrl] = useState(() => localStorage.getItem('companyLogo') || '');
     const [uploading, setUploading] = useState(false);
+
+    // Load the saved logo from the backend so it persists across logout/devices.
+    useEffect(() => {
+        settingsApi.get().then(({ data }) => {
+            const url = data.settings?.companyLogo || '';
+            setLogoUrl(url);
+            if (url) localStorage.setItem('companyLogo', url);
+            else localStorage.removeItem('companyLogo');
+        }).catch(() => {});
+    }, []);
 
     const onUpdateTheme = () => {
         applyTheme({ primary, secondary });
@@ -53,6 +63,7 @@ function SystemSettings() {
         try {
             const { data } = await imageApi.upload(logoData, { purpose: 'logo', filename: logoName });
             const url = data.image?.url || '';
+            await settingsApi.update({ companyLogo: url }); // persist server-side
             localStorage.setItem('companyLogo', url);
             setLogoUrl(url);
             setLogoData('');
@@ -71,6 +82,7 @@ function SystemSettings() {
         if (!window.confirm('Delete the company logo?')) return;
         const id = logoUrl.split('/').pop();
         try { await imageApi.remove(id); } catch (e) { /* image may already be gone */ }
+        try { await settingsApi.update({ companyLogo: '' }); } catch (e) { /* ignore */ }
         localStorage.removeItem('companyLogo');
         setLogoUrl('');
         setSuccess('Company logo removed.');
