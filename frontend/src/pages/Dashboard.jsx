@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { SessionPill } from '../components/SessionGuard';
 import NotificationBell from '../components/NotificationBell';
-import { authApi, leaveApi, employeeInfoApi, holidayApi, adminApi, settingsApi, resolveImageUrl } from '../services/api';
+import { authApi, leaveApi, employeeInfoApi, holidayApi, adminApi, resolveImageUrl } from '../services/api';
 
 const ADMIN_TILES = [
     { key: 'users', title: 'Users', icon: '👥', color: '#3b82f6', path: '/admin/users' },
@@ -33,18 +33,6 @@ function Dashboard() {
     const [notifications, setNotifications] = useState([]);
     const [bellOpen, setBellOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
-    const [companyLogo, setCompanyLogo] = useState(() => localStorage.getItem('companyLogo') || '');
-    const [companyName, setCompanyName] = useState(() => localStorage.getItem('companyName') || '');
-
-    useEffect(() => {
-        settingsApi.get().then(({ data }) => {
-            const s = data.settings || {};
-            setCompanyLogo(s.companyLogo || '');
-            setCompanyName(s.companyName || '');
-            localStorage.setItem('companyLogo', s.companyLogo || '');
-            localStorage.setItem('companyName', s.companyName || '');
-        }).catch(() => {});
-    }, []);
 
     const isManager = ['manager', 'admin', 'super-admin'].includes(user.role);
 
@@ -154,12 +142,6 @@ function Dashboard() {
             <Sidebar />
             <main className="main-content">
                 <div className="dashboard-header">
-                    {companyLogo && (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: 18 }}>
-                            <img src={resolveImageUrl(companyLogo)} alt="Company logo" style={{ maxHeight: 44, maxWidth: 130, objectFit: 'contain' }} />
-                            {companyName && <span style={{ fontSize: 12, fontWeight: 700, color: '#1e3a8a', marginTop: 2 }}>{companyName}</span>}
-                        </div>
-                    )}
                     <div className="greeting">
                         <h2>Good {timeOfDay}, {displayName} 👋</h2>
                         <p>{displayDesignation} • {displayDepartment}</p>
