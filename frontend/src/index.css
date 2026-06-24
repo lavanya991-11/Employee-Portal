@@ -947,6 +947,8 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
     width: 220px; flex-shrink: 0;
     background: white; border: 1px solid #c7d2fe; border-radius: 6px;
     position: relative;
+    /* Tall enough to fully contain the 4 vertical side tabs (4 x 60px). */
+    min-height: 248px;
 }
 .erp-actions-header {
     background: white; color: #1e3a8a;
