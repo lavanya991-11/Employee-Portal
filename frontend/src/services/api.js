@@ -146,6 +146,11 @@ export const amortizationApi = {
     list: () => api.get('/amortization')
 };
 
+export const settingsApi = {
+    get: () => api.get('/settings'),
+    update: (data) => api.put('/settings', data)
+};
+
 export const dataMgmtApi = {
     tables: () => api.get('/data-management/tables'),
     deleteOne: (key) => api.delete(`/data-management/tables/${key}`),
