@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
-import { loanRequestApi } from '../services/api';
+import { loanRequestApi, amortizationApi } from '../services/api';
 
 const fmtDateTime = (d) => d ? new Date(d).toLocaleString('en-GB') : '';
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
@@ -46,6 +46,7 @@ function LoanRequests() {
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState(null);
     const [showView, setShowView] = useState(false);
+    const [amortLoading, setAmortLoading] = useState(false);
 
     useEffect(() => { load(); }, []);
 
@@ -75,6 +76,27 @@ function LoanRequests() {
         setShowView(true);
     };
 
+    // Amortization: load installments for the selected loan (employeeCode +
+    // transactionNo + loanPayCode) into the temp table, then open the page.
+    const onAmortization = async (e) => {
+        e.stopPropagation();
+        if (!selected) { alert('Select a loan request row first.'); return; }
+        if (!selected.transactionNo) { alert('This loan has no Transaction No. Set one before viewing amortization.'); return; }
+        setError(''); setAmortLoading(true);
+        try {
+            await amortizationApi.load({
+                employeeCode: selected.employeeCode,
+                transactionNo: selected.transactionNo,
+                loanPayCode: selected.loanPayCode
+            });
+            navigate('/amortization');
+        } catch (err) {
+            setError(err.response?.data?.message || err.response?.data?.error || 'Failed to load amortization');
+        } finally {
+            setAmortLoading(false);
+        }
+    };
+
     return (
         <div className="app-layout">
             <Sidebar />
@@ -86,6 +108,7 @@ function LoanRequests() {
                         <div className="erp-titlebar-actions">
                             <button className="erp-action-btn" onClick={() => navigate('/loans/apply')}>➕ Apply Loan</button>
                             <button className="erp-action-btn" onClick={(e) => { e.stopPropagation(); onView(); }} disabled={!selected}>👁️ View</button>
+                            <button className="erp-action-btn" onClick={onAmortization} disabled={!selected || amortLoading}>📑 {amortLoading ? 'Loading…' : 'Amortization'}</button>
                             <button className="erp-action-btn" onClick={load} disabled={loading}>🔄 Refresh</button>
                         </div>
                     </div>

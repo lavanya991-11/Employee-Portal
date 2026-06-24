@@ -141,6 +141,11 @@ export const loanRequestApi = {
     updateByRef: (requestNo, data) => api.patch(`/loan-requests/by-ref/${requestNo}`, data)
 };
 
+export const amortizationApi = {
+    load: (data) => api.post('/amortization', data),
+    list: () => api.get('/amortization')
+};
+
 export const dataMgmtApi = {
     tables: () => api.get('/data-management/tables'),
     deleteOne: (key) => api.delete(`/data-management/tables/${key}`),

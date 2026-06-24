@@ -447,4 +447,48 @@ const submitLoanRequest = async ({ employeeCode, loanPayCode, loanAmount, instal
     return parsed;
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, generatePayslip, getLoanProducts, submitLoanRequest };
+// Fetch an employee's loan installments (amortization) from the NOVAPAY web
+// service, filtered by employeeCode + transactionNo + finId. BC returns a
+// stringified JSON object { ...summary, installments: [...] } in `value`.
+const getEmployeeInstallments = async ({ employeeCode, transactionNo, finId } = {}) => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    const url = `${odataV4Root()}/NOVAPAYWebService_GetEmployeeInstallments?company=${process.env.BC_COMPANY_ID}`;
+    const body = JSON.stringify({
+        inputJson: JSON.stringify({
+            employeeCode: String(employeeCode),
+            transactionNo: String(transactionNo),
+            finId: Number(finId)
+        })
+    });
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        let msg = text;
+        try { msg = JSON.parse(text)?.error?.message || text; } catch (e) { /* keep raw */ }
+        const err = new Error(`BC GetEmployeeInstallments failed: ${res.status} ${msg}`);
+        err.bcMessage = msg;
+        if (res.status === 404) err.bcNotFound = true;
+        throw err;
+    }
+
+    const data = await res.json();
+    let parsed = data.value;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { parsed = null; }
+    }
+    return parsed || {};
+};
+
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, generatePayslip, getLoanProducts, submitLoanRequest, getEmployeeInstallments };
