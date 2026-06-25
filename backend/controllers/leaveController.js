@@ -118,7 +118,10 @@ exports.applyLeave = async (req, res) => {
                 reason: segments.length > 1 ? `${reason} (${seg.payType} part)` : reason
             });
 
+            let bcAttempted = false;
+            let bcOk = false;
             if (bcConfigured() && leaveFinId != null && employeeCode) {
+                bcAttempted = true;
                 try {
                     const result = await createEmployeeLeave({
                         employeeNumber: employeeCode,
@@ -128,16 +131,20 @@ exports.applyLeave = async (req, res) => {
                         payType: toBcPayType(seg.payType)
                         // Don't send leaveReferenceNumber — BC generates it.
                     });
-                    // Capture BC's generated reference and store on our row. Mark as posted.
+                    // Capture BC's generated reference and store on our row.
                     const bcRef = result?.leaveReferenceNumber || result?.LeaveReferenceNumber || null;
-                    created.isPosted = true;
                     if (bcRef) created.leaveReferenceNumber = bcRef;
-                    await created.save();
+                    bcOk = true;
                     bc.push({ ok: true, payType: seg.payType, days: seg.totalDays, leaveReferenceNumber: bcRef, result });
                 } catch (e) {
                     bc.push({ ok: false, payType: seg.payType, days: seg.totalDays, error: e.message });
                 }
             }
+            // Posting marks the leave as Posted (Draft → Posted). If a BC sync was
+            // attempted but failed, keep it as a draft so it can be retried;
+            // otherwise (BC not configured / no pay code) post it locally.
+            created.isPosted = bcAttempted ? bcOk : true;
+            await created.save();
             leaves.push(created);
         }
 
