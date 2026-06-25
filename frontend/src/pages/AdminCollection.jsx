@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { adminApi } from '../services/api';
+import { statusLabel, statusColor } from '../utils/status';
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 const fmtMoney = (n) => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
@@ -76,6 +77,24 @@ const COLLECTIONS = {
             { header: 'Amount', get: (r) => fmtMoney(r.amount) },
             { header: 'Remarks', get: (r) => r.remarks },
             { header: 'Status', get: (r) => r.status, color: (r) => STATUS_COLOR[r.status] }
+        ]
+    },
+    travels: {
+        title: 'All Travel Expenses',
+        fetcher: () => adminApi.travels(),
+        rowsKey: 'items',
+        columns: [
+            { header: 'Date', get: (r) => fmtDate(r.createdAt) },
+            { header: 'Employee', get: (r) => r.employee?.name || '—' },
+            { header: 'Request No.', get: (r) => r.requestNo || '—' },
+            { header: 'Document No.', get: (r) => r.documentNo || '—' },
+            { header: 'Transaction No.', get: (r) => r.transactionNo || '—' },
+            { header: 'Total Amount', get: (r) => fmtMoney(r.totalAmount) },
+            { header: 'Lines', get: (r) => (r.lines || []).length },
+            { header: 'Comments', get: (r) => r.comments || '—' },
+            { header: 'Status', get: (r) => statusLabel(r.status), color: (r) => statusColor(r.status) },
+            { header: 'Approved By', get: (r) => r.approvedBy || '—' },
+            { header: 'Approved Date', get: (r) => fmtDate(r.approvedDate) }
         ]
     },
     overtimes: {

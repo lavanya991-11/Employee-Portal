@@ -186,6 +186,7 @@ export const adminApi = {
     assets: () => api.get('/assets/all'),
     overtimes: () => api.get('/overtimes/all'),
     expenses: () => api.get('/expenses/all'),
+    travels: () => api.get('/travel-requests/all'),
     finElements: () => api.get('/fin-elements')
 };
 
