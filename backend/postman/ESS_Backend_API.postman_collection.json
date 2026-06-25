@@ -486,62 +486,75 @@
       ]
     },
     {
-      "name": "Travels",
+      "name": "Travel Requests",
+      "description": "Travel (Earning) requests submitted to Business Central via SubmitEarningRequest and stored locally.",
       "item": [
         {
-          "name": "POST apply",
+          "name": "GET earning pay codes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/travel-requests/earning-paycodes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "travel-requests", "earning-paycodes"]
+            }
+          }
+        },
+        {
+          "name": "POST submit (Travel)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"travelType\": \"Domestic\",\n  \"purpose\": \"Client meeting\",\n  \"fromDate\": \"2026-06-10\",\n  \"toDate\": \"2026-06-12\",\n  \"modeOfTravel\": \"Flight\",\n  \"fromLocation\": \"Hyderabad\",\n  \"toLocation\": \"Mumbai\",\n  \"estimatedCost\": 15000\n}"
+              "raw": "{\n  \"comments\": \"Annual air ticket\",\n  \"lines\": [\n    { \"earningPayCode\": 18, \"earningPayCodeDesc\": \"Air Ticket\", \"amount\": 1500, \"unitCount\": 1, \"earningDate\": \"2026-06-30\" }\n  ],\n  \"attachments\": [\n    { \"fileName\": \"ticket.pdf\", \"mimeType\": \"application/pdf\", \"contentBase64\": \"JVBERi0xLjQK\" }\n  ]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/travels/apply",
+              "raw": "{{baseUrl}}/api/travel-requests",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "travels", "apply"]
+              "path": ["api", "travel-requests"]
             }
           }
         },
         {
-          "name": "GET my travels",
+          "name": "GET my travel requests",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/travels/my",
+              "raw": "{{baseUrl}}/api/travel-requests/my",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "travels", "my"]
+              "path": ["api", "travel-requests", "my"]
             }
           }
         },
         {
-          "name": "GET all travels",
+          "name": "GET all travel requests",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/travels/all",
+              "raw": "{{baseUrl}}/api/travel-requests/all",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "travels", "all"]
+              "path": ["api", "travel-requests", "all"]
             }
           }
         },
         {
-          "name": "PUT update status",
+          "name": "PATCH update by Request No (status / approval / transaction no)",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"Approved\",\n  \"approverRemarks\": \"OK\"\n}"
+              "raw": "{\n  \"status\": \"Approved\",\n  \"transactionNo\": \"TRX-000123\",\n  \"approvedBy\": \"Mohd Riyaz Uddin\",\n  \"approvedDate\": \"2026-06-25\",\n  \"comments\": \"Approved by reporting manager\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/travels/:id/status",
+              "raw": "{{baseUrl}}/api/travel-requests/by-ref/:requestNo",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "travels", ":id", "status"],
-              "variable": [{ "key": "id", "value": "" }]
+              "path": ["api", "travel-requests", "by-ref", ":requestNo"],
+              "variable": [{ "key": "requestNo", "value": "ER000004" }]
             }
           }
         }
@@ -550,22 +563,6 @@
     {
       "name": "Expenses",
       "item": [
-        {
-          "name": "POST apply (Travel)",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"expenseType\": \"Travel\",\n  \"claimType\": \"Flight Ticket\",\n  \"amount\": 12500,\n  \"attachment\": \"https://example.com/receipt.pdf\",\n  \"remarks\": \"Mumbai client meeting\",\n  \"travelRef\": \"\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/expenses/apply",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "expenses", "apply"]
-            }
-          }
-        },
         {
           "name": "POST apply (Non-Travel)",
           "request": {
@@ -588,10 +585,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/expenses/my?type=Travel",
+              "raw": "{{baseUrl}}/api/expenses/my?type=Non-Travel",
               "host": ["{{baseUrl}}"],
               "path": ["api", "expenses", "my"],
-              "query": [{ "key": "type", "value": "Travel" }]
+              "query": [{ "key": "type", "value": "Non-Travel" }]
             }
           }
         },

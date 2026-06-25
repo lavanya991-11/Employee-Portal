@@ -19,6 +19,7 @@ const travelAttachmentSchema = new mongoose.Schema({
 const travelRequestSchema = new mongoose.Schema({
     employee: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     documentNo: { type: String, default: '' },
+    transactionNo: { type: String, default: '', maxlength: 20 },
     employeeCode: { type: String, default: '' },
     comments: { type: String, default: '' },
     lines: { type: [travelLineSchema], default: [] },

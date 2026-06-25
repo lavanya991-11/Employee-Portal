@@ -86,6 +86,43 @@ exports.submit = async (req, res) => {
     }
 };
 
+// PATCH /api/travel-requests/by-ref/:requestNo — update status, transaction no,
+// comments, approvedBy and approvedDate for the travel request matching the
+// given Request No. Used by BC / approvers to sync the ESS portal fields.
+exports.updateByRef = async (req, res) => {
+    try {
+        const { requestNo } = req.params;
+        const { status, transactionNo, comments, approvedBy, approvedDate } = req.body;
+
+        const update = {};
+        if (status !== undefined) update.status = status;
+        if (transactionNo !== undefined) update.transactionNo = transactionNo;
+        if (comments !== undefined) update.comments = comments;
+        if (approvedBy !== undefined) update.approvedBy = approvedBy;
+        if (approvedDate !== undefined) update.approvedDate = approvedDate ? new Date(approvedDate) : null;
+
+        // Auto-stamp the approved date when the status becomes Approved/Rejected
+        // and no explicit approvedDate was sent.
+        const s = (status || '').toLowerCase();
+        const isFinal = (s.includes('approv') && !s.includes('pending')) || s.includes('reject');
+        if (approvedDate === undefined && status !== undefined && isFinal) {
+            update.approvedDate = new Date();
+        }
+
+        if (Object.keys(update).length === 0) {
+            return res.status(400).json({ success: false, message: 'Provide at least one of: status, transactionNo, comments, approvedBy, approvedDate.' });
+        }
+
+        const item = await TravelRequest.findOneAndUpdate({ requestNo }, { $set: update }, { new: true });
+        if (!item) {
+            return res.status(404).json({ success: false, message: `No travel request found with Request No ${requestNo}.` });
+        }
+        res.json({ success: true, message: `Travel request ${requestNo} updated.`, request: item });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
+
 // GET /api/travel-requests/my — travel requests submitted by the logged-in employee.
 exports.listMine = async (req, res) => {
     try {

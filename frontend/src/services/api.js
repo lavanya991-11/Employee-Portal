@@ -94,7 +94,8 @@ export const travelRequestApi = {
     earningPayCodes: () => api.get('/travel-requests/earning-paycodes'),
     submit: (data) => api.post('/travel-requests', data),
     my: () => api.get('/travel-requests/my'),
-    all: () => api.get('/travel-requests/all')
+    all: () => api.get('/travel-requests/all'),
+    updateByRef: (requestNo, data) => api.patch(`/travel-requests/by-ref/${requestNo}`, data)
 };
 
 export const employeeInfoApi = {

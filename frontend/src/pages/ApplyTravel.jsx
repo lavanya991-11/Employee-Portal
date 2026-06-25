@@ -21,7 +21,7 @@ const emptyLine = () => ({
     unitCount: 1,
     earningDate: today()
 });
-const initialLines = () => Array.from({ length: 3 }, () => emptyLine());
+const initialLines = () => [emptyLine()];
 
 // Strip the "data:<mime>;base64," prefix so BC receives raw base64.
 const readFileAsBase64 = (file) => new Promise((resolve, reject) => {

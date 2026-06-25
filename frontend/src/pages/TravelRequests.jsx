@@ -12,6 +12,7 @@ const COLUMNS = [
     { key: 'requestNo', header: 'Request No.' },
     { key: 'status', header: 'Status' },
     { key: 'documentNo', header: 'Document No.' },
+    { key: 'transactionNo', header: 'Transaction No.' },
     { key: 'employeeCode', header: 'Employee Code' },
     { key: 'totalAmount', header: 'Total Amount', type: 'money' },
     { key: 'lines', header: 'Lines', type: 'lines' },
