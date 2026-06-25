@@ -129,7 +129,7 @@ function ApplyTravel() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Apply Travel <span className="erp-badge">Draft</span></div>
                         <div className="erp-titlebar-actions">
-                            <button type="button" className="erp-action-btn" onClick={() => navigate('/dashboard')}>← Back</button>
+                            <button type="button" className="erp-action-btn" onClick={() => navigate('/travels')}>← Back</button>
                             <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
                             <button type="button" className="erp-action-btn" onClick={onPost} disabled={saving}>
                                 {saving ? 'Posting…' : '📤 Post'}
@@ -254,7 +254,7 @@ function ApplyTravel() {
                                 <li onClick={onPost}>📤 Post</li>
                                 <li onClick={onNew}>📄 New</li>
                                 <li onClick={addLine}>➕ Add Line</li>
-                                <li onClick={() => navigate('/dashboard')}>← Back</li>
+                                <li onClick={() => navigate('/travels')}>← Back to List</li>
                             </ul>
                             <div className="erp-side-tabs">
                                 <span>Actions</span><span>Info</span><span>Reports</span><span>Shortcut</span>
