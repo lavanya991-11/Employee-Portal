@@ -41,28 +41,28 @@ body {
 }
 
 .login-panel {
-    flex: 0 0 460px;
+    flex: 0 0 560px;
     display: flex; align-items: center; justify-content: center;
     padding: 30px;
 }
 .login-card {
-    background: #fff; border-radius: 12px;
+    background: #fff; border-radius: 14px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.25);
-    width: 100%; max-width: 360px;
-    padding: 40px 34px;
+    width: 100%; max-width: 460px;
+    padding: 52px 44px;
 }
 .login-brand {
-    text-align: center; font-size: 26px; font-weight: 700;
-    color: #1f2937; letter-spacing: 2px; margin-bottom: 28px;
+    text-align: center; font-size: 32px; font-weight: 700;
+    color: #1f2937; letter-spacing: 2px; margin-bottom: 34px;
 }
 .login-brand-accent { color: #06b6d4; }
 
-.login-field { margin-bottom: 18px; }
-.login-field label { display: block; font-size: 13px; color: #64748b; margin-bottom: 6px; }
+.login-field { margin-bottom: 22px; }
+.login-field label { display: block; font-size: 14px; color: #64748b; margin-bottom: 7px; }
 .login-field input {
-    width: 100%; padding: 11px 12px;
+    width: 100%; padding: 14px 14px;
     border: 1px solid #d1d5db; border-radius: 6px;
-    font-size: 14px; outline: none;
+    font-size: 15px; outline: none;
     transition: border-color 0.15s;
 }
 .login-field input:focus { border-color: #06b6d4; }
@@ -85,10 +85,10 @@ body {
 .login-link:hover { color: #1d4ed8; }
 
 .login-btn {
-    width: 100%; padding: 12px;
+    width: 100%; padding: 15px;
     background: #14b8c4; color: #fff;
     border: none; border-radius: 6px;
-    font-size: 15px; font-weight: 600; cursor: pointer;
+    font-size: 17px; font-weight: 600; cursor: pointer;
     transition: background 0.15s;
 }
 .login-btn:hover:not(:disabled) { background: #0e9aa6; }
