@@ -32,6 +32,9 @@ const cellValue = (c, it) => {
     return it[c.key] ?? '';
 };
 
+// Managers/admins see every employee's requests; employees see only their own.
+const isAdmin = () => ['manager', 'admin', 'super-admin'].includes(JSON.parse(localStorage.getItem('user') || '{}').role);
+
 function TravelRequests() {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
@@ -46,7 +49,7 @@ function TravelRequests() {
     const load = async () => {
         setLoading(true); setError('');
         try {
-            const { data } = await travelRequestApi.my();
+            const { data } = await (isAdmin() ? travelRequestApi.all() : travelRequestApi.my());
             setItems(data.items || []);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to load travel requests');

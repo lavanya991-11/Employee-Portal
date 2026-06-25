@@ -30,6 +30,9 @@ const cellValue = (c, it) => {
     return it[c.key] ?? '';
 };
 
+// Managers/admins see every employee's requests; employees see only their own.
+const isAdmin = () => ['manager', 'admin', 'super-admin'].includes(JSON.parse(localStorage.getItem('user') || '{}').role);
+
 function LoanRequests() {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
@@ -45,7 +48,7 @@ function LoanRequests() {
     const load = async () => {
         setLoading(true); setError('');
         try {
-            const { data } = await loanRequestApi.my();
+            const { data } = await (isAdmin() ? loanRequestApi.all() : loanRequestApi.my());
             setItems(data.items || []);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to load loan requests');
