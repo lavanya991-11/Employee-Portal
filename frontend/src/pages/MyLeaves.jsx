@@ -32,16 +32,8 @@ function MyLeaves() {
     const [searchQuery, setSearchQuery] = useState('');
     const tableRef = useRef(null);
 
-    // Deselect when clicking outside the table or toolbar.
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (tableRef.current && !tableRef.current.contains(e.target)) {
-                setSelected(null);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    // Note: selection is kept while scrolling — it only changes when you click a
+    // row again or toggle its checkbox (no click-outside / scrollbar deselect).
 
     const onEdit = () => {
         if (!selected) { alert('Select a row first.'); return; }
