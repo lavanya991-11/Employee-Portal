@@ -7,6 +7,7 @@ const Loan = require('../models/loan');
 const Asset = require('../models/asset');
 const Overtime = require('../models/overtime');
 const Expense = require('../models/expense');
+const TravelRequest = require('../models/travelRequest');
 const FinElement = require('../models/finElement');
 const Calendar = require('../models/calendar');
 const CalendarPeriod = require('../models/calendarPeriod');
@@ -23,7 +24,7 @@ exports.listAll = async (req, res) => {
 
 exports.adminStats = async (req, res) => {
     try {
-        const [users, employees, leaves, loans, assets, overtimes, expenses, finElements, calendars, calendarPeriods, loanProducts] = await Promise.all([
+        const [users, employees, leaves, loans, assets, overtimes, expenses, travels, finElements, calendars, calendarPeriods, loanProducts] = await Promise.all([
             User.countDocuments(),
             EmployeeInfo.countDocuments(),
             Leave.countDocuments(),
@@ -31,22 +32,24 @@ exports.adminStats = async (req, res) => {
             Asset.countDocuments(),
             Overtime.countDocuments(),
             Expense.countDocuments(),
+            TravelRequest.countDocuments(),
             FinElement.countDocuments(),
             Calendar.countDocuments(),
             CalendarPeriod.countDocuments(),
             LoanProduct.countDocuments()
         ]);
-        const [pendingLeaves, pendingLoans, pendingExpenses, pendingAssets, pendingOvertimes] = await Promise.all([
+        const [pendingLeaves, pendingLoans, pendingExpenses, pendingAssets, pendingOvertimes, pendingTravels] = await Promise.all([
             Leave.countDocuments({ status: 'Pending' }),
             Loan.countDocuments({ status: 'Pending' }),
             Expense.countDocuments({ status: 'Pending' }),
             Asset.countDocuments({ status: 'Pending' }),
-            Overtime.countDocuments({ status: 'Pending' })
+            Overtime.countDocuments({ status: 'Pending' }),
+            TravelRequest.countDocuments({ status: { $regex: 'pending', $options: 'i' } })
         ]);
         res.json({
             success: true,
-            totals: { users, employees, leaves, loans, assets, overtimes, expenses, finElements, calendars, calendarPeriods, loanProducts, credentials: users },
-            pending: { leaves: pendingLeaves, loans: pendingLoans, expenses: pendingExpenses, assets: pendingAssets, overtimes: pendingOvertimes }
+            totals: { users, employees, leaves, loans, assets, overtimes, expenses, travels, finElements, calendars, calendarPeriods, loanProducts, credentials: users },
+            pending: { leaves: pendingLeaves, loans: pendingLoans, expenses: pendingExpenses, assets: pendingAssets, overtimes: pendingOvertimes, travels: pendingTravels }
         });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error', error: err.message });
