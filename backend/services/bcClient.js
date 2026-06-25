@@ -447,6 +447,61 @@ const submitLoanRequest = async ({ employeeCode, loanPayCode, loanAmount, instal
     return parsed;
 };
 
+// Submit a travel/earning request to the NOVAPAY web service via the
+// SubmitEarningRequest unbound action. `lines` and `attachments` mirror the BC
+// inputJson shape. BC returns { requestNo, status, totalAmount } as a
+// stringified JSON object inside `value`.
+const submitEarningRequest = async ({ employeeCode, comments = '', lines = [], attachments = [] } = {}) => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    const url = `${odataV4Root()}/NOVAPAYWebService_SubmitEarningRequest?company=${process.env.BC_COMPANY_ID}`;
+    const body = JSON.stringify({
+        inputJson: JSON.stringify({
+            employeeCode: String(employeeCode),
+            comments: comments || '',
+            lines: (lines || []).map((l) => ({
+                earningPayCode: Number(l.earningPayCode),
+                amount: Number(l.amount),
+                unitCount: Number(l.unitCount) || 1,
+                earningDate: l.earningDate
+            })),
+            attachments: (attachments || []).map((a) => ({
+                fileName: a.fileName,
+                mimeType: a.mimeType,
+                contentBase64: a.contentBase64
+            }))
+        })
+    });
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        let msg = text;
+        try { msg = JSON.parse(text)?.error?.message || text; } catch (e) { /* keep raw */ }
+        const err = new Error(`BC SubmitEarningRequest failed: ${res.status} ${msg}`);
+        err.bcMessage = msg;
+        if (res.status === 404) err.bcNotFound = true;
+        throw err;
+    }
+
+    const data = await res.json();
+    let parsed = data.value;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { parsed = null; }
+    }
+    return parsed;
+};
+
 // Fetch an employee's loan installments (amortization) from the NOVAPAY web
 // service, filtered by employeeCode + transactionNo + finId. BC returns a
 // stringified JSON object { ...summary, installments: [...] } in `value`.
@@ -491,4 +546,4 @@ const getEmployeeInstallments = async ({ employeeCode, transactionNo, finId } = 
     return parsed || {};
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, generatePayslip, getLoanProducts, submitLoanRequest, getEmployeeInstallments };
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, generatePayslip, getLoanProducts, submitLoanRequest, submitEarningRequest, getEmployeeInstallments };

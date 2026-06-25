@@ -19,6 +19,8 @@ import SystemSettings from './pages/SystemSettings';
 import DataManagement from './pages/DataManagement';
 import NonTravelExpenses from './pages/NonTravelExpenses';
 import ExpensesList from './pages/ExpensesList';
+import TravelRequests from './pages/TravelRequests';
+import ApplyTravel from './pages/ApplyTravel';
 import OvertimeRequest from './pages/OvertimeRequest';
 import FinElements from './pages/FinElements';
 import FinElementForm from './pages/FinElementForm';
@@ -166,6 +168,22 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <DataManagement />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/travels"
+                element={
+                    <ProtectedRoute>
+                        <TravelRequests />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/travels/apply"
+                element={
+                    <ProtectedRoute>
+                        <ApplyTravel />
                     </ProtectedRoute>
                 }
             />

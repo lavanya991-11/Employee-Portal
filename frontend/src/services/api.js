@@ -90,6 +90,13 @@ export const expenseApi = {
     updateStatus: (id, data) => api.put(`/expenses/${id}/status`, data)
 };
 
+export const travelRequestApi = {
+    earningPayCodes: () => api.get('/travel-requests/earning-paycodes'),
+    submit: (data) => api.post('/travel-requests', data),
+    my: () => api.get('/travel-requests/my'),
+    all: () => api.get('/travel-requests/all')
+};
+
 export const employeeInfoApi = {
     getMy: () => api.get('/employee-info/my'),
     save: (data) => api.post('/employee-info/my', data),
