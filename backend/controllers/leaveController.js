@@ -118,7 +118,16 @@ exports.applyLeave = async (req, res) => {
                 reason: segments.length > 1 ? `${reason} (${seg.payType} part)` : reason
             });
 
-            if (bcConfigured() && leaveFinId != null && employeeCode) {
+            // A leave counts as "Posted" only when it is actually accepted by
+            // Business Central (it then carries a BC reference number). If BC is
+            // not reachable for this leave, explain why and leave it as a Draft.
+            let bcOk = false;
+            let skipReason = '';
+            if (!bcConfigured()) skipReason = 'Business Central is not configured on the server.';
+            else if (leaveFinId == null) skipReason = 'This leave type has no pay code (FIN element) mapped, so it cannot post to Business Central.';
+            else if (!employeeCode) skipReason = 'Your account has no Employee Code. Set it on the Employee Information page, then post again.';
+
+            if (!skipReason) {
                 try {
                     const result = await createEmployeeLeave({
                         employeeNumber: employeeCode,
@@ -131,15 +140,16 @@ exports.applyLeave = async (req, res) => {
                     // Capture BC's generated reference and store on our row.
                     const bcRef = result?.leaveReferenceNumber || result?.LeaveReferenceNumber || null;
                     if (bcRef) created.leaveReferenceNumber = bcRef;
+                    bcOk = true;
                     bc.push({ ok: true, payType: seg.payType, days: seg.totalDays, leaveReferenceNumber: bcRef, result });
                 } catch (e) {
                     bc.push({ ok: false, payType: seg.payType, days: seg.totalDays, error: e.message });
                 }
+            } else {
+                bc.push({ ok: false, payType: seg.payType, days: seg.totalDays, error: skipReason });
             }
-            // Posting always moves the leave to Posted (Draft → Posted). A failed
-            // BC sync is still surfaced via the `bc` array so it can be retried,
-            // but it no longer leaves the document stuck as a Draft.
-            created.isPosted = true;
+            // Posted only when Business Central actually accepted it.
+            created.isPosted = bcOk;
             await created.save();
             leaves.push(created);
         }
