@@ -79,6 +79,26 @@ const COLLECTIONS = {
             { header: 'Status', get: (r) => r.status, color: (r) => STATUS_COLOR[r.status] }
         ]
     },
+    loanRequests: {
+        title: 'All Loan Requests',
+        fetcher: () => adminApi.loanRequests(),
+        rowsKey: 'items',
+        columns: [
+            { header: 'Date', get: (r) => fmtDate(r.createdAt) },
+            { header: 'Employee', get: (r) => r.employee?.name || '—' },
+            { header: 'Request No.', get: (r) => r.requestNo || '—' },
+            { header: 'Document No.', get: (r) => r.documentNo || '—' },
+            { header: 'Transaction No.', get: (r) => r.transactionNo || '—' },
+            { header: 'Employee Code', get: (r) => r.employeeCode || '—' },
+            { header: 'Loan Pay Code', get: (r) => r.loanPayCode || '—' },
+            { header: 'Amount', get: (r) => fmtMoney(r.loanAmount) },
+            { header: 'No. of Installments', get: (r) => r.noOfInstallments || '—' },
+            { header: 'Comments', get: (r) => r.comments || '—' },
+            { header: 'Status', get: (r) => statusLabel(r.status), color: (r) => statusColor(r.status) },
+            { header: 'Approved By', get: (r) => r.approvedBy || '—' },
+            { header: 'Approved Date', get: (r) => fmtDate(r.approvedDate) }
+        ]
+    },
     travels: {
         title: 'All Travel Expenses',
         fetcher: () => adminApi.travels(),

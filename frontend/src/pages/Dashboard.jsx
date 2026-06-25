@@ -10,6 +10,7 @@ const ADMIN_TILES = [
     { key: 'employees', title: 'Employees', icon: '👔', color: '#1e3a8a', path: '/admin/employees' },
     { key: 'leaves', title: 'Leaves', icon: '📅', color: '#22c55e', path: '/admin/leaves' },
     { key: 'loans', title: 'Loans', icon: '💰', color: '#f59e0b', path: '/admin/loans' },
+    { key: 'loanRequests', title: 'Loan Requests', icon: '💳', color: '#d97706', path: '/admin/loanRequests' },
     { key: 'expenses', title: 'Expenses', icon: '🧾', color: '#a855f7', path: '/admin/expenses' },
     { key: 'travels', title: 'Travel Expenses', icon: '✈️', color: '#0ea5e9', path: '/admin/travels' },
     { key: 'overtimes', title: 'Overtime', icon: '⏰', color: '#ef4444', path: '/admin/overtimes' },

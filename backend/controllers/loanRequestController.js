@@ -102,3 +102,15 @@ exports.listMine = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error', error: err.message });
     }
 };
+
+// GET /api/loan-requests/all — all loan requests (admin views).
+exports.listAll = async (req, res) => {
+    try {
+        const items = await LoanRequest.find()
+            .populate('employee', 'name email')
+            .sort({ createdAt: -1 });
+        res.json({ success: true, count: items.length, items });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
