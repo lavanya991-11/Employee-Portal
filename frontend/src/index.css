@@ -1,5 +1,8 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html, body, #root { width: 100%; min-height: 100vh; }
+body { overflow-x: hidden; }
+
 :root {
     --primary-color: #1976d2;
     --secondary-color: #dc004e;
@@ -20,7 +23,7 @@ body {
 .auth-card .link a { color: #1e3a8a; text-decoration: none; }
 
 /* === Login screen (two-panel) === */
-.login-screen { min-height: 100vh; display: flex; background: #0f1f3d; }
+.login-screen { width: 100%; min-height: 100vh; display: flex; background: #0f1f3d; }
 .login-hero {
     flex: 1;
     display: flex; flex-direction: column;
