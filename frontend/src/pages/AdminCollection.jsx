@@ -122,12 +122,23 @@ function AdminCollection() {
     useEffect(() => {
         if (!config) return;
         setLoading(true);
+        setPage(1);
         config.fetcher()
             .then(({ data }) => setRows(data[config.rowsKey] || []))
             .catch((err) => setError(err.response?.data?.message || 'Failed to load'))
             .finally(() => setLoading(false));
     }, [collection]);
 
+    const filtered = useMemo(() => {
+        if (!config) return [];
+        const t = search.trim().toLowerCase();
+        if (!t) return rows;
+        return rows.filter((r) =>
+            config.columns.some((c) => String(c.get(r) ?? '').toLowerCase().includes(t))
+        );
+    }, [rows, search, config]);
+
+    // Keep all hooks above this early return so hook order stays stable (Rules of Hooks).
     if (!config) {
         return (
             <div className="app-layout">
@@ -138,14 +149,6 @@ function AdminCollection() {
             </div>
         );
     }
-
-    const filtered = useMemo(() => {
-        const t = search.trim().toLowerCase();
-        if (!t) return rows;
-        return rows.filter((r) =>
-            config.columns.some((c) => String(c.get(r) ?? '').toLowerCase().includes(t))
-        );
-    }, [rows, search, config]);
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);

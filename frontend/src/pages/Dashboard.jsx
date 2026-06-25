@@ -138,8 +138,8 @@ function Dashboard() {
         { label: 'HR Policies', path: '/policies' }
     ];
 
-    const pendingLeaves = recentLeaves.filter((l) => l.status === 'Pending').length;
-    const approvedLeaves = recentLeaves.filter((l) => l.status === 'Approved').length;
+    const pendingLeaves = allLeaves.filter((l) => l.status === 'Pending').length;
+    const approvedLeaves = allLeaves.filter((l) => l.status === 'Approved').length;
 
     const displayName = [info?.firstName, info?.middleName, info?.lastName].filter(Boolean).join(' ')
         || user.name || 'Employee';
@@ -323,7 +323,7 @@ function Dashboard() {
                                         background: l.status === 'Approved' ? '#22c55e' : l.status === 'Rejected' ? '#ef4444' : '#f59e0b'
                                     }} />
                                     <div style={{ flex: 1, fontSize: 13, color: '#374151' }}>
-                                        Leave request for {new Date(l.fromDate).toLocaleDateString('en-GB')} is <b>{l.status.toLowerCase()}</b>.
+                                        Leave request for {new Date(l.fromDate).toLocaleDateString('en-GB')} is <b>{(l.status || '').toLowerCase()}</b>.
                                     </div>
                                     <div style={{ fontSize: 11, color: '#9ca3af' }}>
                                         {new Date(l.createdAt).toLocaleDateString('en-GB')}

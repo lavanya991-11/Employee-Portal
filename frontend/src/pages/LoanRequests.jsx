@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
 import { loanRequestApi, amortizationApi } from '../services/api';
+import { statusLabel, statusColor } from '../utils/status';
 
 const fmtDateTime = (d) => d ? new Date(d).toLocaleString('en-GB') : '';
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
@@ -25,16 +26,8 @@ const COLUMNS = [
 const cellValue = (c, it) => {
     if (c.type === 'date') return fmtDate(it[c.key]);
     if (c.type === 'datetime') return fmtDateTime(it[c.key]);
+    if (c.key === 'status') return statusLabel(it[c.key]);
     return it[c.key] ?? '';
-};
-
-// Status text colour: Pending (Approval) = yellow, Approved = green, Rejected = red.
-const statusColor = (s) => {
-    const v = (s || '').toLowerCase();
-    if (v.includes('reject')) return '#ef4444';
-    if (v.includes('pending')) return '#f59e0b';
-    if (v.includes('approv')) return '#22c55e';
-    return undefined;
 };
 
 function LoanRequests() {
@@ -152,7 +145,7 @@ function LoanRequests() {
                                                     {COLUMNS.map((c) => (
                                                         <td key={c.key}>
                                                             {c.key === 'status'
-                                                                ? <span style={{ color: statusColor(it.status), fontWeight: 600 }}>{it.status}</span>
+                                                                ? <span style={{ color: statusColor(it.status), fontWeight: 600 }}>{statusLabel(it.status)}</span>
                                                                 : cellValue(c, it)}
                                                         </td>
                                                     ))}

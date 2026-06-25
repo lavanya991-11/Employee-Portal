@@ -3,16 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
 import { travelRequestApi, employeeInfoApi } from '../services/api';
+import { statusLabel, statusColor } from '../utils/status';
 
 const today = () => new Date().toISOString().slice(0, 10);
-
-const statusColor = (s) => {
-    const v = (s || '').toLowerCase();
-    if (v.includes('reject')) return '#ef4444';
-    if (v.includes('pending')) return '#f59e0b';
-    if (v.includes('approv')) return '#22c55e';
-    return undefined;
-};
 
 const emptyLine = () => ({
     id: Math.random().toString(36).slice(2),
@@ -136,7 +129,7 @@ function ApplyTravel() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Apply Travel <span className="erp-badge">Draft</span></div>
                         <div className="erp-titlebar-actions">
-                            <button type="button" className="erp-action-btn" onClick={() => navigate('/travels')}>← Back</button>
+                            <button type="button" className="erp-action-btn" onClick={() => navigate('/dashboard')}>← Back</button>
                             <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
                             <button type="button" className="erp-action-btn" onClick={onPost} disabled={saving}>
                                 {saving ? 'Posting…' : '📤 Post'}
@@ -159,7 +152,7 @@ function ApplyTravel() {
                                         </div>
                                         <div className="erp-field">
                                             <label>Status</label>
-                                            <input value={posted.status || ''} readOnly className="erp-readonly" style={{ color: statusColor(posted.status), fontWeight: 600 }} />
+                                            <input value={statusLabel(posted.status)} readOnly className="erp-readonly" style={{ color: statusColor(posted.status), fontWeight: 600 }} />
                                         </div>
                                         <div className="erp-field">
                                             <label>Total Amount</label>
@@ -261,7 +254,7 @@ function ApplyTravel() {
                                 <li onClick={onPost}>📤 Post</li>
                                 <li onClick={onNew}>📄 New</li>
                                 <li onClick={addLine}>➕ Add Line</li>
-                                <li onClick={() => navigate('/travels')}>← Back to List</li>
+                                <li onClick={() => navigate('/dashboard')}>← Back</li>
                             </ul>
                             <div className="erp-side-tabs">
                                 <span>Actions</span><span>Info</span><span>Reports</span><span>Shortcut</span>

@@ -145,7 +145,7 @@ function ExpensesList() {
                                 {selected && (
                                     <div style={{ marginTop: 18, paddingTop: 12, borderTop: '1px solid #e5e7eb' }}>
                                         <div style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: 6 }}>{docNo(selected)}</div>
-                                        <div style={{ fontSize: 12, color: '#6b7280' }}>{selected.claimType} · {Number(selected.amount).toFixed(2)}</div>
+                                        <div style={{ fontSize: 12, color: '#6b7280' }}>{selected.claimType} · {(Number(selected.amount) || 0).toFixed(2)}</div>
                                         {selected.remarks && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4 }}>{selected.remarks}</div>}
                                     </div>
                                 )}

@@ -3,14 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
 import { loanProductApi, loanRequestApi, employeeInfoApi } from '../services/api';
-
-const statusColor = (s) => {
-    const v = (s || '').toLowerCase();
-    if (v.includes('reject')) return '#ef4444';
-    if (v.includes('pending')) return '#f59e0b';
-    if (v.includes('approv')) return '#22c55e';
-    return undefined;
-};
+import { statusLabel, statusColor } from '../utils/status';
 
 const blankForm = {
     loanPayCode: '',
@@ -110,7 +103,7 @@ function ApplyLoan() {
                                         </div>
                                         <div className="erp-field">
                                             <label>Status</label>
-                                            <input value={posted.status || ''} readOnly className="erp-readonly" style={{ color: statusColor(posted.status), fontWeight: 600 }} />
+                                            <input value={statusLabel(posted.status)} readOnly className="erp-readonly" style={{ color: statusColor(posted.status), fontWeight: 600 }} />
                                         </div>
                                     </div>
                                 </div>

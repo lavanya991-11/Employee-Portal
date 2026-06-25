@@ -81,7 +81,7 @@ function Sidebar() {
                 </div>
                 {openMenu === 'expenses' && (
                     <>
-                        <Link to="/travels" className="nav-subitem">Travel Expenses</Link>
+                        <Link to="/travels/apply" className="nav-subitem">Travel Expenses</Link>
                     </>
                 )}
 

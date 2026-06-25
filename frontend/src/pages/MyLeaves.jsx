@@ -74,8 +74,8 @@ function MyLeaves() {
     const onRegenerate = async () => {
         setMessage('Regenerating from server…');
         try {
-            await load();
-            setMessage(`Regenerated · ${leaves.length} record(s) refreshed at ${new Date().toLocaleTimeString('en-GB')}`);
+            const list = await load();
+            setMessage(`Regenerated · ${list.length} record(s) refreshed at ${new Date().toLocaleTimeString('en-GB')}`);
             setTimeout(() => setMessage(''), 3000);
         } catch (err) {
             setError(err.response?.data?.message || 'Regenerate failed');
@@ -91,9 +91,12 @@ function MyLeaves() {
             const role = JSON.parse(localStorage.getItem('user') || '{}').role;
             const isManager = ['manager', 'admin', 'super-admin'].includes(role);
             const { data } = await (isManager ? leaveApi.allLeaves() : leaveApi.myLeaves());
-            setLeaves(data.leaves || []);
+            const list = data.leaves || [];
+            setLeaves(list);
+            return list;
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to load leaves');
+            return [];
         } finally {
             setLoading(false);
         }

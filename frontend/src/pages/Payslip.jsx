@@ -111,7 +111,7 @@ function Payslip() {
 
     const selectedEmployee = useMemo(() => {
         return allEmployees.find((e) => e.employeeCode === filterEmp)
-            || (info && info.employeeCode === filterEmp ? info : info);
+            || (info && info.employeeCode === filterEmp ? info : null);
     }, [allEmployees, filterEmp, info]);
 
     // Real payslip built from the BC GeneratePaySlip response. `lines` are
