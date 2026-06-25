@@ -205,7 +205,14 @@ const createEmployeeLeave = async ({ employeeNumber, payCode, leaveStartDate, le
 
     if (!res.ok) {
         const text = await res.text();
-        throw new Error(`BC createEmployeeLeave failed: ${res.status} ${text}`);
+        // Surface BC's own dialog message cleanly (drop the JSON wrapper, status
+        // code and CorrelationId) so the user sees a normal, readable message.
+        let msg = text;
+        try { msg = JSON.parse(text)?.error?.message || text; } catch (e) { /* keep raw */ }
+        msg = String(msg).replace(/\s*CorrelationId:\s*[0-9a-fA-F-]+\.?\s*$/, '').trim();
+        const err = new Error(msg);
+        err.bcMessage = msg;
+        throw err;
     }
 
     return res.json().catch(() => ({}));
