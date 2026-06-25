@@ -224,8 +224,14 @@ function ApplyLeave() {
             const bcResults = Array.isArray(data?.bc) ? data.bc : (data?.bc ? [data.bc] : []);
             const bcFails = bcResults.filter((r) => !r.ok);
             if (bcFails.length > 0) {
-                setError(`BC sync failed: ${bcFails.map((f) => f.error || 'unknown').join(' | ')}`);
+                // Business Central did not accept it — stay on the page and show why,
+                // so it's clear the leave is still a draft (not silently navigated away).
+                setError(`Not posted to Business Central: ${bcFails.map((f) => f.error || 'unknown').join(' | ')}`);
+                const newId = data.leaves?.[0]?._id;
+                if (newId) setSavedId(newId); // point at the recreated draft so Post can retry it
+                return;
             }
+            setSuccess('Posted to Business Central.');
             navigate('/leaves/my');
         } catch (err) {
             setError(err.response?.data?.message || (saveOnly ? 'Failed to save leave' : 'Failed to apply leave'));
