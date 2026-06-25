@@ -488,6 +488,8 @@ const submitEarningRequest = async ({ employeeCode, comments = '', lines = [], a
         const text = await res.text();
         let msg = text;
         try { msg = JSON.parse(text)?.error?.message || text; } catch (e) { /* keep raw */ }
+        // Strip BC's technical "CorrelationId: <guid>" suffix so the user sees a clean message.
+        msg = String(msg).replace(/\s*CorrelationId:\s*[0-9a-fA-F-]+\.?\s*$/, '').trim();
         const err = new Error(`BC SubmitEarningRequest failed: ${res.status} ${msg}`);
         err.bcMessage = msg;
         if (res.status === 404) err.bcNotFound = true;
