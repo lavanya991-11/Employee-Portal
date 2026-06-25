@@ -10,7 +10,6 @@ const ADMIN_TILES = [
     { key: 'employees', title: 'Employees', icon: '👔', color: '#1e3a8a', path: '/admin/employees' },
     { key: 'leaves', title: 'Leaves', icon: '📅', color: '#22c55e', path: '/admin/leaves' },
     { key: 'loans', title: 'Loans', icon: '💰', color: '#f59e0b', path: '/admin/loans' },
-    { key: 'travels', title: 'Travel Requests', icon: '✈️', color: '#0ea5e9', path: '/admin/travels' },
     { key: 'expenses', title: 'Expenses', icon: '🧾', color: '#a855f7', path: '/admin/expenses' },
     { key: 'overtimes', title: 'Overtime', icon: '⏰', color: '#ef4444', path: '/admin/overtimes' },
     { key: 'assets', title: 'Asset Requests', icon: '🛠️', color: '#14b8a6', path: '/admin/assets' },
@@ -129,8 +128,7 @@ function Dashboard() {
         { icon: '⏰', label: 'Overtime Request', path: '/overtimes/apply' },
         { icon: '💰', label: 'Expense Claim', path: '/expenses/apply' },
         { icon: '📄', label: 'View Pay slip', path: '/payslip' },
-        { icon: '🪪', label: 'My Information', path: '/my-information' },
-        { icon: '✈️', label: 'Travel Request', path: '/travels/apply' }
+        { icon: '🪪', label: 'My Information', path: '/my-information' }
     ];
 
     const quickLinks = [
@@ -283,7 +281,7 @@ function Dashboard() {
                         <div className="dash-announce-list">
                             <AnnounceItem icon="📢" iconBg="#dbeafe"
                                 title="Welcome to the new Employee Portal"
-                                body="Use the sidebar to navigate Leave, Loan, Travel, Expenses and more."
+                                body="Use the sidebar to navigate Leave, Loan, Expenses and more."
                                 meta="HR Department · today" />
                             <AnnounceItem icon="📋" iconBg="#dcfce7"
                                 title="Holidays for 2026 are now live"

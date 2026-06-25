@@ -7,7 +7,6 @@ const Leave = require('../models/leave');
 const Loan = require('../models/loan');
 const Asset = require('../models/asset');
 const Overtime = require('../models/overtime');
-const Travel = require('../models/travel');
 const Expense = require('../models/expense');
 const FinElement = require('../models/finElement');
 const ImageRegister = require('../models/imageRegister');
@@ -20,7 +19,6 @@ const AmortizationTemp = require('../models/amortizationTemp');
 // Each entry pairs a logical name with its Mongoose model. Order matters for dependencies.
 const TABLES = [
     { key: 'expenses', label: 'expenses', model: Expense },
-    { key: 'travels', label: 'travels', model: Travel },
     { key: 'overtimes', label: 'overtimes', model: Overtime },
     { key: 'assets', label: 'assets', model: Asset },
     { key: 'loans', label: 'loans', model: Loan },

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
 import { expenseApi } from '../services/api';
@@ -14,11 +14,9 @@ const PAGE_SIZE = 10;
 
 function ExpensesList() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const isNonTravel = location.pathname.includes('non-travel');
-    const type = isNonTravel ? 'Non-Travel' : 'Travel';
-    const formPath = isNonTravel ? '/expenses/non-travel/new' : '/expenses/travel/new';
-    const title = isNonTravel ? 'Non-Travel Expenses' : 'Travel Expenses';
+    const type = 'Non-Travel';
+    const formPath = '/expenses/non-travel/new';
+    const title = 'Expense Claims';
 
     const user = useMemo(() => JSON.parse(localStorage.getItem('user') || '{}'), []);
     const [rows, setRows] = useState([]);

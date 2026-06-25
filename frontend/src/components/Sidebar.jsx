@@ -75,15 +75,13 @@ function Sidebar() {
                     </>
                 )}
 
-                <div className="nav-item" onClick={() => toggle('travel')}>
-                    <span className="nav-item-icon">✈️</span> Travel
-                    <span className="nav-item-caret">{openMenu === 'travel' ? '▼' : '▶'}</span>
+                <div className="nav-item" onClick={() => toggle('expenses')}>
+                    <span className="nav-item-icon">🧾</span> Expenses
+                    <span className="nav-item-caret">{openMenu === 'expenses' ? '▼' : '▶'}</span>
                 </div>
-                {openMenu === 'travel' && (
+                {openMenu === 'expenses' && (
                     <>
-                        <Link to="/travels" className="nav-subitem">Travel Request</Link>
-                        <Link to="/expenses/travel" className="nav-subitem">Travel Expenses</Link>
-                        <Link to="/expenses/non-travel" className="nav-subitem">Non-Travel Expenses</Link>
+                        <Link to="/expenses/non-travel" className="nav-subitem">Expense Claims</Link>
                     </>
                 )}
 

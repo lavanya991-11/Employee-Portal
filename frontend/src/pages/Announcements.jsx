@@ -7,7 +7,7 @@ const ANNOUNCEMENTS = [
         icon: '📢',
         iconBg: '#dbeafe',
         title: 'Welcome to the new Employee Portal',
-        body: 'Use the sidebar to navigate Leave, Loan, Travel, Expenses and more. Check the Dashboard tiles for quick access to all your tools.',
+        body: 'Use the sidebar to navigate Leave, Loan, Expenses and more. Check the Dashboard tiles for quick access to all your tools.',
         author: 'HR Department',
         date: 'today'
     },

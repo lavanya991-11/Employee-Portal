@@ -3,26 +3,19 @@ const Expense = require('../models/expense');
 exports.applyExpense = async (req, res) => {
     try {
         const {
-            expenseType,
             claimType,
             amount,
             attachment,
-            remarks,
-            travelRef
+            remarks
         } = req.body;
-
-        if (!['Travel', 'Non-Travel'].includes(expenseType)) {
-            return res.status(400).json({ message: "expenseType must be 'Travel' or 'Non-Travel'" });
-        }
 
         const expense = await Expense.create({
             employee: req.user.id,
-            expenseType,
+            expenseType: 'Non-Travel',
             claimType,
             amount,
             attachment,
-            remarks,
-            travelRef: expenseType === 'Travel' ? travelRef : null
+            remarks
         });
 
         res.status(201).json({

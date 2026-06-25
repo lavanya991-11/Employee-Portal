@@ -64,21 +64,6 @@ const COLLECTIONS = {
             { header: 'Status', get: (r) => r.status, color: (r) => STATUS_COLOR[r.status] }
         ]
     },
-    travels: {
-        title: 'All Travel Requests',
-        fetcher: () => adminApi.travels(),
-        rowsKey: 'travels',
-        columns: [
-            { header: 'Date', get: (r) => fmtDate(r.createdAt) },
-            { header: 'Employee', get: (r) => r.employee?.name || '—' },
-            { header: 'Type', get: (r) => r.travelType },
-            { header: 'Purpose', get: (r) => r.purpose },
-            { header: 'Mode', get: (r) => r.modeOfTravel },
-            { header: 'From → To', get: (r) => `${r.fromLocation} → ${r.toLocation}` },
-            { header: 'Cost', get: (r) => fmtMoney(r.estimatedCost) },
-            { header: 'Status', get: (r) => r.status, color: (r) => STATUS_COLOR[r.status] }
-        ]
-    },
     expenses: {
         title: 'All Expenses',
         fetcher: () => adminApi.expenses(),

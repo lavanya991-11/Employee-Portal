@@ -83,13 +83,6 @@ export const overtimeApi = {
     updateStatus: (id, data) => api.put(`/overtimes/${id}/status`, data)
 };
 
-export const travelApi = {
-    apply: (data) => api.post('/travels/apply', data),
-    myTravels: () => api.get('/travels/my'),
-    allTravels: () => api.get('/travels/all'),
-    updateStatus: (id, data) => api.put(`/travels/${id}/status`, data)
-};
-
 export const expenseApi = {
     apply: (data) => api.post('/expenses/apply', data),
     myExpenses: (type) => api.get('/expenses/my', { params: type ? { type } : {} }),
@@ -184,7 +177,6 @@ export const adminApi = {
     loans: () => api.get('/loans/all'),
     assets: () => api.get('/assets/all'),
     overtimes: () => api.get('/overtimes/all'),
-    travels: () => api.get('/travels/all'),
     expenses: () => api.get('/expenses/all'),
     finElements: () => api.get('/fin-elements')
 };

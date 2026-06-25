@@ -17,9 +17,6 @@ import Holidays from './pages/Holidays';
 import Announcements from './pages/Announcements';
 import SystemSettings from './pages/SystemSettings';
 import DataManagement from './pages/DataManagement';
-import TravelRequest from './pages/TravelRequest';
-import TravelRequests from './pages/TravelRequests';
-import TravelExpenses from './pages/TravelExpenses';
 import NonTravelExpenses from './pages/NonTravelExpenses';
 import ExpensesList from './pages/ExpensesList';
 import OvertimeRequest from './pages/OvertimeRequest';
@@ -169,38 +166,6 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <DataManagement />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/travels/apply"
-                element={
-                    <ProtectedRoute>
-                        <TravelRequest />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/travels"
-                element={
-                    <ProtectedRoute>
-                        <TravelRequests />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/expenses/travel"
-                element={
-                    <ProtectedRoute>
-                        <ExpensesList />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/expenses/travel/new"
-                element={
-                    <ProtectedRoute>
-                        <TravelExpenses />
                     </ProtectedRoute>
                 }
             />

@@ -8,8 +8,8 @@ const expenseSchema = new mongoose.Schema({
     },
     expenseType: {
         type: String,
-        enum: ['Travel', 'Non-Travel'],
-        required: true
+        enum: ['Non-Travel'],
+        default: 'Non-Travel'
     },
     claimType: {
         type: String,
@@ -27,11 +27,6 @@ const expenseSchema = new mongoose.Schema({
     remarks: {
         type: String,
         default: ''
-    },
-    travelRef: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Travel',
-        default: null
     },
     status: {
         type: String,

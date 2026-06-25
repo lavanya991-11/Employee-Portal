@@ -6,7 +6,6 @@ const Leave = require('../models/leave');
 const Loan = require('../models/loan');
 const Asset = require('../models/asset');
 const Overtime = require('../models/overtime');
-const Travel = require('../models/travel');
 const Expense = require('../models/expense');
 const FinElement = require('../models/finElement');
 const Calendar = require('../models/calendar');
@@ -24,32 +23,30 @@ exports.listAll = async (req, res) => {
 
 exports.adminStats = async (req, res) => {
     try {
-        const [users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements, calendars, calendarPeriods, loanProducts] = await Promise.all([
+        const [users, employees, leaves, loans, assets, overtimes, expenses, finElements, calendars, calendarPeriods, loanProducts] = await Promise.all([
             User.countDocuments(),
             EmployeeInfo.countDocuments(),
             Leave.countDocuments(),
             Loan.countDocuments(),
             Asset.countDocuments(),
             Overtime.countDocuments(),
-            Travel.countDocuments(),
             Expense.countDocuments(),
             FinElement.countDocuments(),
             Calendar.countDocuments(),
             CalendarPeriod.countDocuments(),
             LoanProduct.countDocuments()
         ]);
-        const [pendingLeaves, pendingLoans, pendingTravels, pendingExpenses, pendingAssets, pendingOvertimes] = await Promise.all([
+        const [pendingLeaves, pendingLoans, pendingExpenses, pendingAssets, pendingOvertimes] = await Promise.all([
             Leave.countDocuments({ status: 'Pending' }),
             Loan.countDocuments({ status: 'Pending' }),
-            Travel.countDocuments({ status: 'Pending' }),
             Expense.countDocuments({ status: 'Pending' }),
             Asset.countDocuments({ status: 'Pending' }),
             Overtime.countDocuments({ status: 'Pending' })
         ]);
         res.json({
             success: true,
-            totals: { users, employees, leaves, loans, assets, overtimes, travels, expenses, finElements, calendars, calendarPeriods, loanProducts, credentials: users },
-            pending: { leaves: pendingLeaves, loans: pendingLoans, travels: pendingTravels, expenses: pendingExpenses, assets: pendingAssets, overtimes: pendingOvertimes }
+            totals: { users, employees, leaves, loans, assets, overtimes, expenses, finElements, calendars, calendarPeriods, loanProducts, credentials: users },
+            pending: { leaves: pendingLeaves, loans: pendingLoans, expenses: pendingExpenses, assets: pendingAssets, overtimes: pendingOvertimes }
         });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error', error: err.message });
