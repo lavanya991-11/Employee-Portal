@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { SessionPill } from '../components/SessionGuard';
@@ -143,6 +143,61 @@ function Dashboard() {
     const pendingLeaves = allLeaves.filter((l) => l.status === 'Pending').length;
     const approvedLeaves = allLeaves.filter((l) => l.status === 'Approved').length;
 
+    // Logical attendance/leave metrics derived from the real leave data, scoped to
+    // the logged-in user (managers' allLeaves contains everyone, so filter to self).
+    const ANNUAL_LEAVE_ALLOWANCE = 30;
+    const metrics = useMemo(() => {
+        const uid = String(user?._id || user?.id || '');
+        const mine = allLeaves.filter((l) => {
+            const eid = String(l.employee?._id || l.employee || '');
+            return !uid || eid === uid;
+        });
+        const approved = mine.filter((l) => l.status === 'Approved');
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const monthStart = new Date(year, month, 1);
+        const todayEnd = new Date(year, month, now.getDate(), 23, 59, 59, 999);
+        const isWeekday = (d) => d.getDay() !== 0 && d.getDay() !== 6;
+
+        // Weekdays between two dates, clamped to [lo, hi].
+        const weekdaysBetween = (fromD, toD, lo, hi) => {
+            const start = new Date(Math.max(fromD.getTime(), lo.getTime()));
+            const end = new Date(Math.min(toD.getTime(), hi.getTime()));
+            let n = 0;
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) if (isWeekday(d)) n++;
+            return n;
+        };
+
+        // Leave days actually used (sum of days, not record count).
+        let usedThisYear = 0;
+        let usedThisMonth = 0;
+        approved.forEach((l) => {
+            const f = new Date(l.fromDate);
+            const days = Number(l.totalDays) || 0;
+            if (f.getFullYear() === year) usedThisYear += days;
+            if (f.getFullYear() === year && f.getMonth() === month) usedThisMonth += days;
+        });
+
+        // Present days = working days elapsed this month − approved leave weekdays this month.
+        let weekdaysElapsed = 0;
+        for (let d = new Date(monthStart); d <= todayEnd; d.setDate(d.getDate() + 1)) if (isWeekday(d)) weekdaysElapsed++;
+        let leaveWeekdaysThisMonth = 0;
+        approved.forEach((l) => {
+            leaveWeekdaysThisMonth += weekdaysBetween(new Date(l.fromDate), new Date(l.toDate), monthStart, todayEnd);
+        });
+        const presentDays = Math.max(0, weekdaysElapsed - leaveWeekdaysThisMonth);
+
+        return {
+            leaveBalance: Math.max(0, ANNUAL_LEAVE_ALLOWANCE - usedThisYear),
+            usedThisYear,
+            usedThisMonth,
+            presentDays,
+            workingHours: presentDays * 8
+        };
+    }, [allLeaves, user]);
+
     const displayName = [info?.firstName, info?.middleName, info?.lastName].filter(Boolean).join(' ')
         || user.name || 'Employee';
     const displayDesignation = info?.jobTitle || info?.designation || user.designation || 'Employee';
@@ -261,11 +316,11 @@ function Dashboard() {
                 {/* 4 stat cards */}
                 <div className="dash-stats">
                     <StatCard icon="📅" iconBg="#dbeafe" iconColor="#1e40af"
-                        label="Present Days" value={Math.min(new Date().getDate(), 22)} sub="This Month" delta="↗ 2 from last month" />
+                        label="Present Days" value={metrics.presentDays} sub="This Month (working days)" delta={`${metrics.usedThisMonth} leave day(s) this month`} />
                     <StatCard icon="🌴" iconBg="#dcfce7" iconColor="#15803d"
-                        label="Leave Balance" value={12 - approvedLeaves} sub="Days Left" delta={`${approvedLeaves} used this month`} />
+                        label="Leave Balance" value={metrics.leaveBalance} sub="Days Left" delta={`${metrics.usedThisYear} of ${ANNUAL_LEAVE_ALLOWANCE} used this year`} />
                     <StatCard icon="⏰" iconBg="#fed7aa" iconColor="#c2410c"
-                        label="Working Hours" value="176" sub="This Month" delta="↗ 8 from last month" />
+                        label="Working Hours" value={metrics.workingHours} sub="This Month" delta={`${metrics.presentDays} present day(s) × 8h`} />
                     <StatCard icon="🎉" iconBg="#ede9fe" iconColor="#6d28d9"
                         label="Upcoming Holiday" value={nextHoliday?.description || '—'}
                         sub={nextHoliday ? new Date(nextHoliday.fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
