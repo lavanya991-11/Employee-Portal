@@ -28,6 +28,7 @@ function MyLeaves() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selected, setSelected] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState(false);
     const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const tableRef = useRef(null);
@@ -51,7 +52,12 @@ function MyLeaves() {
     const onDelete = async () => {
         if (!selected) return;
         if (selected.isPosted || selected.status !== 'Pending') return;
-        if (!window.confirm(`Delete this draft leave request? This cannot be undone.`)) return;
+        setConfirmDelete(true);
+    };
+
+    const doDelete = async () => {
+        setConfirmDelete(false);
+        if (!selected) return;
         try {
             await leaveApi.remove(selected._id);
             setSelected(null);
@@ -291,6 +297,30 @@ function MyLeaves() {
                         </aside>
                     </div>
                 </div>
+
+                {confirmDelete && selected && (
+                    <div className="erp-modal-backdrop" onClick={() => setConfirmDelete(false)}>
+                        <div className="erp-modal" onClick={(e) => e.stopPropagation()} style={{ width: 420 }}>
+                            <div className="erp-modal-header">Delete leave request</div>
+                            <div className="erp-modal-body">
+                                <p style={{ margin: 0, color: '#374151' }}>
+                                    Delete draft <b>{docNo(selected)}</b>?
+                                </p>
+                                <p style={{ margin: '8px 0 0', fontSize: 13, color: '#6b7280' }}>
+                                    This action cannot be undone.
+                                </p>
+                            </div>
+                            <div className="erp-modal-footer">
+                                <button className="erp-action-btn" onClick={() => setConfirmDelete(false)}>Cancel</button>
+                                <button
+                                    className="erp-action-btn"
+                                    style={{ background: '#dc2626', color: '#fff', borderColor: '#dc2626' }}
+                                    onClick={doDelete}
+                                >Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );
