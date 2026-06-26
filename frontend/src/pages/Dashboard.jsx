@@ -29,6 +29,7 @@ function Dashboard() {
     const [recentLeaves, setRecentLeaves] = useState([]);
     const [allLeaves, setAllLeaves] = useState([]);
     const [nextHoliday, setNextHoliday] = useState(null);
+    const [bcLeaveBalance, setBcLeaveBalance] = useState(null); // real BC total, null until/unless available
     const [adminStats, setAdminStats] = useState(null);
     const [notificationCount, setNotificationCount] = useState(0);
     const [notifications, setNotifications] = useState([]);
@@ -73,6 +74,12 @@ function Dashboard() {
         employeeInfoApi.getMy()
             .then(({ data }) => setInfo(data.employeeInfo || null))
             .catch(() => {});
+
+        // Real leave balance from Business Central (summed across leave pay codes).
+        // Falls back to the local estimate if BC is unavailable / no employee code.
+        leaveApi.bcBalanceSummary()
+            .then(({ data }) => setBcLeaveBalance(typeof data.totalBalance === 'number' ? data.totalBalance : null))
+            .catch(() => setBcLeaveBalance(null));
 
         // Managers see ALL leaves on calendar + notifications; employees see only their own.
         const leavesFetcher = isManager ? leaveApi.allLeaves() : leaveApi.myLeaves();
@@ -318,7 +325,10 @@ function Dashboard() {
                     <StatCard icon="📅" iconBg="#dbeafe" iconColor="#1e40af"
                         label="Present Days" value={metrics.presentDays} sub="This Month (working days)" delta={`${metrics.usedThisMonth} leave day(s) this month`} />
                     <StatCard icon="🌴" iconBg="#dcfce7" iconColor="#15803d"
-                        label="Leave Balance" value={metrics.leaveBalance} sub="Days Left" delta={`${metrics.usedThisYear} of ${ANNUAL_LEAVE_ALLOWANCE} used this year`} />
+                        label="Leave Balance"
+                        value={bcLeaveBalance != null ? bcLeaveBalance : metrics.leaveBalance}
+                        sub="Days Left"
+                        delta={bcLeaveBalance != null ? 'From Business Central' : `${metrics.usedThisYear} of ${ANNUAL_LEAVE_ALLOWANCE} used this year`} />
                     <StatCard icon="⏰" iconBg="#fed7aa" iconColor="#c2410c"
                         label="Working Hours" value={metrics.workingHours} sub="This Month" delta={`${metrics.presentDays} present day(s) × 8h`} />
                     <StatCard icon="🎉" iconBg="#ede9fe" iconColor="#6d28d9"

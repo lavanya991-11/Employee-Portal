@@ -56,6 +56,7 @@ export const leaveApi = {
     allLeaves: () => api.get('/leaves/all'),
     updateStatus: (id, data) => api.put(`/leaves/${id}/status`, data),
     bcBalance: (finId, asOfDate) => api.get('/leaves/bc-balance', { params: { finId, asOfDate } }),
+    bcBalanceSummary: () => api.get('/leaves/bc-balance-summary'),
     getOne: (id) => api.get(`/leaves/${id}`),
     update: (id, data) => api.put(`/leaves/${id}`, data),
     remove: (id) => api.delete(`/leaves/${id}`),

@@ -1,6 +1,7 @@
 const Leave = require('../models/leave');
 const EmployeeInfo = require('../models/employeeInfo');
 const User = require('../models/user');
+const FinElement = require('../models/finElement');
 const { checkLeaveBalance, createEmployeeLeave, bcConfigured } = require('../services/bcClient');
 
 const toBcPayType = (p) => {
@@ -182,6 +183,38 @@ exports.bcLeaveBalance = async (req, res) => {
         res.json({ success: true, employeeCode: info.employeeCode, finId: Number(finId), result });
     } catch (err) {
         res.status(500).json({ success: false, message: 'BC leave balance check failed', error: err.message });
+    }
+};
+
+// GET /api/leaves/bc-balance-summary — total leave balance across the employee's
+// leave pay codes (PaidLeave + UnPaidLeave FIN elements), summed live from BC.
+exports.bcLeaveBalanceSummary = async (req, res) => {
+    try {
+        if (!bcConfigured()) {
+            return res.status(400).json({ success: false, message: 'BC not configured (set BC_* env vars on the backend).' });
+        }
+        const info = await EmployeeInfo.findOne({ user: req.user.id });
+        if (!info || !info.employeeCode) {
+            return res.status(400).json({ success: false, message: 'Your Employee Information has no employeeCode.' });
+        }
+        const leaveTypes = await FinElement.find({
+            finType: { $in: ['PaidLeave', 'UnPaidLeave'] },
+            isDisabled: { $ne: true }
+        }).select('finId description');
+
+        const asOf = new Date().toISOString().slice(0, 10);
+        const perType = await Promise.all(leaveTypes.map(async (t) => {
+            try {
+                const r = await checkLeaveBalance(info.employeeCode, t.finId, asOf);
+                return { finId: t.finId, description: t.description, balance: Number(r?.balance) || 0 };
+            } catch (e) {
+                return { finId: t.finId, description: t.description, balance: 0, error: e.message };
+            }
+        }));
+        const totalBalance = perType.reduce((s, x) => s + (Number(x.balance) || 0), 0);
+        res.json({ success: true, employeeCode: info.employeeCode, totalBalance, perType });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'BC leave balance summary failed', error: err.message });
     }
 };
 

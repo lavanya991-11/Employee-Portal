@@ -7,6 +7,7 @@ const {
     getAllLeaves,
     updateLeaveStatus,
     bcLeaveBalance,
+    bcLeaveBalanceSummary,
     updateMyLeave,
     deleteMyLeave,
     getOneMyLeave,
@@ -17,6 +18,7 @@ router.post('/apply', protect, applyLeave);
 router.get('/my', protect, getMyLeaves);
 router.get('/all', protect, getAllLeaves);
 router.get('/bc-balance', protect, bcLeaveBalance);
+router.get('/bc-balance-summary', protect, bcLeaveBalanceSummary);
 router.get('/:id', protect, getOneMyLeave);
 router.put('/:id', protect, updateMyLeave);
 router.delete('/:id', protect, deleteMyLeave);
