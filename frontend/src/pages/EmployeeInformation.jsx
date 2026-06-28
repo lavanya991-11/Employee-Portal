@@ -6,6 +6,10 @@ import { employeeInfoApi, identificationTypeApi } from '../services/api';
 
 const toDateInput = (d) => d ? new Date(d).toISOString().slice(0, 10) : '';
 
+// Toggle the Identity Documents section on the employee details page.
+// Set to true to show it again.
+const SHOW_IDENTITY_DOCUMENTS = false;
+
 const emptyForm = {
     employeeCode: '',
     firstName: '', middleName: '', lastName: '', initials: '',
@@ -332,6 +336,7 @@ function EmployeeInformation() {
                         </div>
 
                         {/* Identity Documents — styled to match the BC "Identity Documents" card */}
+                        {SHOW_IDENTITY_DOCUMENTS && (
                         <div className="id-docs-card" style={{ marginTop: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: '16px 20px', background: '#fff' }}>
                             <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', paddingBottom: 8, borderBottom: '1px solid #d1d5db', marginBottom: 16 }}>
                                 Identity Documents
@@ -367,6 +372,7 @@ function EmployeeInformation() {
                                 </div>
                             </div>
                         </div>
+                        )}
 
                         <button type="submit" className="btn" disabled={saving} style={{ marginTop: 20 }}>
                             {saving ? 'Saving…' : 'Save'}
