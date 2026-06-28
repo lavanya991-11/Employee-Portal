@@ -180,11 +180,22 @@ exports.patchMyInfo = async (req, res) => {
         delete data._id;
 
         const existing = await EmployeeInfo.findOne({ user: req.user.id });
+
+        // Upsert: if this user has no portal record yet, create one (needs
+        // employeeCode); otherwise update the existing record.
         if (!existing) {
-            return res.status(404).json({
-                success: false,
-                message: 'No portal record found for this user. Use Save to create it first.'
-            });
+            if (!data.employeeCode) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'No portal record exists yet for this user. Include "employeeCode" to create one.'
+                });
+            }
+            const codeExists = await EmployeeInfo.findOne({ employeeCode: data.employeeCode });
+            if (codeExists) {
+                return res.status(400).json({ success: false, message: 'Employee Code already in use by another user.' });
+            }
+            const created = await EmployeeInfo.create({ ...data, user: req.user.id });
+            return res.status(201).json({ success: true, message: 'Portal data created', employeeInfo: created });
         }
 
         // The form submits complete `administration` / `identityDocuments`

@@ -67,7 +67,7 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"jobTitle\": \"General Manager\",\n  \"department\": \"GEFZCO\",\n  \"grade\": \"GRADE A\",\n  \"emergencyContactNo\": \"0500000000\",\n  \"identityDocuments\": {\n    \"visaNumber\": \"301/2025/7/97928\",\n    \"visaType\": \"VISA\",\n    \"visaDesignation\": \"General Manager\",\n    \"visaIssueFrom\": \"Sharjah\",\n    \"passportNumber\": \"Q586505\",\n    \"passportIssueFrom\": \"DUBAI\",\n    \"residencyPermitStatus\": \"Current\"\n  }\n}"
+          "raw": "{\n  \"employeeCode\": \"1001\",\n  \"firstName\": \"Qusai\",\n  \"lastName\": \"Alazzam\",\n  \"jobTitle\": \"General Manager\",\n  \"department\": \"GEFZCO\",\n  \"grade\": \"GRADE A\",\n  \"emergencyContactNo\": \"0500000000\",\n  \"identityDocuments\": {\n    \"visaNumber\": \"301/2025/7/97928\",\n    \"visaType\": \"VISA\",\n    \"visaDesignation\": \"General Manager\",\n    \"visaIssueFrom\": \"Sharjah\",\n    \"passportNumber\": \"Q586505\",\n    \"passportIssueFrom\": \"DUBAI\",\n    \"residencyPermitStatus\": \"Current\"\n  }\n}"
         },
         "url": {
           "raw": "{{baseUrl}}/api/employee-info/my",
