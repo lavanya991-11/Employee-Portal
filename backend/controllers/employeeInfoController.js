@@ -49,7 +49,9 @@ const toBcPayload = (info) => {
         birthDate: ymd(adm.birthDate),
         probationDate: ymd(adm.probationDate),
         probationInMonths: String(adm.probationInMonths ?? 0),
-        employmentDate: ymd(adm.employmentDate),
+        // NOTE: BC maps `employmentDate` and `dateOfJoining` to the SAME table
+        // field, so sending both with different values is rejected. We send
+        // only `dateOfJoining` (above) and omit `employmentDate` here.
         seniorityDate: ymd(adm.seniorityDate),
         terminationDate: ymd(adm.terminationDate),
         noticePeriodInMonths: Number(adm.noticePeriodInMonths ?? 0),

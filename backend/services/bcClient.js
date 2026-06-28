@@ -89,7 +89,14 @@ const updateEmployee = async (systemId, payload) => {
 
     if (!res.ok) {
         const text = await res.text();
-        throw new Error(`BC employee PATCH failed: ${res.status} ${text}`);
+        // Surface BC's own dialog message cleanly (drop the JSON wrapper and the
+        // technical CorrelationId suffix) so the user sees a readable message.
+        let msg = text;
+        try { msg = JSON.parse(text)?.error?.message || text; } catch (e) { /* keep raw */ }
+        msg = String(msg).replace(/\s*CorrelationId:\s*[0-9a-fA-F-]+\.?\s*$/, '').trim();
+        const err = new Error(msg);
+        err.bcMessage = msg;
+        throw err;
     }
 
     return res.json().catch(() => ({}));
