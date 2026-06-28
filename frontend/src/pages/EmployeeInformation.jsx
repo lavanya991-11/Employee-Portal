@@ -332,11 +332,11 @@ function EmployeeInformation() {
                         </div>
 
                         {/* Identity Documents — styled to match the BC "Identity Documents" card */}
-                        <div style={{ marginTop: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: '16px 20px', background: '#fff' }}>
+                        <div className="id-docs-card" style={{ marginTop: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: '16px 20px', background: '#fff' }}>
                             <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', paddingBottom: 8, borderBottom: '1px solid #d1d5db', marginBottom: 16 }}>
                                 Identity Documents
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                            <div className="id-docs-grid">
                                 <div className="emp-col" style={{ paddingRight: 24 }}>
                                     <div style={{ fontWeight: 700, color: '#111827', marginBottom: 12 }}>Visa Details</div>
                                     <Field label="Primary Visa Number" name="primaryVisaNumber" value={form.identityDocuments.primaryVisaNumber} onChange={onIdentityChange} />

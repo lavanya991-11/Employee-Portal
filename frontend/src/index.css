@@ -729,6 +729,30 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 }
 .emp-field-row input[readonly] { background: #f3f4f6; color: #6b7280; }
 
+/* Identity Documents card: three equal columns that actually fit.
+   Narrower label column + shrinkable inputs (min-width:0) so the third
+   column doesn't overflow. */
+.id-docs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+.id-docs-card .emp-col { min-width: 0; }
+.id-docs-card .emp-field-row {
+    grid-template-columns: 130px 1fr;
+    gap: 8px;
+}
+.id-docs-card .emp-field-row input,
+.id-docs-card .emp-field-row select {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+/* Stack the three sections on narrower screens. */
+@media (max-width: 1024px) {
+    .id-docs-grid { grid-template-columns: 1fr; }
+    .id-docs-card .emp-col { border-left: none !important; padding: 0 !important; }
+}
+
 .toggle {
     position: relative;
     display: inline-block;
