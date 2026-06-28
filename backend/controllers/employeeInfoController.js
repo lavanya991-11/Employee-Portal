@@ -147,6 +147,57 @@ exports.saveMyInfo = async (req, res) => {
     }
 };
 
+// PUT/POST /api/employee-info/identification
+// Update an employee's identification-type / identity-document fields directly
+// on the Business Central employee record, using the two-step flow:
+//   1. GET the employee's systemId  (employees?$filter=employeeCode eq '<code>')
+//   2. PATCH employees(systemId)     (update profile) with the supplied fields
+//
+// Body:
+//   { "employeeCode": "1001", "fields": { "<bcField>": "<value>", ... } }
+//   — or, for convenience, put the BC fields at the top level alongside
+//     employeeCode: { "employeeCode": "1001", "identificationType": "PASSPORT" }
+//
+// The PATCH body is passed straight through to BC, so the keys must match the
+// employee entity's actual identification property names.
+exports.updateIdentification = async (req, res) => {
+    try {
+        if (!bcConfigured()) {
+            return res.status(400).json({ success: false, message: 'BC not configured (set BC_* env vars on the backend).' });
+        }
+
+        const { employeeCode, fields, ...rest } = req.body || {};
+        if (!employeeCode) {
+            return res.status(400).json({ success: false, message: 'employeeCode is required' });
+        }
+
+        // Accept either a nested `fields` object or top-level BC properties.
+        const payload = (fields && typeof fields === 'object' && !Array.isArray(fields)) ? fields : rest;
+        if (!payload || Object.keys(payload).length === 0) {
+            return res.status(400).json({ success: false, message: 'No identification fields supplied to update.' });
+        }
+
+        // Step 1 — look up the BC systemId for this employee code.
+        const systemId = await findEmployeeSystemId(employeeCode);
+        if (!systemId) {
+            return res.status(404).json({ success: false, message: `No BC employee found with code '${employeeCode}'.` });
+        }
+
+        // Step 2 — PATCH the employee record (update profile) with the identification fields.
+        const updated = await updateEmployee(systemId, payload);
+
+        res.json({
+            success: true,
+            message: `Identification updated for employee ${employeeCode} (systemId: ${systemId}).`,
+            employeeCode,
+            systemId,
+            updated
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Identification update failed', error: err.message });
+    }
+};
+
 exports.getAllInfo = async (req, res) => {
     try {
         const list = await EmployeeInfo.find()
