@@ -331,35 +331,40 @@ function EmployeeInformation() {
                             </div>
                         </div>
 
-                        <div className="form-section-title" style={{ marginTop: 24 }}>IDENTITY DOCUMENTS</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-                            <div className="emp-col">
-                                <div style={{ fontWeight: 700, color: '#1e3a8a', marginBottom: 8 }}>Visa Details</div>
-                                <Field label="Primary Visa Number" name="primaryVisaNumber" value={form.identityDocuments.primaryVisaNumber} onChange={onIdentityChange} />
-                                <Field label="Number" name="visaNumber" value={form.identityDocuments.visaNumber} onChange={onIdentityChange} />
-                                <Field label="Type" name="visaType" value={form.identityDocuments.visaType} onChange={onIdentityChange} options={typeOptions} />
-                                <Field label="Designation" name="visaDesignation" value={form.identityDocuments.visaDesignation} onChange={onIdentityChange} />
-                                <Field label="Issue From" name="visaIssueFrom" value={form.identityDocuments.visaIssueFrom} onChange={onIdentityChange} />
-                                <Field label="Issue Date" name="visaIssueDate" value={form.identityDocuments.visaIssueDate} onChange={onIdentityChange} type="date" />
-                                <Field label="Expiry Date" name="visaExpiryDate" value={form.identityDocuments.visaExpiryDate} onChange={onIdentityChange} type="date" />
+                        {/* Identity Documents — styled to match the BC "Identity Documents" card */}
+                        <div style={{ marginTop: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: '16px 20px', background: '#fff' }}>
+                            <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', paddingBottom: 8, borderBottom: '1px solid #d1d5db', marginBottom: 16 }}>
+                                Identity Documents
                             </div>
-                            <div className="emp-col">
-                                <div style={{ fontWeight: 700, color: '#1e3a8a', marginBottom: 8 }}>Passport Details</div>
-                                <Field label="Primary Passport Number" name="primaryPassportNumber" value={form.identityDocuments.primaryPassportNumber} onChange={onIdentityChange} />
-                                <Field label="Number" name="passportNumber" value={form.identityDocuments.passportNumber} onChange={onIdentityChange} />
-                                <Field label="Issue From" name="passportIssueFrom" value={form.identityDocuments.passportIssueFrom} onChange={onIdentityChange} />
-                                <Field label="Passport Name" name="passportName" value={form.identityDocuments.passportName} onChange={onIdentityChange} />
-                                <Field label="Issue Date" name="passportIssueDate" value={form.identityDocuments.passportIssueDate} onChange={onIdentityChange} type="date" />
-                                <Field label="Expiry Date" name="passportExpiryDate" value={form.identityDocuments.passportExpiryDate} onChange={onIdentityChange} type="date" />
-                            </div>
-                            <div className="emp-col">
-                                <div style={{ fontWeight: 700, color: '#1e3a8a', marginBottom: 8 }}>Residence Details</div>
-                                <Field label="Primary Residency ID" name="primaryResidencyId" value={form.identityDocuments.primaryResidencyId} onChange={onIdentityChange} />
-                                <Field label="Civil ID" name="civilId" value={form.identityDocuments.civilId} onChange={onIdentityChange} />
-                                <Field label="Number" name="residencyNumber" value={form.identityDocuments.residencyNumber} onChange={onIdentityChange} />
-                                <Field label="Issue Date" name="residencyIssueDate" value={form.identityDocuments.residencyIssueDate} onChange={onIdentityChange} type="date" />
-                                <Field label="Expiry Date" name="residencyExpiryDate" value={form.identityDocuments.residencyExpiryDate} onChange={onIdentityChange} type="date" />
-                                <Field label="Permit Status" name="residencyPermitStatus" value={form.identityDocuments.residencyPermitStatus} onChange={onIdentityChange} options={['', 'Current', 'Expired', 'Cancelled', 'Under Process']} />
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                                <div className="emp-col" style={{ paddingRight: 24 }}>
+                                    <div style={{ fontWeight: 700, color: '#111827', marginBottom: 12 }}>Visa Details</div>
+                                    <Field label="Primary Visa Number" name="primaryVisaNumber" value={form.identityDocuments.primaryVisaNumber} onChange={onIdentityChange} />
+                                    <Field label="Number" name="visaNumber" value={form.identityDocuments.visaNumber} onChange={onIdentityChange} />
+                                    <Field label="Type" name="visaType" value={form.identityDocuments.visaType} onChange={onIdentityChange} options={typeOptions} />
+                                    <Field label="Designation" name="visaDesignation" value={form.identityDocuments.visaDesignation} onChange={onIdentityChange} />
+                                    <Field label="Issue From" name="visaIssueFrom" value={form.identityDocuments.visaIssueFrom} onChange={onIdentityChange} />
+                                    <Field label="Issue Date" name="visaIssueDate" value={form.identityDocuments.visaIssueDate} onChange={onIdentityChange} type="date" />
+                                    <Field label="Expiry Date" name="visaExpiryDate" value={form.identityDocuments.visaExpiryDate} onChange={onIdentityChange} type="date" />
+                                </div>
+                                <div className="emp-col" style={{ padding: '0 24px', borderLeft: '1px solid #e5e7eb' }}>
+                                    <div style={{ fontWeight: 700, color: '#111827', marginBottom: 12 }}>Passport Details</div>
+                                    <Field label="Primary Passport Number" name="primaryPassportNumber" value={form.identityDocuments.primaryPassportNumber} onChange={onIdentityChange} />
+                                    <Field label="Number" name="passportNumber" value={form.identityDocuments.passportNumber} onChange={onIdentityChange} />
+                                    <Field label="Issue From" name="passportIssueFrom" value={form.identityDocuments.passportIssueFrom} onChange={onIdentityChange} />
+                                    <Field label="Passport Name" name="passportName" value={form.identityDocuments.passportName} onChange={onIdentityChange} />
+                                    <Field label="Issue Date" name="passportIssueDate" value={form.identityDocuments.passportIssueDate} onChange={onIdentityChange} type="date" />
+                                    <Field label="Expiry Date" name="passportExpiryDate" value={form.identityDocuments.passportExpiryDate} onChange={onIdentityChange} type="date" />
+                                </div>
+                                <div className="emp-col" style={{ paddingLeft: 24, borderLeft: '1px solid #e5e7eb' }}>
+                                    <div style={{ fontWeight: 700, color: '#111827', marginBottom: 12 }}>Residence Details</div>
+                                    <Field label="Primary Residency ID" name="primaryResidencyId" value={form.identityDocuments.primaryResidencyId} onChange={onIdentityChange} />
+                                    <Field label="Civil ID" name="civilId" value={form.identityDocuments.civilId} onChange={onIdentityChange} />
+                                    <Field label="Number" name="residencyNumber" value={form.identityDocuments.residencyNumber} onChange={onIdentityChange} />
+                                    <Field label="Issue Date" name="residencyIssueDate" value={form.identityDocuments.residencyIssueDate} onChange={onIdentityChange} type="date" />
+                                    <Field label="Expiry Date" name="residencyExpiryDate" value={form.identityDocuments.residencyExpiryDate} onChange={onIdentityChange} type="date" />
+                                    <Field label="Permit Status" name="residencyPermitStatus" value={form.identityDocuments.residencyPermitStatus} onChange={onIdentityChange} options={['', 'Current', 'Expired', 'Cancelled', 'Under Process']} />
+                                </div>
                             </div>
                         </div>
 
