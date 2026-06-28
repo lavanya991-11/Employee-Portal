@@ -169,6 +169,35 @@ exports.saveMyInfo = async (req, res) => {
     }
 };
 
+// PATCH /api/employee-info/my — update the PORTAL (local) employee record only.
+// Unlike POST/PUT (saveMyInfo) this does NOT sync to Business Central; it just
+// persists the changes to the portal's own database. Backs the
+// "Update Portal Data" button.
+exports.patchMyInfo = async (req, res) => {
+    try {
+        const data = { ...req.body };
+        delete data.user;
+        delete data._id;
+
+        const existing = await EmployeeInfo.findOne({ user: req.user.id });
+        if (!existing) {
+            return res.status(404).json({
+                success: false,
+                message: 'No portal record found for this user. Use Save to create it first.'
+            });
+        }
+
+        // The form submits complete `administration` / `identityDocuments`
+        // objects, so a shallow assign updates the whole record cleanly.
+        Object.assign(existing, data);
+        await existing.save();
+
+        res.json({ success: true, message: 'Portal data updated', employeeInfo: existing });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    }
+};
+
 exports.getAllInfo = async (req, res) => {
     try {
         const list = await EmployeeInfo.find()

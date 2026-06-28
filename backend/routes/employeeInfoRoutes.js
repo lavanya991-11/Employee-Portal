@@ -4,12 +4,14 @@ const { protect } = require('../middleware/authmiddleware');
 const {
     getMyInfo,
     saveMyInfo,
+    patchMyInfo,
     getAllInfo
 } = require('../controllers/employeeInfoController');
 
 router.get('/my', protect, getMyInfo);
 router.post('/my', protect, saveMyInfo);
 router.put('/my', protect, saveMyInfo);
+router.patch('/my', protect, patchMyInfo);
 router.get('/all', protect, getAllInfo);
 
 module.exports = router;

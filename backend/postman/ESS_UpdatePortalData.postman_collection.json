@@ -1,0 +1,81 @@
+{
+  "info": {
+    "name": "ESS - Update Portal Data (PATCH)",
+    "description": "PATCH /api/employee-info/my — updates the employee record in the portal (local DB) only; does not sync to Business Central. Backs the 'Update Portal Data' button.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "ess-update-portal-data-2026"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "POST login (saves accessToken)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.accessToken) {",
+              "    pm.collectionVariables.set('accessToken', json.accessToken);",
+              "    console.log('accessToken saved');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@ess.com\",\n  \"password\": \"Admin@123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "GET my portal data",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/employee-info/my",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employee-info", "my"]
+        }
+      }
+    },
+    {
+      "name": "PATCH update portal data",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jobTitle\": \"General Manager\",\n  \"department\": \"GEFZCO\",\n  \"grade\": \"GRADE A\",\n  \"emergencyContactNo\": \"0500000000\",\n  \"identityDocuments\": {\n    \"visaNumber\": \"301/2025/7/97928\",\n    \"visaType\": \"VISA\",\n    \"visaDesignation\": \"General Manager\",\n    \"visaIssueFrom\": \"Sharjah\",\n    \"passportNumber\": \"Q586505\",\n    \"passportIssueFrom\": \"DUBAI\",\n    \"residencyPermitStatus\": \"Current\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/employee-info/my",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employee-info", "my"]
+        },
+        "description": "Partial update of the signed-in user's portal employee record. Send only the fields you want to change. Nested objects (administration, identityDocuments) should be sent complete."
+      }
+    }
+  ]
+}

@@ -102,6 +102,7 @@ export const travelRequestApi = {
 export const employeeInfoApi = {
     getMy: () => api.get('/employee-info/my'),
     save: (data) => api.post('/employee-info/my', data),
+    updatePortal: (data) => api.patch('/employee-info/my', data),
     getAll: () => api.get('/employee-info/all')
 };
 
