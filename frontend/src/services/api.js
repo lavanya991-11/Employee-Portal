@@ -125,6 +125,13 @@ export const calendarPeriodApi = {
     removeAll: () => api.delete('/calendar-periods/all')
 };
 
+export const identificationTypeApi = {
+    list: () => api.get('/identification-types'),
+    scan: () => api.post('/identification-types/scan'),
+    remove: (id) => api.delete(`/identification-types/${id}`),
+    removeAll: () => api.delete('/identification-types/all')
+};
+
 export const payslipApi = {
     generate: (params) => api.get('/payslip', { params })
 };

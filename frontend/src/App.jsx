@@ -26,6 +26,7 @@ import FinElements from './pages/FinElements';
 import FinElementForm from './pages/FinElementForm';
 import Calendars from './pages/Calendars';
 import CalendarPeriods from './pages/CalendarPeriods';
+import IdentificationTypes from './pages/IdentificationTypes';
 import LoanProducts from './pages/LoanProducts';
 import LoanRequests from './pages/LoanRequests';
 import EmployeeCredentials from './pages/EmployeeCredentials';
@@ -248,6 +249,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <CalendarPeriods />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/identification-types"
+                element={
+                    <ProtectedRoute>
+                        <IdentificationTypes />
                     </ProtectedRoute>
                 }
             />
