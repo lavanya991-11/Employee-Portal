@@ -19,19 +19,6 @@ exports.list = async (req, res) => {
     }
 };
 
-// GET /api/identification-types/lookup — lightweight list for dropdowns
-// (code + label only), sorted by description.
-exports.lookup = async (req, res) => {
-    try {
-        const items = await IdentificationType.find()
-            .select('identificationTypeCode description identificationType identificationTypeValue')
-            .sort({ description: 1 });
-        res.json({ success: true, items });
-    } catch (err) {
-        res.status(500).json({ success: false, message: 'Server error', error: err.message });
-    }
-};
-
 // POST /api/identification-types/scan — refresh from BC:
 //   1. call the BC OData web service and retrieve the latest identification types
 //   2. delete all existing records

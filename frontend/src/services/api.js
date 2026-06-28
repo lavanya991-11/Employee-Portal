@@ -127,17 +127,9 @@ export const calendarPeriodApi = {
 
 export const identificationTypeApi = {
     list: () => api.get('/identification-types'),
-    lookup: () => api.get('/identification-types/lookup'),
     scan: () => api.post('/identification-types/scan'),
     remove: (id) => api.delete(`/identification-types/${id}`),
     removeAll: () => api.delete('/identification-types/all')
-};
-
-export const identityDocumentApi = {
-    list: () => api.get('/identity-documents'),
-    scan: () => api.post('/identity-documents/scan'),
-    remove: (id) => api.delete(`/identity-documents/${id}`),
-    removeAll: () => api.delete('/identity-documents/all')
 };
 
 export const payslipApi = {
