@@ -1,4 +1,5 @@
 const EmployeeInfo = require('../models/employeeInfo');
+const User = require('../models/user');
 const { findEmployeeSystemId, updateEmployee, bcConfigured } = require('../services/bcClient');
 
 // BC sentinel for "no date" — Business Central requires this instead of null/empty.
@@ -181,20 +182,26 @@ exports.patchMyInfo = async (req, res) => {
 
         const existing = await EmployeeInfo.findOne({ user: req.user.id });
 
-        // Upsert: if this user has no portal record yet, create one (needs
-        // employeeCode); otherwise update the existing record.
+        // Upsert: if this user has no portal record yet, create one; otherwise
+        // update the existing record. employeeCode comes from the body, or
+        // falls back to the Employee ID on the user's account.
         if (!existing) {
-            if (!data.employeeCode) {
+            let employeeCode = data.employeeCode;
+            if (!employeeCode) {
+                const account = await User.findById(req.user.id).select('empId');
+                employeeCode = account?.empId;
+            }
+            if (!employeeCode) {
                 return res.status(400).json({
                     success: false,
-                    message: 'No portal record exists yet for this user. Include "employeeCode" to create one.'
+                    message: 'No portal record exists yet. Include "employeeCode" in the body (or set an Employee ID on your account) to create one.'
                 });
             }
-            const codeExists = await EmployeeInfo.findOne({ employeeCode: data.employeeCode });
+            const codeExists = await EmployeeInfo.findOne({ employeeCode });
             if (codeExists) {
-                return res.status(400).json({ success: false, message: 'Employee Code already in use by another user.' });
+                return res.status(400).json({ success: false, message: `Employee Code '${employeeCode}' is already in use by another user.` });
             }
-            const created = await EmployeeInfo.create({ ...data, user: req.user.id });
+            const created = await EmployeeInfo.create({ ...data, employeeCode, user: req.user.id });
             return res.status(201).json({ success: true, message: 'Portal data created', employeeInfo: created });
         }
 
