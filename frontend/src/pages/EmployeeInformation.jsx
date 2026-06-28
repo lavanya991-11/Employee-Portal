@@ -97,7 +97,6 @@ function EmployeeInformation() {
     const [form, setForm] = useState(emptyForm);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [updatingPortal, setUpdatingPortal] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
@@ -194,19 +193,6 @@ function EmployeeInformation() {
             setError(err.response?.data?.message || 'Save failed');
         } finally {
             setSaving(false);
-        }
-    };
-
-    // Update only the portal's (local) record via PATCH — does not sync to BC.
-    const onUpdatePortal = async () => {
-        setError(''); setSuccess(''); setUpdatingPortal(true);
-        try {
-            const { data } = await employeeInfoApi.updatePortal(form);
-            setSuccess(data.message || 'Portal data updated');
-        } catch (err) {
-            setError(err.response?.data?.message || 'Portal update failed');
-        } finally {
-            setUpdatingPortal(false);
         }
     };
 
@@ -382,15 +368,9 @@ function EmployeeInformation() {
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: 12, marginTop: 20, alignItems: 'center' }}>
-                            <button type="submit" className="btn" disabled={saving || updatingPortal}>
-                                {saving ? 'Saving…' : 'Save'}
-                            </button>
-                            <button type="button" className="btn" onClick={onUpdatePortal} disabled={saving || updatingPortal}
-                                style={{ background: '#0d9488' }}>
-                                {updatingPortal ? 'Updating…' : 'Update Portal Data'}
-                            </button>
-                        </div>
+                        <button type="submit" className="btn" disabled={saving} style={{ marginTop: 20 }}>
+                            {saving ? 'Saving…' : 'Save'}
+                        </button>
                     </form>
                 </div>
             </main>
