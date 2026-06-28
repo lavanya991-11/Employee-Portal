@@ -182,37 +182,35 @@ exports.patchMyInfo = async (req, res) => {
         delete data.user;
         delete data._id;
 
-        const existing = await EmployeeInfo.findOne({ user: req.user.id });
+        // Identify the target record: by employeeCode if supplied (lets an
+        // admin update any employee), otherwise the signed-in user's own record.
+        const existing = data.employeeCode
+            ? await EmployeeInfo.findOne({ employeeCode: data.employeeCode })
+            : await EmployeeInfo.findOne({ user: req.user.id });
 
-        // Upsert: if this user has no portal record yet, create one; otherwise
-        // update the existing record. employeeCode comes from the body, or
-        // falls back to the Employee ID on the user's account.
-        if (!existing) {
-            let employeeCode = data.employeeCode;
-            if (!employeeCode) {
-                const account = await User.findById(req.user.id).select('empId');
-                employeeCode = account?.empId;
-            }
-            if (!employeeCode) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'No portal record exists yet. Include "employeeCode" in the body (or set an Employee ID on your account) to create one.'
-                });
-            }
-            const codeExists = await EmployeeInfo.findOne({ employeeCode });
-            if (codeExists) {
-                return res.status(400).json({ success: false, message: `Employee Code '${employeeCode}' is already in use by another user.` });
-            }
-            const created = await EmployeeInfo.create({ ...data, employeeCode, user: req.user.id });
-            return res.status(201).json({ success: true, message: 'Portal data created', employeeInfo: created });
+        if (existing) {
+            // The form submits complete `administration` / `identityDocuments`
+            // objects, so a shallow assign updates the whole record cleanly.
+            Object.assign(existing, data);
+            await existing.save();
+            return res.json({ success: true, message: 'Portal data updated', employeeInfo: existing });
         }
 
-        // The form submits complete `administration` / `identityDocuments`
-        // objects, so a shallow assign updates the whole record cleanly.
-        Object.assign(existing, data);
-        await existing.save();
-
-        res.json({ success: true, message: 'Portal data updated', employeeInfo: existing });
+        // No matching record yet → create one. A portal record must be tied to
+        // a user account, so we need a valid authenticated user id.
+        if (!req.user?.id) {
+            return res.status(401).json({ success: false, message: 'Not authenticated — please log in again (token is missing the user id).' });
+        }
+        let employeeCode = data.employeeCode;
+        if (!employeeCode) {
+            const account = await User.findById(req.user.id).select('empId');
+            employeeCode = account?.empId;
+        }
+        if (!employeeCode) {
+            return res.status(400).json({ success: false, message: 'employeeCode is required to create a portal record.' });
+        }
+        const created = await EmployeeInfo.create({ ...data, employeeCode, user: req.user.id });
+        return res.status(201).json({ success: true, message: 'Portal data created', employeeInfo: created });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error', error: err.message });
     }
