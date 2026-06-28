@@ -1,0 +1,207 @@
+{
+  "info": {
+    "name": "ESS - Identification & Identity Documents",
+    "description": "Identification Types master, Identity Documents master, and the employee identification-type update API (GET systemId -> PATCH update profile). Also includes the raw Business Central calls for direct testing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "ess-identification-collection-2026"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "employeeCode", "value": "1001", "type": "string" },
+    { "key": "bcBaseUrl", "value": "https://api.businesscentral.dynamics.com/v2.0/c4fcf5c8-ba04-4cc4-b972-091c2e3d6239/Delivery_App/api/Novasoft/Novasoft/v2.0/companies(61425223-765d-f111-ab09-0022486a3f82)", "type": "string" },
+    { "key": "bcToken", "value": "", "type": "string" },
+    { "key": "systemId", "value": "", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "0. Auth",
+      "item": [
+        {
+          "name": "POST login (saves accessToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "    console.log('accessToken saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ess.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Backend API",
+      "item": [
+        {
+          "name": "PUT update employee identification (GET systemId -> PATCH)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeCode\": \"{{employeeCode}}\",\n  \"fields\": {\n    \"identificationType\": \"PASSPORT\",\n    \"primaryPassportNumber\": \"Q586505\",\n    \"passportIssueFrom\": \"DUBAI\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/employee-info/identification",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "employee-info", "identification"]
+            },
+            "description": "Looks up the BC systemId for employeeCode, then PATCHes the employee record with `fields`. The keys inside `fields` must match the BC employee entity's real identification property names."
+          }
+        },
+        {
+          "name": "GET identification types (list)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/identification-types",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "identification-types"]
+            }
+          }
+        },
+        {
+          "name": "GET identification types lookup (dropdown)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/identification-types/lookup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "identification-types", "lookup"]
+            }
+          }
+        },
+        {
+          "name": "POST identification types scan (import from BC)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/identification-types/scan",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "identification-types", "scan"]
+            }
+          }
+        },
+        {
+          "name": "GET identity documents (list)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/identity-documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "identity-documents"]
+            }
+          }
+        },
+        {
+          "name": "POST identity documents scan (import from BC)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/identity-documents/scan",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "identity-documents", "scan"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Raw Business Central (set bcToken first)",
+      "item": [
+        {
+          "name": "GET employee systemId (saves systemId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const row = (json.value || [])[0];",
+                  "if (row && row.systemId) {",
+                  "    pm.collectionVariables.set('systemId', row.systemId);",
+                  "    console.log('systemId saved: ' + row.systemId);",
+                  "} else {",
+                  "    console.log('No employee found for that code');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{bcToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{bcBaseUrl}}/employees?$filter=employeeCode eq '{{employeeCode}}'",
+              "host": ["{{bcBaseUrl}}"],
+              "path": ["employees"],
+              "query": [{ "key": "$filter", "value": "employeeCode eq '{{employeeCode}}'" }]
+            }
+          }
+        },
+        {
+          "name": "PATCH employee (update profile)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{bcToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "If-Match", "value": "*" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificationType\": \"PASSPORT\"\n}"
+            },
+            "url": {
+              "raw": "{{bcBaseUrl}}/employees({{systemId}})",
+              "host": ["{{bcBaseUrl}}"],
+              "path": ["employees({{systemId}})"],
+              "description": "If-Match: * is required by BC for updates. Replace the body keys with the real identification field names from the GET response."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
