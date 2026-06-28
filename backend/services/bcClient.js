@@ -368,6 +368,45 @@ const getIdentificationTypes = async () => {
     return Array.isArray(parsed) ? parsed : [];
 };
 
+// Fetch employee identity documents (visa / passport / residence) from the
+// NOVAPAY web service. Returns the rows as a stringified JSON array inside
+// `value`, so we parse it before handing it back.
+//
+// NOTE: action name assumed to follow the existing NOVAPAYWebService_Get*
+// convention. If BC publishes it under a different name, change ONLY the URL
+// below.
+const getIdentityDocuments = async () => {
+    if (!bcConfigured()) throw new Error('BC not configured (set BC_* env vars).');
+
+    const token = await getAccessToken();
+    const url = `${odataV4Root()}/NOVAPAYWebService_GetIdentityDocuments?company=${process.env.BC_COMPANY_ID}`;
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: '{}'
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        const err = new Error(`BC GetIdentityDocuments failed: ${res.status} ${text}`);
+        if (res.status === 404) err.bcNotFound = true;
+        throw err;
+    }
+
+    const data = await res.json();
+    // BC returns { value: "<stringified-json-array>" } — parse it.
+    let parsed = data.value;
+    if (typeof parsed === 'string') {
+        try { parsed = JSON.parse(parsed); } catch (e) { parsed = []; }
+    }
+    return Array.isArray(parsed) ? parsed : [];
+};
+
 // Generate an employee payslip from the NOVAPAY web service. Takes an
 // `inputJson` parameter and returns a single payslip object (with earning/
 // deduction `lines`) as a stringified JSON in `value`.
@@ -590,4 +629,4 @@ const getEmployeeInstallments = async ({ employeeCode, transactionNo, finId } = 
     return parsed || {};
 };
 
-module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, getIdentificationTypes, generatePayslip, getLoanProducts, submitLoanRequest, submitEarningRequest, getEmployeeInstallments };
+module.exports = { bcConfigured, getAccessToken, findEmployeeSystemId, updateEmployee, getAllFinMasters, checkLeaveBalance, createEmployeeLeave, getHolidays, getAllHolidays, getCalendars, getCalendarPeriods, getIdentificationTypes, getIdentityDocuments, generatePayslip, getLoanProducts, submitLoanRequest, submitEarningRequest, getEmployeeInstallments };
