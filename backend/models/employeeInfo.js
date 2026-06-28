@@ -72,6 +72,33 @@ const employeeInfoSchema = new mongoose.Schema({
         altAddressEndDate: { type: Date },
         email: { type: String, default: '' },
         oldEmployeeCode: { type: String, default: '' }
+    },
+
+    // Identity Documents (mirrors the BC employee "Identity Documents" card).
+    // Field names match the BC employee entity exactly so they map 1:1 on PATCH.
+    identityDocuments: {
+        // Visa Details
+        primaryVisaNumber: { type: String, default: '' },
+        visaNumber: { type: String, default: '' },
+        visaType: { type: String, default: '' },
+        visaDesignation: { type: String, default: '' },
+        visaIssueFrom: { type: String, default: '' },
+        visaIssueDate: { type: Date },
+        visaExpiryDate: { type: Date },
+        // Passport Details
+        primaryPassportNumber: { type: String, default: '' },
+        passportNumber: { type: String, default: '' },
+        passportIssueFrom: { type: String, default: '' },
+        passportName: { type: String, default: '' },
+        passportIssueDate: { type: Date },
+        passportExpiryDate: { type: Date },
+        // Residence Details
+        primaryResidencyId: { type: String, default: '' },
+        civilId: { type: String, default: '' },
+        residencyNumber: { type: String, default: '' },
+        residencyIssueDate: { type: Date },
+        residencyExpiryDate: { type: Date },
+        residencyPermitStatus: { type: String, default: '' }
     }
 }, { timestamps: true });
 

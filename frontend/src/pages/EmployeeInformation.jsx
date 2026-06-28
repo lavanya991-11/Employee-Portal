@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
-import { employeeInfoApi } from '../services/api';
+import { employeeInfoApi, identificationTypeApi } from '../services/api';
 
 const toDateInput = (d) => d ? new Date(d).toISOString().slice(0, 10) : '';
 
@@ -44,6 +44,17 @@ const emptyForm = {
         altAddressEndDate: '',
         email: '',
         oldEmployeeCode: ''
+    },
+    identityDocuments: {
+        // Visa Details
+        primaryVisaNumber: '', visaNumber: '', visaType: '', visaDesignation: '',
+        visaIssueFrom: '', visaIssueDate: '', visaExpiryDate: '',
+        // Passport Details
+        primaryPassportNumber: '', passportNumber: '', passportIssueFrom: '',
+        passportName: '', passportIssueDate: '', passportExpiryDate: '',
+        // Residence Details
+        primaryResidencyId: '', civilId: '', residencyNumber: '',
+        residencyIssueDate: '', residencyExpiryDate: '', residencyPermitStatus: ''
     }
 };
 
@@ -64,7 +75,11 @@ function Field({ label, name, value, onChange, type = 'text', readOnly = false, 
             <div className="emp-field-row">
                 <label>{label}</label>
                 <select name={name} value={value ?? ''} onChange={onChange} disabled={readOnly}>
-                    {options.map((o) => <option key={o} value={o}>{o}</option>)}
+                    {options.map((o) => {
+                        const val = typeof o === 'object' ? o.value : o;
+                        const lbl = typeof o === 'object' ? o.label : o;
+                        return <option key={val} value={val}>{lbl}</option>;
+                    })}
                 </select>
             </div>
         );
@@ -85,6 +100,7 @@ function EmployeeInformation() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [idTypes, setIdTypes] = useState([]);
 
     const refresh = async () => {
         setLoading(true);
@@ -107,6 +123,16 @@ function EmployeeInformation() {
                         terminationDate: toDateInput(info.administration?.terminationDate),
                         altAddressStartDate: toDateInput(info.administration?.altAddressStartDate),
                         altAddressEndDate: toDateInput(info.administration?.altAddressEndDate)
+                    },
+                    identityDocuments: {
+                        ...emptyForm.identityDocuments,
+                        ...(info.identityDocuments || {}),
+                        visaIssueDate: toDateInput(info.identityDocuments?.visaIssueDate),
+                        visaExpiryDate: toDateInput(info.identityDocuments?.visaExpiryDate),
+                        passportIssueDate: toDateInput(info.identityDocuments?.passportIssueDate),
+                        passportExpiryDate: toDateInput(info.identityDocuments?.passportExpiryDate),
+                        residencyIssueDate: toDateInput(info.identityDocuments?.residencyIssueDate),
+                        residencyExpiryDate: toDateInput(info.identityDocuments?.residencyExpiryDate)
                     }
                 });
             }
@@ -117,7 +143,13 @@ function EmployeeInformation() {
         }
     };
 
-    useEffect(() => { refresh(); }, []);
+    useEffect(() => {
+        refresh();
+        // Identification Types feed the Visa "Type" dropdown.
+        identificationTypeApi.list()
+            .then(({ data }) => setIdTypes(data.items || []))
+            .catch(() => {});
+    }, []);
 
     // Filter visible fields by label text matching the search query.
     useEffect(() => {
@@ -145,6 +177,12 @@ function EmployeeInformation() {
         setSuccess('');
     };
 
+    const onIdentityChange = (e) => {
+        const { name, value } = e.target;
+        setForm({ ...form, identityDocuments: { ...form.identityDocuments, [name]: value } });
+        setSuccess('');
+    };
+
     const onSubmit = async (e) => {
         e.preventDefault();
         setError(''); setSuccess(''); setSaving(true);
@@ -157,6 +195,15 @@ function EmployeeInformation() {
             setSaving(false);
         }
     };
+
+    // Visa "Type" dropdown options, sourced from the Identification Types master.
+    const typeOptions = [
+        { value: '', label: '-- Select --' },
+        ...idTypes.map((t) => ({
+            value: t.identificationTypeCode,
+            label: t.description || t.identificationType || t.identificationTypeCode
+        }))
+    ];
 
     return (
         <div className="app-layout">
@@ -281,6 +328,38 @@ function EmployeeInformation() {
                                 <Field label="Alt. Address End Date" name="altAddressEndDate" value={form.administration.altAddressEndDate} onChange={onAdministrationChange} type="date" />
                                 <Field label="Email" name="email" value={form.administration.email} onChange={onAdministrationChange} type="email" />
                                 <Field label="Old Employee Code" name="oldEmployeeCode" value={form.administration.oldEmployeeCode} onChange={onAdministrationChange} />
+                            </div>
+                        </div>
+
+                        <div className="form-section-title" style={{ marginTop: 24 }}>IDENTITY DOCUMENTS</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+                            <div className="emp-col">
+                                <div style={{ fontWeight: 700, color: '#1e3a8a', marginBottom: 8 }}>Visa Details</div>
+                                <Field label="Primary Visa Number" name="primaryVisaNumber" value={form.identityDocuments.primaryVisaNumber} onChange={onIdentityChange} />
+                                <Field label="Number" name="visaNumber" value={form.identityDocuments.visaNumber} onChange={onIdentityChange} />
+                                <Field label="Type" name="visaType" value={form.identityDocuments.visaType} onChange={onIdentityChange} options={typeOptions} />
+                                <Field label="Designation" name="visaDesignation" value={form.identityDocuments.visaDesignation} onChange={onIdentityChange} />
+                                <Field label="Issue From" name="visaIssueFrom" value={form.identityDocuments.visaIssueFrom} onChange={onIdentityChange} />
+                                <Field label="Issue Date" name="visaIssueDate" value={form.identityDocuments.visaIssueDate} onChange={onIdentityChange} type="date" />
+                                <Field label="Expiry Date" name="visaExpiryDate" value={form.identityDocuments.visaExpiryDate} onChange={onIdentityChange} type="date" />
+                            </div>
+                            <div className="emp-col">
+                                <div style={{ fontWeight: 700, color: '#1e3a8a', marginBottom: 8 }}>Passport Details</div>
+                                <Field label="Primary Passport Number" name="primaryPassportNumber" value={form.identityDocuments.primaryPassportNumber} onChange={onIdentityChange} />
+                                <Field label="Number" name="passportNumber" value={form.identityDocuments.passportNumber} onChange={onIdentityChange} />
+                                <Field label="Issue From" name="passportIssueFrom" value={form.identityDocuments.passportIssueFrom} onChange={onIdentityChange} />
+                                <Field label="Passport Name" name="passportName" value={form.identityDocuments.passportName} onChange={onIdentityChange} />
+                                <Field label="Issue Date" name="passportIssueDate" value={form.identityDocuments.passportIssueDate} onChange={onIdentityChange} type="date" />
+                                <Field label="Expiry Date" name="passportExpiryDate" value={form.identityDocuments.passportExpiryDate} onChange={onIdentityChange} type="date" />
+                            </div>
+                            <div className="emp-col">
+                                <div style={{ fontWeight: 700, color: '#1e3a8a', marginBottom: 8 }}>Residence Details</div>
+                                <Field label="Primary Residency ID" name="primaryResidencyId" value={form.identityDocuments.primaryResidencyId} onChange={onIdentityChange} />
+                                <Field label="Civil ID" name="civilId" value={form.identityDocuments.civilId} onChange={onIdentityChange} />
+                                <Field label="Number" name="residencyNumber" value={form.identityDocuments.residencyNumber} onChange={onIdentityChange} />
+                                <Field label="Issue Date" name="residencyIssueDate" value={form.identityDocuments.residencyIssueDate} onChange={onIdentityChange} type="date" />
+                                <Field label="Expiry Date" name="residencyExpiryDate" value={form.identityDocuments.residencyExpiryDate} onChange={onIdentityChange} type="date" />
+                                <Field label="Permit Status" name="residencyPermitStatus" value={form.identityDocuments.residencyPermitStatus} onChange={onIdentityChange} options={['', 'Current', 'Expired', 'Cancelled', 'Under Process']} />
                             </div>
                         </div>
 

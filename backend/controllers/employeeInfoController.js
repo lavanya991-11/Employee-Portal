@@ -13,6 +13,7 @@ const ymd = (d) => {
 // Map our EmployeeInfo model → BC Novasoft employee PATCH body.
 const toBcPayload = (info) => {
     const adm = info.administration || {};
+    const idd = info.identityDocuments || {};
     return {
         firstName: info.firstName || '',
         middleName: info.middleName || '',
@@ -66,7 +67,28 @@ const toBcPayload = (info) => {
         altAddressStartDate: ymd(adm.altAddressStartDate),
         altAddressEndDate: ymd(adm.altAddressEndDate),
         companyEmail: adm.email || '',
-        oldEmployeeCode: adm.oldEmployeeCode || ''
+        oldEmployeeCode: adm.oldEmployeeCode || '',
+
+        // Identity Documents → BC employee entity (names match BC exactly)
+        primaryVisaNumber: idd.primaryVisaNumber || '',
+        visaNumber: idd.visaNumber || '',
+        visaType: idd.visaType || '',
+        visaDesignation: idd.visaDesignation || '',
+        visaIssueFrom: idd.visaIssueFrom || '',
+        visaIssueDate: ymd(idd.visaIssueDate),
+        visaExpiryDate: ymd(idd.visaExpiryDate),
+        primaryPassportNumber: idd.primaryPassportNumber || '',
+        passportNumber: idd.passportNumber || '',
+        passportIssueFrom: idd.passportIssueFrom || '',
+        passportName: idd.passportName || '',
+        passportIssueDate: ymd(idd.passportIssueDate),
+        passportExpiryDate: ymd(idd.passportExpiryDate),
+        primaryResidencyId: idd.primaryResidencyId || '',
+        civilId: idd.civilId || '',
+        residencyNumber: idd.residencyNumber || '',
+        residencyIssueDate: ymd(idd.residencyIssueDate),
+        residencyExpiryDate: ymd(idd.residencyExpiryDate),
+        residencyPermitStatus: idd.residencyPermitStatus || ''
     };
 };
 
