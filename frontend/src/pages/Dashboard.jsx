@@ -35,6 +35,19 @@ const KPI_ICONS = {
     holiday: kpiSvg(<><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13M5 12v9h14v-9" /><path d="M12 8S9.6 2.2 7 4s2.6 4 5 4M12 8s2.4-5.8 5-4-2.6 4-5 4" /></>)
 };
 
+// Smaller line icons for the Quick Links list.
+const qlSvg = (paths) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{paths}</svg>
+);
+const QL_ICONS = {
+    leave: qlSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /></>),
+    overtime: qlSvg(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>),
+    payslip: qlSvg(<><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18" /><circle cx="12" cy="14.5" r="1.6" /></>),
+    profile: qlSvg(<><circle cx="12" cy="8" r="4" /><path d="M4 20a8 8 0 0 1 16 0" /></>),
+    holidays: qlSvg(<><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13M5 12v9h14v-9" /><path d="M12 8S9.6 2.2 7 4s2.6 4 5 4M12 8s2.4-5.8 5-4-2.6 4-5 4" /></>)
+};
+
 function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
@@ -378,11 +391,11 @@ function Dashboard() {
                     <div className="dash-card">
                         <div className="dash-card-head"><span>Quick Links</span></div>
                         <div className="dash-quicklink-list">
-                            <QuickLink to="/leaves/my" icon="🗓️" iconBg="#dbeafe" label="Apply Leave" />
-                            <QuickLink to="/overtimes/apply" icon="⏰" iconBg="#fed7aa" label="Request Overtime" />
-                            <QuickLink to="/payslip" icon="💰" iconBg="#dcfce7" label="View Payslip" />
-                            <QuickLink to="/employee-information" icon="🪪" iconBg="#ede9fe" label="Update Profile" />
-                            <QuickLink to="/holidays" icon="🎉" iconBg="#fce7f3" label="Holidays" />
+                            <QuickLink to="/leaves/my" icon={QL_ICONS.leave} iconBg="#dbeafe" iconColor="#2563eb" label="Apply Leave" />
+                            <QuickLink to="/overtimes/apply" icon={QL_ICONS.overtime} iconBg="#fed7aa" iconColor="#c2410c" label="Request Overtime" />
+                            <QuickLink to="/payslip" icon={QL_ICONS.payslip} iconBg="#dcfce7" iconColor="#15803d" label="View Payslip" />
+                            <QuickLink to="/employee-information" icon={QL_ICONS.profile} iconBg="#ede9fe" iconColor="#6d28d9" label="Update Profile" />
+                            <QuickLink to="/holidays" icon={QL_ICONS.holidays} iconBg="#fce7f3" iconColor="#be185d" label="Holidays" />
                         </div>
                     </div>
                 </div>
@@ -685,19 +698,19 @@ function AnnounceItem({ icon, iconBg, title, body, meta }) {
     );
 }
 
-function QuickLink({ to, icon, iconBg, label }) {
+function QuickLink({ to, icon, iconBg, iconColor, label }) {
     return (
         <Link to={to} style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '10px 14px', borderBottom: '1px solid #f3f4f6',
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '11px 14px', borderBottom: '1px solid #f3f4f6',
             textDecoration: 'none', color: '#374151'
         }}>
             <span style={{
-                width: 28, height: 28, borderRadius: 8, background: iconBg,
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14
+                width: 32, height: 32, borderRadius: 9, background: iconBg, color: iconColor || '#374151',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
             }}>{icon}</span>
-            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>{label}</span>
-            <span style={{ color: '#9ca3af' }}>›</span>
+            <span style={{ fontSize: 13.5, fontWeight: 500, flex: 1 }}>{label}</span>
+            <span style={{ color: '#cbd5e1' }}>›</span>
         </Link>
     );
 }
