@@ -29,7 +29,7 @@ const kpiSvg = (paths) => (
         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{paths}</svg>
 );
 const KPI_ICONS = {
-    present: kpiSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /><path d="m8.5 15 2.2 2.2 4.3-4.4" /></>),
+    present: kpiSvg(<><rect width="8" height="4" x="8" y="2" rx="1.5" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><path d="m9 14 2 2 4-4" /></>),
     leave: kpiSvg(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" /></>),
     hours: kpiSvg(<><circle cx="12" cy="12" r="9.5" /><g strokeWidth="1.4"><path d="M12 3V4M16.5 4.2 16 5.1M19.8 7.5 18.9 8M21 12H20M19.8 16.5 18.9 16M16.5 19.8 16 18.9M12 21V20M7.5 19.8 8 18.9M4.2 16.5 5.1 16M3 12H4M4.2 7.5 5.1 8M7.5 4.2 8 5.1" /></g><path d="M12 12V7M12 12l3.5 1.8" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /></>),
     holiday: kpiSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /><path fill="currentColor" stroke="none" d="M12 12 12.9 14.7 15.8 14.8 13.5 16.5 14.4 19.2 12 17.6 9.6 19.2 10.5 16.5 8.2 14.8 11.1 14.7Z" /></>)
