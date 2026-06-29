@@ -32,7 +32,7 @@ const KPI_ICONS = {
     present: kpiSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /><path d="m8.5 15 2.2 2.2 4.3-4.4" /></>),
     leave: kpiSvg(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" /></>),
     hours: kpiSvg(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>),
-    holiday: kpiSvg(<><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13M5 12v9h14v-9" /><path d="M12 8S9.6 2.2 7 4s2.6 4 5 4M12 8s2.4-5.8 5-4-2.6 4-5 4" /></>)
+    holiday: kpiSvg(<><path d="M5.8 11.3 2 22l10.7-3.8" /><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01" /><path d="m22 2-2.2.8a2.9 2.9 0 0 0-2 3.1c.1.9-.6 1.6-1.4 1.6h-.4c-.9 0-1.6.6-1.8 1.4L12 10" /><path d="m22 13-.8-.3c-.9-.3-1.8.2-2 1.1-.1.7-.7 1.2-1.4 1.2H17" /><path d="m11 2 .3.8c.3.9-.2 1.8-1.1 2-.7.1-1.2.7-1.2 1.4V7" /><path d="M11 13c1.9 1.9 2.8 4.2 2 5s-3.1-.1-5-2-2.8-4.2-2-5 3.1.1 5 2Z" /></>)
 };
 
 // Smaller line icons for the Quick Links list.
@@ -45,7 +45,7 @@ const QL_ICONS = {
     overtime: qlSvg(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>),
     payslip: qlSvg(<><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18" /><circle cx="12" cy="14.5" r="1.6" /></>),
     profile: qlSvg(<><circle cx="12" cy="8" r="4" /><path d="M4 20a8 8 0 0 1 16 0" /></>),
-    holidays: qlSvg(<><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13M5 12v9h14v-9" /><path d="M12 8S9.6 2.2 7 4s2.6 4 5 4M12 8s2.4-5.8 5-4-2.6 4-5 4" /></>)
+    holidays: qlSvg(<><path d="M5.8 11.3 2 22l10.7-3.8" /><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01" /><path d="m22 2-2.2.8a2.9 2.9 0 0 0-2 3.1c.1.9-.6 1.6-1.4 1.6h-.4c-.9 0-1.6.6-1.8 1.4L12 10" /><path d="m22 13-.8-.3c-.9-.3-1.8.2-2 1.1-.1.7-.7 1.2-1.4 1.2H17" /><path d="m11 2 .3.8c.3.9-.2 1.8-1.1 2-.7.1-1.2.7-1.2 1.4V7" /><path d="M11 13c1.9 1.9 2.8 4.2 2 5s-3.1-.1-5-2-2.8-4.2-2-5 3.1.1 5 2Z" /></>)
 };
 
 function Dashboard() {
