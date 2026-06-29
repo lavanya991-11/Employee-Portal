@@ -31,7 +31,7 @@ const kpiSvg = (paths) => (
 const KPI_ICONS = {
     present: kpiSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /><path d="m8.5 15 2.2 2.2 4.3-4.4" /></>),
     leave: kpiSvg(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" /></>),
-    hours: kpiSvg(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>),
+    hours: kpiSvg(<><circle cx="12" cy="12" r="9" /><path d="M12 12 9 9.5M12 12 14.5 13.5" /><path d="M12 3.5V5M12 19v1.5M3.5 12H5M19 12h1.5" /><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none" /></>),
     holiday: kpiSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /><path fill="currentColor" stroke="none" d="M12 12 12.9 14.7 15.8 14.8 13.5 16.5 14.4 19.2 12 17.6 9.6 19.2 10.5 16.5 8.2 14.8 11.1 14.7Z" /></>)
 };
 
