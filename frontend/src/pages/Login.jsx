@@ -21,7 +21,6 @@ const HeroArt = () => (
                 <path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm0 2c-2.7 0-8 1.3-8 4v2h9v-2c0-1 .4-1.9 1-2.6A12 12 0 0 0 8 13Zm8 0c-.3 0-.7 0-1.1.1A4 4 0 0 1 16 16v3h8v-2c0-2.7-5.3-4-8-4Z" />
             </svg>
             <div className="login-brand">Employee Portal</div>
-            <div className="login-hero-tag">Your HR. Simplified.</div>
 
             <svg className="login-hero-chips" width="280" height="70" viewBox="0 0 280 70" fill="none">
                 <path d="M40 40 Q90 0 130 35 T240 35" stroke="#93b4ee" strokeWidth="1.5" strokeDasharray="4 4" />
