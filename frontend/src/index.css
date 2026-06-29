@@ -688,12 +688,12 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 }
 .cal-month-label { font-size: 14px; font-weight: 600; color: #1e3a8a; min-width: 130px; text-align: center; }
 .cal-today-btn {
-    background: var(--surface) !important; color: #374151 !important;
-    width: auto !important; padding: 6px 14px !important;
-    border: 1px solid var(--input-border) !important; border-radius: 8px !important; font-size: 12px !important;
+    background: var(--surface) !important; color: var(--accent-dark) !important; font-weight: 600 !important;
+    width: auto !important; padding: 7px 14px !important;
+    border: 1px solid #cdddf6 !important; border-radius: 9px !important; font-size: 12px !important;
     display: inline-flex !important; align-items: center !important; gap: 4px !important;
 }
-.cal-today-btn:hover { background: var(--accent-soft) !important; border-color: #bfd3f5 !important; color: var(--accent-dark) !important; }
+.cal-today-btn:hover { background: var(--accent-soft) !important; border-color: var(--accent) !important; color: var(--accent) !important; }
 .cal-legend-bar {
     display: flex; flex-wrap: wrap; gap: 16px;
     padding: 10px 14px; background: #f9fafb; border-bottom: 1px solid #e5e7eb;
@@ -897,12 +897,15 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 }
 .erp-titlebar-actions { display: flex; gap: 8px; }
 .erp-action-btn {
-    background: var(--surface); border: 1px solid var(--input-border); color: #374151;
-    font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 8px; cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface); border: 1px solid #cdddf6; color: var(--accent-dark);
+    font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 9px; cursor: pointer;
+    box-shadow: 0 1px 2px rgba(16,24,40,.04);
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, color 0.15s;
 }
-.erp-action-btn:hover { background: var(--accent-soft); border-color: #bfd3f5; color: var(--accent-dark); }
-.erp-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.erp-action-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); box-shadow: 0 2px 8px rgba(37,99,235,.16); }
+.erp-action-btn:active { background: #dbe7fb; }
+.erp-action-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
 .erp-body { display: flex; gap: 12px; align-items: stretch; }
 .erp-form { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -987,8 +990,8 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 }
 .emp-filter-footer { gap: 6px; }
 .emp-helpdesk-btn {
-    background: white; border: 1px solid var(--input-border); color: #374151;
-    font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    background: white; border: 1px solid #cdddf6; color: var(--accent-dark);
+    font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 9px; cursor: pointer;
 }
 .emp-helpdesk-btn-dark { background: var(--accent-dark); color: white; border-color: var(--accent-dark); }
 .emp-helpdesk-btn:hover { opacity: 0.9; }
