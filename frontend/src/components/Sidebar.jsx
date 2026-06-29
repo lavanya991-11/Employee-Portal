@@ -138,14 +138,6 @@ function Sidebar() {
                     </Link>
                 )}
             </nav>
-
-            <div className="sidebar-bottom">
-                <div className="sidebar-help">
-                    <div className="sidebar-help-icon">{Icons.help}</div>
-                    <div className="sidebar-help-title">Need Help?</div>
-                    <div className="sidebar-help-text">Visit our help center for guides and support.</div>
-                </div>
-            </div>
         </aside>
     );
 }
