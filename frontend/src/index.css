@@ -4,7 +4,7 @@ html, body, #root { width: 100%; min-height: 100vh; }
 body { overflow-x: hidden; }
 
 :root {
-    --primary-color: #1976d2;
+    --primary-color: #2563eb;
     --secondary-color: #dc004e;
 }
 
