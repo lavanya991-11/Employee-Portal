@@ -157,26 +157,27 @@ body {
     flex-direction: column;
 }
 .sidebar-profile {
-    padding: 22px 16px;
-    text-align: center;
-    background: var(--surface);
-    border-bottom: 1px solid var(--line-soft);
+    margin: 14px 12px 10px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.28);
+    display: flex; align-items: center; gap: 12px;
 }
 .sidebar-logo {
-    max-height: 48px; max-width: 160px;
+    max-height: 40px; max-width: 104px;
     object-fit: contain;
-    margin: 0 auto 10px; display: block;
+    background: #fff; border-radius: 10px; padding: 6px 8px; display: block; flex-shrink: 0;
 }
 .sidebar-logo-fallback {
-    width: 56px; height: 56px; border-radius: 14px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: #fff;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(255, 255, 255, 0.18); color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; font-weight: 700;
-    margin: 0 auto 10px;
-    box-shadow: 0 6px 16px rgba(37,99,235,.25);
+    font-size: 20px; font-weight: 800; flex-shrink: 0;
+    backdrop-filter: blur(2px);
 }
 .sidebar-company {
-    color: var(--accent-dark); font-weight: 700; font-size: 15px; letter-spacing: -0.01em;
+    color: #fff; font-weight: 700; font-size: 15px; letter-spacing: -0.01em; line-height: 1.25;
 }
 
 .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
