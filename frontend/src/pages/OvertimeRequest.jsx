@@ -26,6 +26,7 @@ const emptyLine = (defaults = {}) => ({
 function OvertimeRequest() {
     const user = useMemo(() => JSON.parse(localStorage.getItem('user') || '{}'), []);
     const [info, setInfo] = useState(null);
+    const [sideTab, setSideTab] = useState('actions'); // actions | info | reports | shortcuts
 
     const txnNumber = useMemo(() => 'PR' + Math.floor(100000 + Math.random() * 900000), []);
     const glDocNo = useMemo(() => 'PVN' + String(Math.floor(1000 + Math.random() * 9000)), []);
@@ -305,15 +306,35 @@ function OvertimeRequest() {
                         </form>
 
                         <aside className="erp-actions-panel">
-                            <div className="erp-actions-header"><span>Actions</span></div>
-                            <ul className="erp-actions-list">
-                                <li onClick={onCalculate}>🧮 Calculate</li>
-                                <li onClick={addLine}>➕ New Line</li>
-                                <li onClick={() => window.print()}>🖨️ Print</li>
-                                <li onClick={load}>🔄 Refresh</li>
-                            </ul>
+                            <div className="erp-actions-header"><span>{{ actions: 'Actions', info: 'Info', reports: 'Reports', shortcuts: 'Shortcuts' }[sideTab]}</span></div>
+                            {sideTab === 'actions' && (
+                                <ul className="erp-actions-list">
+                                    <li onClick={onCalculate}>🧮 Calculate</li>
+                                    <li onClick={addLine}>➕ New Line</li>
+                                    <li onClick={() => window.print()}>🖨️ Print</li>
+                                    <li onClick={load}>🔄 Refresh</li>
+                                </ul>
+                            )}
+                            {sideTab === 'info' && (
+                                <div style={{ padding: 14, fontSize: 13, color: 'var(--muted)', lineHeight: 1.55 }}>
+                                    Add overtime lines and use <b>Calculate</b>, then submit to post to Business Central. The <b>Actions</b> tab has Print and Refresh.
+                                </div>
+                            )}
+                            {sideTab === 'reports' && (
+                                <div style={{ padding: 14, fontSize: 13, color: 'var(--muted)' }}>Reports for this document will appear here.</div>
+                            )}
+                            {sideTab === 'shortcuts' && (
+                                <ul className="erp-actions-list">
+                                    <li>⌨️ Ctrl + S — Save</li>
+                                    <li>🖨️ Ctrl + P — Print</li>
+                                    <li>⎋ Esc — Close</li>
+                                </ul>
+                            )}
                             <div className="erp-side-tabs">
-                                <span>Actions</span><span>Info</span><span>Reports</span><span>ShortCut</span>
+                                <span className={sideTab === 'actions' ? 'active' : ''} onClick={() => setSideTab('actions')}>Actions</span>
+                                <span className={sideTab === 'info' ? 'active' : ''} onClick={() => setSideTab('info')}>Info</span>
+                                <span className={sideTab === 'reports' ? 'active' : ''} onClick={() => setSideTab('reports')}>Reports</span>
+                                <span className={sideTab === 'shortcuts' ? 'active' : ''} onClick={() => setSideTab('shortcuts')}>Shortcuts</span>
                             </div>
                         </aside>
                     </div>

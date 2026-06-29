@@ -15,6 +15,7 @@ const blankForm = {
 
 function ApplyLoan() {
     const navigate = useNavigate();
+    const [sideTab, setSideTab] = useState('actions'); // actions | info | reports | shortcuts
 
     const [employeeCode, setEmployeeCode] = useState('');
     const [products, setProducts] = useState([]);
@@ -144,14 +145,34 @@ function ApplyLoan() {
                         </form>
 
                         <aside className="erp-actions-panel">
-                            <div className="erp-actions-header"><span>Actions</span></div>
-                            <ul className="erp-actions-list">
-                                <li onClick={onPost}>📤 Post</li>
-                                <li onClick={onNew}>📄 New</li>
-                                <li onClick={() => navigate('/loan-requests')}>← Back to List</li>
-                            </ul>
+                            <div className="erp-actions-header"><span>{{ actions: 'Actions', info: 'Info', reports: 'Reports', shortcuts: 'Shortcuts' }[sideTab]}</span></div>
+                            {sideTab === 'actions' && (
+                                <ul className="erp-actions-list">
+                                    <li onClick={onPost}>📤 Post</li>
+                                    <li onClick={onNew}>📄 New</li>
+                                    <li onClick={() => navigate('/loan-requests')}>← Back to List</li>
+                                </ul>
+                            )}
+                            {sideTab === 'info' && (
+                                <div style={{ padding: 14, fontSize: 13, color: 'var(--muted)', lineHeight: 1.55 }}>
+                                    Fill in the loan request and use <b>Post</b> to submit it to Business Central. The <b>Actions</b> tab has New and Back to List.
+                                </div>
+                            )}
+                            {sideTab === 'reports' && (
+                                <div style={{ padding: 14, fontSize: 13, color: 'var(--muted)' }}>Reports for this document will appear here.</div>
+                            )}
+                            {sideTab === 'shortcuts' && (
+                                <ul className="erp-actions-list">
+                                    <li>⌨️ Ctrl + S — Save</li>
+                                    <li>🖨️ Ctrl + P — Print</li>
+                                    <li>⎋ Esc — Close</li>
+                                </ul>
+                            )}
                             <div className="erp-side-tabs">
-                                <span>Actions</span><span>Info</span><span>Reports</span><span>Shortcut</span>
+                                <span className={sideTab === 'actions' ? 'active' : ''} onClick={() => setSideTab('actions')}>Actions</span>
+                                <span className={sideTab === 'info' ? 'active' : ''} onClick={() => setSideTab('info')}>Info</span>
+                                <span className={sideTab === 'reports' ? 'active' : ''} onClick={() => setSideTab('reports')}>Reports</span>
+                                <span className={sideTab === 'shortcuts' ? 'active' : ''} onClick={() => setSideTab('shortcuts')}>Shortcuts</span>
                             </div>
                         </aside>
                     </div>

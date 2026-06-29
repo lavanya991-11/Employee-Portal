@@ -1118,6 +1118,7 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 }
 .erp-side-tabs span:last-child { border-bottom: none; }
 .erp-side-tabs span:hover { background: #2563eb; }
+.erp-side-tabs span.active { background: #1e3a8a; }
 
 @media (max-width: 900px) {
     .erp-grid { grid-template-columns: repeat(2, 1fr); }

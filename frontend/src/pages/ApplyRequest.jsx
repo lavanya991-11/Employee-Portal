@@ -20,6 +20,7 @@ function ApplyRequest() {
         employee: user.name || ''
     });
     const [rows, setRows] = useState([emptyRow()]);
+    const [sideTab, setSideTab] = useState('actions'); // actions | info | reports | shortcuts
     const [assets, setAssets] = useState([]);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -200,14 +201,34 @@ function ApplyRequest() {
                         </form>
 
                         <aside className="erp-actions-panel">
-                            <div className="erp-actions-header"><span>Actions</span></div>
-                            <ul className="erp-actions-list">
-                                <li onClick={() => window.print()}>🖨️ Print</li>
-                                <li onClick={addRow}>➕ Add Row</li>
-                                <li onClick={load}>🔄 Refresh</li>
-                            </ul>
+                            <div className="erp-actions-header"><span>{{ actions: 'Actions', info: 'Info', reports: 'Reports', shortcuts: 'Shortcuts' }[sideTab]}</span></div>
+                            {sideTab === 'actions' && (
+                                <ul className="erp-actions-list">
+                                    <li onClick={() => window.print()}>🖨️ Print</li>
+                                    <li onClick={addRow}>➕ Add Row</li>
+                                    <li onClick={load}>🔄 Refresh</li>
+                                </ul>
+                            )}
+                            {sideTab === 'info' && (
+                                <div style={{ padding: 14, fontSize: 13, color: 'var(--muted)', lineHeight: 1.55 }}>
+                                    Fill in the request and submit it for approval. The <b>Actions</b> tab has Print, Add Row and Refresh.
+                                </div>
+                            )}
+                            {sideTab === 'reports' && (
+                                <div style={{ padding: 14, fontSize: 13, color: 'var(--muted)' }}>Reports for this document will appear here.</div>
+                            )}
+                            {sideTab === 'shortcuts' && (
+                                <ul className="erp-actions-list">
+                                    <li>⌨️ Ctrl + S — Save</li>
+                                    <li>🖨️ Ctrl + P — Print</li>
+                                    <li>⎋ Esc — Close</li>
+                                </ul>
+                            )}
                             <div className="erp-side-tabs">
-                                <span>Actions</span><span>Info</span><span>Reports</span><span>Shortcut</span>
+                                <span className={sideTab === 'actions' ? 'active' : ''} onClick={() => setSideTab('actions')}>Actions</span>
+                                <span className={sideTab === 'info' ? 'active' : ''} onClick={() => setSideTab('info')}>Info</span>
+                                <span className={sideTab === 'reports' ? 'active' : ''} onClick={() => setSideTab('reports')}>Reports</span>
+                                <span className={sideTab === 'shortcuts' ? 'active' : ''} onClick={() => setSideTab('shortcuts')}>Shortcuts</span>
                             </div>
                         </aside>
                     </div>
