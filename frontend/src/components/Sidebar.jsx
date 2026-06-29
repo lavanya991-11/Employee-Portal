@@ -1,35 +1,32 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { employeeInfoApi, resolveImageUrl } from '../services/api';
+import { settingsApi, resolveImageUrl } from '../services/api';
 
 function Sidebar() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const [info, setInfo] = useState(null);
     const [openMenu, setOpenMenu] = useState('');
+    const [companyLogo, setCompanyLogo] = useState(() => localStorage.getItem('companyLogo') || '');
+    const [companyName, setCompanyName] = useState(() => localStorage.getItem('companyName') || '');
 
     useEffect(() => {
-        employeeInfoApi.getMy()
-            .then(({ data }) => setInfo(data.employeeInfo || null))
-            .catch(() => {});
+        settingsApi.get().then(({ data }) => {
+            const s = data.settings || {};
+            setCompanyLogo(s.companyLogo || '');
+            setCompanyName(s.companyName || '');
+            localStorage.setItem('companyLogo', s.companyLogo || '');
+            localStorage.setItem('companyName', s.companyName || '');
+        }).catch(() => {});
     }, []);
 
     const toggle = (name) => setOpenMenu(openMenu === name ? '' : name);
 
-    const displayName = [info?.firstName, info?.middleName, info?.lastName].filter(Boolean).join(' ')
-        || user.name || 'User';
-    const displayCode = info?.employeeCode || user.empId;
-
     return (
         <aside className="sidebar">
             <div className="sidebar-profile">
-                <div className="avatar">
-                    {user.profilePicture
-                        ? <img src={resolveImageUrl(user.profilePicture)} alt="" />
-                        : '👤'}
-                </div>
-                <div className="user-id">
-                    {displayCode ? `${displayCode} - ${displayName}` : displayName}
-                </div>
+                {companyLogo
+                    ? <img className="sidebar-logo" src={resolveImageUrl(companyLogo)} alt={companyName || 'Company'} />
+                    : <div className="sidebar-logo-fallback">{(companyName || 'C').charAt(0).toUpperCase()}</div>}
+                <div className="sidebar-company">{companyName || 'Company'}</div>
             </div>
 
             <nav className="sidebar-nav">
