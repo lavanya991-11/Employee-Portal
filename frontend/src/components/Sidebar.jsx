@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { settingsApi, authApi, resolveImageUrl } from '../services/api';
+import { Link, useLocation } from 'react-router-dom';
+import { settingsApi, resolveImageUrl } from '../services/api';
 
 /* Thin line icons (inherit currentColor) — match the login's icon style. */
 const ic = (paths) => (
@@ -36,7 +36,6 @@ const MENU_ROUTES = {
 };
 
 function Sidebar() {
-    const navigate = useNavigate();
     const { pathname } = useLocation();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const [companyLogo, setCompanyLogo] = useState(() => localStorage.getItem('companyLogo') || '');
@@ -59,12 +58,6 @@ function Sidebar() {
     const toggle = (name) => setOpenMenu(openMenu === name ? '' : name);
     const isActive = (path) => pathname === path || pathname.startsWith(path + '/');
     const menuActive = (name) => MENU_ROUTES[name].some((p) => isActive(p));
-
-    const handleLogout = async () => {
-        try { await authApi.logout(); } catch (e) {}
-        localStorage.clear();
-        navigate('/login');
-    };
 
     const Parent = ({ name, icon, label }) => (
         <button type="button"
@@ -152,9 +145,6 @@ function Sidebar() {
                     <div className="sidebar-help-title">Need Help?</div>
                     <div className="sidebar-help-text">Visit our help center for guides and support.</div>
                 </div>
-                <button type="button" className="sidebar-logout" onClick={handleLogout}>
-                    <span className="nav-item-icon">{Icons.logout}</span> Logout
-                </button>
             </div>
         </aside>
     );
