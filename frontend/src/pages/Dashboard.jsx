@@ -23,6 +23,18 @@ const ADMIN_TILES = [
     { key: 'credentials', title: 'Employee Credentials', icon: '🪪', color: '#64748b', path: '/employee-credentials' }
 ];
 
+// Professional line icons for the KPI cards (inherit the card's icon colour).
+const kpiSvg = (paths) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{paths}</svg>
+);
+const KPI_ICONS = {
+    present: kpiSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /><path d="m8.5 15 2.2 2.2 4.3-4.4" /></>),
+    leave: kpiSvg(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" /></>),
+    hours: kpiSvg(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>),
+    holiday: kpiSvg(<><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13M5 12v9h14v-9" /><path d="M12 8S9.6 2.2 7 4s2.6 4 5 4M12 8s2.4-5.8 5-4-2.6 4-5 4" /></>)
+};
+
 function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
@@ -321,16 +333,16 @@ function Dashboard() {
 
                 {/* 4 stat cards */}
                 <div className="dash-stats">
-                    <StatCard icon="📅" iconBg="#dbeafe" iconColor="#1e40af"
+                    <StatCard icon={KPI_ICONS.present} iconBg="#dbeafe" iconColor="#1e40af"
                         label="Present Days" value={metrics.presentDays} sub="This Month (working days)" delta={`${metrics.usedThisMonth} leave day(s) this month`} />
-                    <StatCard icon="🌴" iconBg="#dcfce7" iconColor="#15803d"
+                    <StatCard icon={KPI_ICONS.leave} iconBg="#dcfce7" iconColor="#15803d"
                         label="Leave Balance"
                         value={bcLeaveBalance != null ? bcLeaveBalance : metrics.leaveBalance}
                         sub="Days Left"
                         delta={bcLeaveBalance != null ? 'From Business Central' : `${metrics.usedThisYear} of ${ANNUAL_LEAVE_ALLOWANCE} used this year`} />
-                    <StatCard icon="⏰" iconBg="#fed7aa" iconColor="#c2410c"
+                    <StatCard icon={KPI_ICONS.hours} iconBg="#fed7aa" iconColor="#c2410c"
                         label="Working Hours" value={metrics.workingHours} sub="This Month" delta={`${metrics.presentDays} present day(s) × 8h`} />
-                    <StatCard icon="🎉" iconBg="#ede9fe" iconColor="#6d28d9"
+                    <StatCard icon={KPI_ICONS.holiday} iconBg="#ede9fe" iconColor="#6d28d9"
                         label="Upcoming Holiday" value={nextHoliday?.description || '—'}
                         sub={nextHoliday ? new Date(nextHoliday.fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
                         delta={<Link to="/holidays" style={{ color: '#3b82f6', textDecoration: 'none' }}>View Calendar</Link>}
