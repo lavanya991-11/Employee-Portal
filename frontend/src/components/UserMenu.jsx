@@ -38,16 +38,16 @@ function UserMenu() {
                 type="button"
                 onClick={() => setOpen((v) => !v)}
                 style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6,
-                    cursor: 'pointer', padding: '4px 10px 4px 4px'
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                    background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 10,
+                    cursor: 'pointer', padding: '8px 14px'
                 }}
             >
                 <span style={{
-                    width: 28, height: 28, borderRadius: '50%', background: '#3b82f6', color: '#fff',
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13
+                    width: 32, height: 32, borderRadius: '50%', background: '#3b82f6', color: '#fff',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14
                 }}>{initial}</span>
-                <span style={{ fontWeight: 600, color: '#111827', fontSize: 13 }}>{user.name || 'User'}</span>
+                <span style={{ fontWeight: 600, color: '#111827', fontSize: 12 }}>{user.name || 'User'}</span>
             </button>
             {open && (
                 <div style={{

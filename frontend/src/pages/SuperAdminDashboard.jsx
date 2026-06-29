@@ -104,13 +104,13 @@ function SuperAdminDashboard() {
                         <button
                             type="button"
                             onClick={() => setMenuOpen((v) => !v)}
-                            style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px 8px' }}
+                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px 8px' }}
                         >
                             <span style={{
                                 width: 36, height: 36, borderRadius: '50%', background: 'var(--accent)', color: '#fff',
                                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700
                             }}>{avatarInitial}</span>
-                            <span style={{ fontWeight: 600, color: '#111827' }}>{displayName}</span>
+                            <span style={{ fontWeight: 600, color: '#111827', fontSize: 12 }}>{displayName}</span>
                         </button>
                         {menuOpen && (
                             <div style={{

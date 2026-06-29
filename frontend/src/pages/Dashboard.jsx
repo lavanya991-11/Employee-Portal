@@ -232,7 +232,7 @@ function Dashboard() {
                             type="button"
                             onClick={() => setUserMenuOpen((v) => !v)}
                             style={{
-                                display: 'flex', alignItems: 'center', gap: 10,
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                                 background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px 8px'
                             }}
                         >
@@ -240,7 +240,7 @@ function Dashboard() {
                                 width: 36, height: 36, borderRadius: '50%', background: 'var(--accent)', color: '#fff',
                                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700
                             }}>{avatarInitial}</span>
-                            <span style={{ fontWeight: 600, color: '#111827' }}>{user.name || displayName}</span>
+                            <span style={{ fontWeight: 600, color: '#111827', fontSize: 12 }}>{user.name || displayName}</span>
                         </button>
                         {userMenuOpen && (
                             <div style={{
