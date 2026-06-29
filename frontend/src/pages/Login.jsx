@@ -22,22 +22,30 @@ const HeroArt = () => (
             </svg>
             <div className="login-brand">Employee Portal</div>
 
-            <svg className="login-hero-chips" width="280" height="70" viewBox="0 0 280 70" fill="none">
-                <path d="M40 40 Q90 0 130 35 T240 35" stroke="#93b4ee" strokeWidth="1.5" strokeDasharray="4 4" />
+            <svg className="login-hero-chips" width="300" height="92" viewBox="0 0 300 92" fill="none">
+                <path d="M48 54 C70 20 98 20 120 54 C142 20 170 20 192 54 C214 24 238 24 256 54"
+                    stroke="#9cb8ee" strokeWidth="1.4" strokeDasharray="3 5" strokeLinecap="round" />
                 {[
-                    { x: 40, e: '👤' }, { x: 113, e: '📅' }, { x: 186, e: '📄' }, { x: 252, e: '📊' }
+                    { x: 48, icon: <><circle cx="0" cy="-2.5" r="3" /><path d="M-5.5 6.5a5.5 5.5 0 0 1 11 0" /></> },
+                    { x: 120, icon: <><rect x="-7" y="-6" width="14" height="13" rx="2" /><path d="M-7 -1.5h14M-3.5 -9v3.5M3.5 -9v3.5" /></> },
+                    { x: 192, icon: <><path d="M-5 -8h6l4 4v12h-10z" /><path d="M1 -8v4h4" /></> },
+                    { x: 256, icon: <><path d="M-6 7v-4M-1 7v-9M4 7v-6" /></> }
                 ].map((c, i) => (
                     <g key={i}>
-                        <circle cx={c.x} cy="40" r="18" fill="#ffffff" stroke="#dbe5f8" />
-                        <text x={c.x} y="46" fontSize="16" textAnchor="middle">{c.e}</text>
+                        <circle cx={c.x} cy="54" r="19" fill="#eaf1fc" stroke="#d4e1f7" />
+                        <g transform={`translate(${c.x} 54)`} stroke="#2563eb" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">{c.icon}</g>
                     </g>
                 ))}
             </svg>
         </div>
-        <svg className="login-waves" viewBox="0 0 500 120" preserveAspectRatio="none" height="120">
-            <path d="M0 60 C120 20 200 90 280 60 C360 30 440 80 500 55 L500 120 L0 120 Z" fill="#cdddf6" opacity="0.7" />
-            <path d="M0 78 C110 45 210 100 300 72 C380 48 450 92 500 72 L500 120 L0 120 Z" fill="#b8d0f2" opacity="0.7" />
-            <path d="M0 95 C130 70 220 110 320 90 C400 74 460 100 500 90 L500 120 L0 120 Z" fill="#a7c4ef" opacity="0.8" />
+        <svg className="login-waves" viewBox="0 0 500 130" preserveAspectRatio="none" height="130">
+            <path d="M0 70 C120 35 200 95 300 65 C380 40 450 85 500 62 L500 130 L0 130 Z" fill="#d7e3f8" opacity="0.65" />
+            <path d="M0 86 C110 55 210 100 300 78 C380 56 450 92 500 76 L500 130 L0 130 Z" fill="#c2d6f4" opacity="0.7" />
+            <path d="M0 102 C130 80 220 112 320 96 C400 82 460 104 500 96 L500 130 L0 130 Z" fill="#aecbf0" opacity="0.85" />
+            <g stroke="#bcd2f4" strokeWidth="1" fill="none" opacity="0.5">
+                <path d="M0 64 C120 30 200 90 300 60 C380 36 450 80 500 58" />
+                <path d="M0 77 C115 44 205 96 300 70 C382 48 452 86 500 68" />
+            </g>
         </svg>
     </>
 );
