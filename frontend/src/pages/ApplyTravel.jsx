@@ -180,7 +180,9 @@ function ApplyTravel() {
                                 <div className="erp-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span>Details</span>
                                     <button type="button" onClick={addLine}
-                                        style={{ background: 'white', color: '#1e3a8a', border: 'none', borderRadius: 3, padding: '2px 8px', cursor: 'pointer', fontWeight: 700 }}>+</button>
+                                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: 'var(--accent)', border: 'none', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', fontWeight: 700, fontSize: 13, boxShadow: '0 1px 2px rgba(16,24,40,.12)' }}>
+                                        <span style={{ fontSize: 15, lineHeight: 1 }}>＋</span> New Line
+                                    </button>
                                 </div>
                                 <table className="erp-table">
                                     <thead>
