@@ -135,7 +135,7 @@ function MyLeaves() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
-                <PageHeader pageName="Apply Leave" />
+                <PageHeader pageName="Leave Request" />
                 <div className="erp-page" ref={tableRef}>
                     <div className="erp-titlebar" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
                         <div style={{ position: 'relative', width: '100%' }}>
@@ -158,7 +158,7 @@ function MyLeaves() {
                             />
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                            <div className="erp-title">Apply Leave</div>
+                            <div className="erp-title">Leave Request</div>
                             <div className="erp-titlebar-actions">
                                 <button className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
                                 <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>

@@ -76,10 +76,10 @@ function TravelRequests() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
-                <PageHeader pageName="Travel Requests" />
+                <PageHeader pageName="Travel Expenses" />
                 <div className="erp-page" onClick={() => setSelected(null)}>
                     <div className="erp-titlebar">
-                        <div className="erp-title">Travel Requests</div>
+                        <div className="erp-title">Travel Expenses</div>
                         <div className="erp-titlebar-actions">
                             <button className="erp-action-btn" onClick={() => navigate('/travels/apply')}>➕ Apply Travel</button>
                             <button className="erp-action-btn" onClick={(e) => { e.stopPropagation(); onView(); }} disabled={!selected}>👁️ View</button>
