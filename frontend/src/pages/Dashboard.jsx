@@ -217,12 +217,6 @@ function Dashboard() {
             <Sidebar />
             <main className="main-content">
                 <div className="dashboard-header">
-                    {(companyLogo || companyName) && (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: 18 }}>
-                            {companyLogo && <img src={resolveImageUrl(companyLogo)} alt="Company logo" style={{ maxHeight: 44, maxWidth: 130, objectFit: 'contain' }} />}
-                            {companyName && <span style={{ fontSize: 13, fontWeight: 700, color: '#1e3a8a', marginTop: 2 }}>{companyName}</span>}
-                        </div>
-                    )}
                     <div className="greeting">
                         <h2>Good {timeOfDay}, {displayName} 👋</h2>
                         <p>{displayDesignation} • {displayDepartment}</p>
