@@ -118,9 +118,8 @@ function SuperAdminDashboard() {
                                 background: '#fff', border: '1px solid var(--line-soft)', borderRadius: 10,
                                 boxShadow: 'var(--shadow-md)', minWidth: 180, zIndex: 50, overflow: 'hidden'
                             }}>
-                                <div style={{ padding: '12px 14px', borderBottom: '1px solid #f3f4f6' }}>
-                                    <div style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>{displayName}</div>
-                                    {user.email && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{user.email}</div>}
+                                <div style={{ padding: '10px 14px', borderBottom: '1px solid #f3f4f6', fontSize: 12, color: '#6b7280' }}>
+                                    {user.email || ''}
                                 </div>
                                 <button
                                     type="button"
