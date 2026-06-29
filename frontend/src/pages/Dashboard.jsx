@@ -41,7 +41,7 @@ const qlSvg = (paths) => (
         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{paths}</svg>
 );
 const QL_ICONS = {
-    leave: qlSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /></>),
+    leave: qlSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /><path d="M12 14v4M10 16h4" /></>),
     overtime: qlSvg(<><path d="M10 3h4" /><path d="M12 3v3" /><circle cx="12" cy="14" r="8" /><path d="M12 14V10" /><path d="m17.7 8.3-1.5 1.5" /></>),
     payslip: qlSvg(<><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18" /><circle cx="12" cy="14.5" r="1.6" /></>),
     profile: qlSvg(<><circle cx="12" cy="8" r="4" /><path d="M4 20a8 8 0 0 1 16 0" /></>),
