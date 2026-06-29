@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import NotificationBell from '../components/NotificationBell';
-import { adminApi, authApi } from '../services/api';
+import { adminApi, authApi, resolveImageUrl } from '../services/api';
 
 const TILES = [
     { key: 'users', title: 'Users', icon: '👥', color: '#3b82f6', path: '/admin/users' },
@@ -107,9 +107,13 @@ function SuperAdminDashboard() {
                             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px 8px' }}
                         >
                             <span style={{
-                                width: 36, height: 36, borderRadius: '50%', background: 'var(--accent)', color: '#fff',
-                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700
-                            }}>{avatarInitial}</span>
+                                width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: '#1e3a8a', color: '#cbd5e1',
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                {user.profilePicture
+                                    ? <img src={resolveImageUrl(user.profilePicture)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    : <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.4 0-9 2.2-9 5.2V22h18v-2.8c0-3-4.6-5.2-9-5.2Z" /></svg>}
+                            </span>
                             <span style={{ fontWeight: 600, color: '#111827', fontSize: 12 }}>{displayName}</span>
                         </button>
                         {menuOpen && (

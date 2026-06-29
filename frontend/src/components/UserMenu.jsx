@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authApi } from '../services/api';
+import { authApi, resolveImageUrl } from '../services/api';
+
+const PersonIcon = ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.4 0-9 2.2-9 5.2V22h18v-2.8c0-3-4.6-5.2-9-5.2Z" />
+    </svg>
+);
+const avatarBox = { width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', background: '#1e3a8a', color: '#cbd5e1', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
 
 function UserMenu() {
     const navigate = useNavigate();
@@ -30,8 +37,6 @@ function UserMenu() {
         navigate('/login');
     };
 
-    const initial = (user.name?.[0] || 'U').toUpperCase();
-
     return (
         <div ref={wrapRef} style={{ position: 'relative' }}>
             <button
@@ -43,10 +48,11 @@ function UserMenu() {
                     cursor: 'pointer', padding: '8px 14px'
                 }}
             >
-                <span style={{
-                    width: 32, height: 32, borderRadius: '50%', background: '#3b82f6', color: '#fff',
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14
-                }}>{initial}</span>
+                <span style={avatarBox}>
+                    {user.profilePicture
+                        ? <img src={resolveImageUrl(user.profilePicture)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        : <PersonIcon />}
+                </span>
                 <span style={{ fontWeight: 600, color: '#111827', fontSize: 12 }}>{user.name || 'User'}</span>
             </button>
             {open && (

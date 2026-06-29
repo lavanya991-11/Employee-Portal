@@ -237,9 +237,13 @@ function Dashboard() {
                             }}
                         >
                             <span style={{
-                                width: 36, height: 36, borderRadius: '50%', background: 'var(--accent)', color: '#fff',
-                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700
-                            }}>{avatarInitial}</span>
+                                width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: '#1e3a8a', color: '#cbd5e1',
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                {user.profilePicture
+                                    ? <img src={resolveImageUrl(user.profilePicture)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    : <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.4 0-9 2.2-9 5.2V22h18v-2.8c0-3-4.6-5.2-9-5.2Z" /></svg>}
+                            </span>
                             <span style={{ fontWeight: 600, color: '#111827', fontSize: 12 }}>{user.name || displayName}</span>
                         </button>
                         {userMenuOpen && (
