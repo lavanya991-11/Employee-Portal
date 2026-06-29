@@ -115,7 +115,7 @@ function IdentificationTypes() {
                                     placeholder="Search by code, description, type…"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    style={{ flex: 1, padding: '4px 8px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 3 }}
+                                    style={{ flex: 1, padding: '9px 12px', fontSize: 13, border: '1px solid var(--input-border)', borderRadius: 'var(--radius-control)' }}
                                 />
                                 <span style={{ fontSize: 11, color: '#6b7280' }}>{filtered.length} records</span>
                             </div>

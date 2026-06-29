@@ -120,7 +120,7 @@ function SystemSettings() {
                     </div>
 
                     {/* Theme Colors card */}
-                    <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 10, margin: '0 20px 20px', padding: 20 }}>
+                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line-soft)', borderRadius: 'var(--radius-card)', boxShadow: 'var(--shadow-sm)', margin: '0 20px 20px', padding: 20 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
                             <span style={{ width: 32, height: 32, borderRadius: 8, background: '#dbeafe', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🎨</span>
                             <div>
@@ -135,16 +135,11 @@ function SystemSettings() {
                         </div>
 
                         <div style={{ marginTop: 18, display: 'flex', gap: 12, alignItems: 'center' }}>
-                            <button
-                                type="button"
-                                onClick={onUpdateTheme}
-                                style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: 6, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                            >🎨 Update Theme</button>
-                            <button
-                                type="button"
-                                onClick={onReset}
-                                style={{ background: 'white', color: '#374151', border: '1px solid #d1d5db', borderRadius: 6, padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
-                            >Reset</button>
+                            <button type="button" className="btn" onClick={onUpdateTheme}
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                🎨 Update Theme
+                            </button>
+                            <button type="button" className="erp-action-btn" onClick={onReset}>Reset</button>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginLeft: 'auto', fontSize: 12, color: '#6b7280' }}>
                                 <span style={{ width: 20, height: 20, borderRadius: 4, background: primary, border: '1px solid #e5e7eb' }} />
                                 <span style={{ width: 20, height: 20, borderRadius: 4, background: secondary, border: '1px solid #e5e7eb' }} />
@@ -154,7 +149,7 @@ function SystemSettings() {
                     </div>
 
                     {/* Company Logo card */}
-                    <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 10, margin: '0 20px 20px', padding: 20 }}>
+                    <div style={{ background: 'var(--surface)', border: '1px solid var(--line-soft)', borderRadius: 'var(--radius-card)', boxShadow: 'var(--shadow-sm)', margin: '0 20px 20px', padding: 20 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
                             <span style={{ width: 32, height: 32, borderRadius: 8, background: '#ede9fe', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🖼️</span>
                             <div>
@@ -171,13 +166,9 @@ function SystemSettings() {
                                     value={companyName}
                                     onChange={(e) => setCompanyName(e.target.value)}
                                     placeholder="e.g. Novasoft"
-                                    style={{ flex: 1, padding: '8px 12px', fontSize: 13, border: '1px solid #d1d5db', borderRadius: 6 }}
+                                    style={{ flex: 1, padding: '10px 12px', fontSize: 13, border: '1px solid var(--input-border)', borderRadius: 'var(--radius-control)' }}
                                 />
-                                <button
-                                    type="button"
-                                    onClick={onSaveCompanyName}
-                                    style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: 6, padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
-                                >Save</button>
+                                <button type="button" className="btn" onClick={onSaveCompanyName}>Save</button>
                             </div>
                         </div>
 
@@ -204,7 +195,7 @@ function SystemSettings() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 12, background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 6 }}>
                                 <label
                                     htmlFor="logo-upload-input"
-                                    style={{ background: '#3b82f6', color: 'white', borderRadius: 4, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                                    style={{ background: 'var(--accent)', color: 'white', borderRadius: 8, padding: '7px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
                                 >Choose file</label>
                                 <input
                                     id="logo-upload-input"
@@ -232,12 +223,10 @@ function SystemSettings() {
                         </div>
 
                         <div style={{ marginTop: 18 }}>
-                            <button
-                                type="button"
-                                onClick={onUploadLogo}
-                                disabled={uploading}
-                                style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: 6, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: uploading ? 'default' : 'pointer', opacity: uploading ? 0.7 : 1, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                            >📤 {uploading ? 'Uploading…' : 'Upload Logo'}</button>
+                            <button type="button" className="btn" onClick={onUploadLogo} disabled={uploading}
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                📤 {uploading ? 'Uploading…' : 'Upload Logo'}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -261,8 +250,8 @@ function ColorField({ label, value, onChange }) {
                     type="text"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    placeholder="#1976d2"
-                    style={{ flex: 1, padding: '8px 12px', fontSize: 13, border: '1px solid #d1d5db', borderRadius: 6, fontFamily: 'monospace' }}
+                    placeholder="#2563eb"
+                    style={{ flex: 1, padding: '10px 12px', fontSize: 13, border: '1px solid var(--input-border)', borderRadius: 'var(--radius-control)', fontFamily: 'monospace' }}
                 />
             </div>
         </div>

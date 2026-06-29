@@ -220,14 +220,14 @@ function FinElements() {
 
                             <div style={{ display: 'flex', gap: 12, padding: 10, borderBottom: '1px solid #e5e7eb', alignItems: 'center' }}>
                                 <label style={{ fontSize: 12, color: '#6b7280' }}>Fin Type:</label>
-                                <select value={filterType} onChange={(e) => setFilterType(e.target.value)} style={{ padding: '4px 8px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 3 }}>
+                                <select value={filterType} onChange={(e) => setFilterType(e.target.value)} style={{ padding: '9px 12px', fontSize: 13, border: '1px solid var(--input-border)', borderRadius: 'var(--radius-control)' }}>
                                     {FIN_TYPES.map((t) => <option key={t} value={t}>{t || 'All'}</option>)}
                                 </select>
                                 <input
                                     placeholder="Search by ID, description, short name…"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    style={{ flex: 1, padding: '4px 8px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 3 }}
+                                    style={{ flex: 1, padding: '9px 12px', fontSize: 13, border: '1px solid var(--input-border)', borderRadius: 'var(--radius-control)' }}
                                 />
                                 <span style={{ fontSize: 11, color: '#6b7280' }}>{filtered.length} records · {ALL_COLUMNS.length} columns</span>
                             </div>

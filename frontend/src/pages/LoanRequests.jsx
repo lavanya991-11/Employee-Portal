@@ -112,12 +112,12 @@ function LoanRequests() {
                         <div className="erp-list-card" style={{ width: '100%' }}>
                             {error && <div className="error">{error}</div>}
 
-                            <div style={{ display: 'flex', gap: 12, padding: 10, borderBottom: '1px solid #e5e7eb', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: 12, padding: 12, borderBottom: '1px solid var(--line-soft)', alignItems: 'center' }}>
                                 <input
                                     placeholder="Search by request no, status, comments…"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    style={{ flex: 1, padding: '4px 8px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 3 }}
+                                    style={{ flex: 1, padding: '9px 12px', fontSize: 13, border: '1px solid var(--input-border)', borderRadius: 'var(--radius-control)' }}
                                 />
                                 <span style={{ fontSize: 11, color: '#6b7280' }}>{filtered.length} records</span>
                             </div>

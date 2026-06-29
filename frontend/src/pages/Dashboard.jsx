@@ -237,7 +237,7 @@ function Dashboard() {
                             }}
                         >
                             <span style={{
-                                width: 36, height: 36, borderRadius: '50%', background: '#3b82f6', color: '#fff',
+                                width: 36, height: 36, borderRadius: '50%', background: 'var(--accent)', color: '#fff',
                                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700
                             }}>{avatarInitial}</span>
                             <span style={{ fontWeight: 600, color: '#111827' }}>{user.name || displayName}</span>
@@ -582,7 +582,7 @@ function AttendanceCalendar({ leaves, title = 'My Attendance' }) {
                                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                                                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                                                 <span style={{
-                                                                    width: 26, height: 26, borderRadius: '50%', background: '#3b82f6', color: 'white',
+                                                                    width: 26, height: 26, borderRadius: '50%', background: 'var(--accent)', color: 'white',
                                                                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700
                                                                 }}>{(employeeName[0] || '?').toUpperCase()}</span>
                                                                 <b style={{ fontSize: 14, color: '#111827' }}>{employeeName}</b>

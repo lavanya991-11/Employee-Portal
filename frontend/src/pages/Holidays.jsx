@@ -91,7 +91,7 @@ function Holidays() {
                             placeholder="🔍 Search..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{ padding: '8px 14px', fontSize: 14, border: '1px solid #d1d5db', borderRadius: 8, width: '100%', background: '#fff' }}
+                            style={{ padding: '9px 14px', fontSize: 14, border: '1px solid var(--input-border)', borderRadius: 'var(--radius-control)', width: '100%', background: '#fff' }}
                         />
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                             <div className="erp-title">Holidays</div>
@@ -100,7 +100,7 @@ function Holidays() {
                                 <select
                                     value={year}
                                     onChange={(e) => setYear(Number(e.target.value))}
-                                    style={{ padding: '6px 10px', fontSize: 13, border: '1px solid #d1d5db', borderRadius: 4 }}
+                                    style={{ padding: '7px 10px', fontSize: 13, border: '1px solid var(--input-border)', borderRadius: 8 }}
                                 >
                                     {yearOptions.map((y) => (
                                         <option key={y} value={y}>{y}</option>

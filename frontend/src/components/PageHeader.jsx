@@ -7,13 +7,14 @@ function PageHeader({ pageName }) {
     return (
         <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '10px 16px', background: '#ffffff',
-            border: '1px solid #e5e7eb', borderRadius: 8, marginBottom: 12
+            padding: '12px 18px', background: 'var(--surface)',
+            border: '1px solid var(--line-soft)', borderRadius: 'var(--radius-card)',
+            marginBottom: 16, boxShadow: 'var(--shadow-sm)'
         }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
-                <Link to="/dashboard" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 500 }}>Home</Link>
-                <span style={{ color: '#9ca3af' }}>›</span>
-                <span style={{ color: '#111827', fontWeight: 600 }}>{pageName}</span>
+                <Link to="/dashboard" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>Home</Link>
+                <span style={{ color: '#cbd5e1' }}>›</span>
+                <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{pageName}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <SessionPill />

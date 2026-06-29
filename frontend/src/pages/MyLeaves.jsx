@@ -150,7 +150,7 @@ function MyLeaves() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{
                                     padding: '10px 14px 10px 38px', fontSize: 14,
-                                    border: '1px solid #e5e7eb', borderRadius: 10,
+                                    border: '1px solid var(--input-border)', borderRadius: 'var(--radius-control)',
                                     width: '100%', background: '#fff',
                                     color: '#111827', outline: 'none',
                                     boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
