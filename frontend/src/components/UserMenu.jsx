@@ -55,8 +55,9 @@ function UserMenu() {
                     background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.08)', minWidth: 200, zIndex: 50, overflow: 'hidden'
                 }}>
-                    <div style={{ padding: '10px 14px', borderBottom: '1px solid #f3f4f6', fontSize: 12, color: '#6b7280' }}>
-                        {user.email || ''}
+                    <div style={{ padding: '12px 14px', borderBottom: '1px solid #f3f4f6' }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>{user.name || 'User'}</div>
+                        {user.email && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{user.email}</div>}
                     </div>
                     <button
                         type="button"
