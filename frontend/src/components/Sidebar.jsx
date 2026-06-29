@@ -8,14 +8,16 @@ const ic = (paths) => (
         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{paths}</svg>
 );
 const Icons = {
-    dashboard: ic(<><rect x="3" y="3" width="7.5" height="7.5" rx="2" /><rect x="13.5" y="3" width="7.5" height="7.5" rx="2" /><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2" /><rect x="3" y="13.5" width="7.5" height="7.5" rx="2" /></>),
-    apply: ic(<><path d="M15.5 3H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7.5Z" /><path d="M15 3v5h5" /><path d="M12 11v5M9.5 13.5h5" /></>),
-    payroll: ic(<><rect x="2.5" y="6" width="19" height="13" rx="2.5" /><path d="M2.5 10h19" /><circle cx="12" cy="14.5" r="1.6" /></>),
-    approvals: ic(<><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z" /><path d="m8.5 12 2.4 2.4 4.6-4.8" /></>),
+    dashboard: ic(<><path d="M3 9.5 12 3l9 6.5" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></>),
+    apply: ic(<><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></>),
+    payroll: ic(<><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M3 12h18" /></>),
+    approvals: ic(<><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z" /><path d="m9 12 2 2 4-4" /></>),
     request: ic(<><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.5 5.5 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.5A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.5Z" /></>),
-    expenses: ic(<><path d="M5 2.5v19l2-1.2 2 1.2 2-1.2 2 1.2 2-1.2 2 1.2v-19l-2 1.2-2-1.2-2 1.2-2-1.2-2 1.2Z" /><path d="M9 8.5h6M9 12.5h6" /></>),
+    expenses: ic(<><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" /><path d="M8 8h8" /><path d="M8 12h8" /></>),
     settings: ic(<><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.74 1.04 2 2 0 1 1-4 0 1.65 1.65 0 0 0-1.08-1.5 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.5-1.08 2 2 0 1 1 0-4 1.65 1.65 0 0 0 1.5-1.1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51 2 2 0 1 1 4 0 1.65 1.65 0 0 0 1.08 1.5 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.31.22.65.22 1Z" /></>),
     data: ic(<><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14a9 3 0 0 0 18 0V5" /><path d="M3 12a9 3 0 0 0 18 0" /></>),
+    help: ic(<><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></>),
+    logout: ic(<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /></>),
 };
 
 const Chevron = () => (
@@ -80,7 +82,6 @@ function Sidebar() {
             </div>
 
             <nav className="sidebar-nav">
-                <div className="nav-section">Main</div>
                 <Link to="/dashboard" className={`nav-item${isActive('/dashboard') ? ' active' : ''}`}>
                     <span className="nav-item-icon">{Icons.dashboard}</span>
                     <span className="nav-item-label">Dashboard</span>
@@ -101,7 +102,6 @@ function Sidebar() {
                     </div>
                 )}
 
-                <div className="nav-section">Workspace</div>
                 {['manager', 'admin', 'super-admin'].includes(user.role) && (
                     <Link to="/approvals" className={`nav-item${isActive('/approvals') ? ' active' : ''}`}>
                         <span className="nav-item-icon">{Icons.approvals}</span>
@@ -125,17 +125,17 @@ function Sidebar() {
                 )}
 
                 {user.role === 'super-admin' && (
-                    <>
-                        <div className="nav-section">Administration</div>
-                        <Link to="/system-settings" className={`nav-item${isActive('/system-settings') ? ' active' : ''}`}>
-                            <span className="nav-item-icon">{Icons.settings}</span>
-                            <span className="nav-item-label">System Settings</span>
-                        </Link>
-                        <Link to="/data-management" className={`nav-item${isActive('/data-management') ? ' active' : ''}`}>
-                            <span className="nav-item-icon">{Icons.data}</span>
-                            <span className="nav-item-label">Data Management</span>
-                        </Link>
-                    </>
+                    <Link to="/system-settings" className={`nav-item${isActive('/system-settings') ? ' active' : ''}`}>
+                        <span className="nav-item-icon">{Icons.settings}</span>
+                        <span className="nav-item-label">System Settings</span>
+                    </Link>
+                )}
+
+                {user.role === 'super-admin' && (
+                    <Link to="/data-management" className={`nav-item${isActive('/data-management') ? ' active' : ''}`}>
+                        <span className="nav-item-icon">{Icons.data}</span>
+                        <span className="nav-item-label">Data Management</span>
+                    </Link>
                 )}
             </nav>
         </aside>
