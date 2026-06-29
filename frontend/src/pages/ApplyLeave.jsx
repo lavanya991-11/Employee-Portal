@@ -38,6 +38,7 @@ function ApplyLeave() {
     const [success, setSuccess] = useState('');
     const [saving, setSaving] = useState(false);
     const [actionsOpen, setActionsOpen] = useState(true);
+    const [sideTab, setSideTab] = useState('actions'); // actions | info | reports | shortcuts
     const editId = searchParams.get('edit');
     const [savedId, setSavedId] = useState(editId || null);
 
@@ -511,32 +512,59 @@ function ApplyLeave() {
                             {actionsOpen && (
                                 <>
                                     <div className="erp-actions-header">
-                                        <span>Actions</span>
+                                        <span>{{ actions: 'Actions', info: 'Info', reports: 'Reports', shortcuts: 'Shortcuts' }[sideTab]}</span>
                                         <button
                                             type="button"
                                             className="erp-actions-close"
                                             onClick={() => setActionsOpen(false)}
                                             title="Close"
-                                            aria-label="Close Actions panel"
+                                            aria-label="Close panel"
                                         >×</button>
                                     </div>
-                                    <ul className="erp-actions-list">
-                                        <li onClick={onPrint}>🖨️ Print</li>
-                                        <li onClick={onPrint}>👁️ Print Preview</li>
-                                        <li onClick={onSuspend}>⏸️ Suspend</li>
-                                        <li onClick={onExport}>📤 Export</li>
-                                        <li onClick={onCopy}>📋 Copy</li>
-                                        <li onClick={onSearch}>🔍 Search</li>
-                                        <li onClick={onMap}>🗺️ Map</li>
-                                        <li onClick={onEInv}>📨 EInv</li>
-                                    </ul>
+
+                                    {sideTab === 'actions' && (
+                                        <ul className="erp-actions-list">
+                                            <li onClick={onPrint}>🖨️ Print</li>
+                                            <li onClick={onPrint}>👁️ Print Preview</li>
+                                            <li onClick={onSuspend}>⏸️ Suspend</li>
+                                            <li onClick={onExport}>📤 Export</li>
+                                            <li onClick={onCopy}>📋 Copy</li>
+                                            <li onClick={onSearch}>🔍 Search</li>
+                                            <li onClick={onMap}>🗺️ Map</li>
+                                            <li onClick={onEInv}>📨 EInv</li>
+                                        </ul>
+                                    )}
+
+                                    {sideTab === 'info' && (
+                                        <div style={{ padding: 14, fontSize: 13 }}>
+                                            <div style={{ fontWeight: 700, color: 'var(--accent-dark)', marginBottom: 8 }}>Leave Request</div>
+                                            <p style={{ color: 'var(--muted)', lineHeight: 1.55, margin: 0 }}>
+                                                Choose a leave pay code and a date range, then <b>Submit</b> to post your request to Business Central. Use <b>Save Draft</b> to keep it for later.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {sideTab === 'reports' && (
+                                        <ul className="erp-actions-list">
+                                            <li onClick={() => navigate('/leaves/my')}>📄 My Leave Requests</li>
+                                            <li onClick={() => navigate('/holidays')}>🎉 Holiday Calendar</li>
+                                        </ul>
+                                    )}
+
+                                    {sideTab === 'shortcuts' && (
+                                        <ul className="erp-actions-list">
+                                            <li onClick={() => navigate('/dashboard')}>🏠 Dashboard</li>
+                                            <li onClick={() => navigate('/leaves/my')}>🗓️ My Leaves</li>
+                                            <li onClick={() => navigate('/payslip')}>💰 Payslip</li>
+                                        </ul>
+                                    )}
                                 </>
                             )}
                             <div className="erp-side-tabs">
-                                <span onClick={() => setActionsOpen(true)} title="Open Actions">Actions</span>
-                                <span>Info</span>
-                                <span>Reports</span>
-                                <span>Shortcuts</span>
+                                <span className={actionsOpen && sideTab === 'actions' ? 'active' : ''} onClick={() => { setActionsOpen(true); setSideTab('actions'); }}>Actions</span>
+                                <span className={actionsOpen && sideTab === 'info' ? 'active' : ''} onClick={() => { setActionsOpen(true); setSideTab('info'); }}>Info</span>
+                                <span className={actionsOpen && sideTab === 'reports' ? 'active' : ''} onClick={() => { setActionsOpen(true); setSideTab('reports'); }}>Reports</span>
+                                <span className={actionsOpen && sideTab === 'shortcuts' ? 'active' : ''} onClick={() => { setActionsOpen(true); setSideTab('shortcuts'); }}>Shortcuts</span>
                             </div>
                         </aside>
                     </div>
