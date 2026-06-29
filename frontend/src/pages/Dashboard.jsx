@@ -42,7 +42,7 @@ const qlSvg = (paths) => (
 );
 const QL_ICONS = {
     leave: qlSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /></>),
-    overtime: qlSvg(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>),
+    overtime: qlSvg(<><path d="M10 3h4" /><path d="M12 3v3" /><circle cx="12" cy="14" r="8" /><path d="M12 14V10" /><path d="m17.7 8.3-1.5 1.5" /></>),
     payslip: qlSvg(<><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18" /><circle cx="12" cy="14.5" r="1.6" /></>),
     profile: qlSvg(<><circle cx="12" cy="8" r="4" /><path d="M4 20a8 8 0 0 1 16 0" /></>),
     holidays: qlSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /><path fill="currentColor" stroke="none" d="M12 12 12.9 14.7 15.8 14.8 13.5 16.5 14.4 19.2 12 17.6 9.6 19.2 10.5 16.5 8.2 14.8 11.1 14.7Z" /></>)
