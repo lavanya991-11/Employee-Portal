@@ -17,8 +17,13 @@ const LockIcon = () => (
 const HeroArt = () => (
     <>
         <div className="login-hero-inner">
-            <svg className="login-hero-icon" width="58" height="58" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm0 2c-2.7 0-8 1.3-8 4v2h9v-2c0-1 .4-1.9 1-2.6A12 12 0 0 0 8 13Zm8 0c-.3 0-.7 0-1.1.1A4 4 0 0 1 16 16v3h8v-2c0-2.7-5.3-4-8-4Z" />
+            <svg className="login-hero-icon" width="68" height="68" viewBox="0 0 64 64" fill="none">
+                {/* back person */}
+                <circle cx="41" cy="20" r="9" fill="#2563eb" />
+                <path d="M25 50c0-9.7 7.2-14.5 16-14.5S57 40.3 57 50Z" fill="#2563eb" />
+                {/* front person */}
+                <circle cx="22" cy="28" r="7.5" fill="#3b82f6" />
+                <path d="M7 53c0-8.3 6.7-12.5 15-12.5S37 44.7 37 53Z" fill="#3b82f6" />
             </svg>
             <div className="login-brand">Employee Portal</div>
 
