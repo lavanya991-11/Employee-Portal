@@ -8,16 +8,6 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '—';
 const docNo = (h, i, year) =>
     `HOL-${year}/${String(i + 1).padStart(3, '0').toUpperCase()}`;
 
-// Holiday status relative to today → coloured badge.
-const statusOf = (h) => {
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const from = new Date(h.fromDate);
-    const to = new Date(h.toDate);
-    if (to < today) return { label: 'Past', color: '#475569', bg: '#f1f5f9' };
-    if (from > today) return { label: 'Upcoming', color: '#b45309', bg: '#fef3c7' };
-    return { label: 'Today', color: '#15803d', bg: '#dcfce7' };
-};
-
 function Holidays() {
     const navigate = useNavigate();
     const [year, setYear] = useState(new Date().getFullYear());
@@ -137,17 +127,16 @@ function Holidays() {
                                     <thead>
                                         <tr>
                                             <th>Select</th>
+                                            <th>Doc Date</th>
                                             <th>Doc No</th>
                                             <th>From Date</th>
                                             <th>To Date</th>
                                             <th>Description</th>
-                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {filteredHolidays.map((h, i) => {
                                             const isSel = selected?.idx === i;
-                                            const st = statusOf(h);
                                             return (
                                                 <tr
                                                     key={`${h.fromDate}-${i}`}
@@ -155,13 +144,11 @@ function Holidays() {
                                                     onClick={() => setSelected({ ...h, idx: i })}
                                                 >
                                                     <td><input type="checkbox" checked={isSel} readOnly /></td>
+                                                    <td>{fmtDate(new Date())}</td>
                                                     <td className="erp-doc-link">{docNo(h, i, year)}</td>
                                                     <td>{fmtDate(h.fromDate)}</td>
                                                     <td>{fmtDate(h.toDate)}</td>
-                                                    <td><span style={{ marginRight: 6 }}>🎉</span>{h.description || '—'}</td>
-                                                    <td>
-                                                        <span style={{ padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: st.bg, color: st.color }}>{st.label}</span>
-                                                    </td>
+                                                    <td>{h.description || '—'}</td>
                                                 </tr>
                                             );
                                         })}
@@ -173,34 +160,31 @@ function Holidays() {
                         <aside className="erp-actions-panel">
                             <div className="erp-actions-header">
                                 <span>Holiday Status</span>
-                                <span style={{ color: 'var(--accent-dark)', fontWeight: 700 }}>{stats.total}</span>
+                                <span style={{ color: '#1e3a8a', fontWeight: 700 }}>{stats.total}</span>
                             </div>
-                            <div style={{ padding: 16 }}>
+                            <div style={{ padding: 14 }}>
                                 {stats.items.map((s) => (
-                                    <div key={s.key} style={{ marginBottom: 16 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--ink)', marginBottom: 6 }}>
-                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                                                <span style={{ width: 8, height: 8, borderRadius: 999, background: s.color }} />
-                                                {s.label} <span style={{ color: 'var(--muted)' }}>{s.pct}%</span>
-                                            </span>
-                                            <span style={{ fontWeight: 700 }}>{s.count}</span>
+                                    <div key={s.key} style={{ marginBottom: 14 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#374151', marginBottom: 4 }}>
+                                            <span>{s.label} <span style={{ color: '#9ca3af' }}>{s.pct}%</span></span>
+                                            <span style={{ fontWeight: 600 }}>{s.count}</span>
                                         </div>
-                                        <div style={{ height: 6, background: 'var(--line-soft)', borderRadius: 999, overflow: 'hidden' }}>
-                                            <div style={{ height: '100%', width: `${s.pct}%`, background: s.color, borderRadius: 999, transition: 'width .4s ease' }} />
+                                        <div style={{ height: 4, background: '#e5e7eb', borderRadius: 2, overflow: 'hidden' }}>
+                                            <div style={{ height: '100%', width: `${s.pct}%`, background: s.color }} />
                                         </div>
                                     </div>
                                 ))}
                                 {selected && (
-                                    <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid var(--line-soft)' }}>
-                                        <div style={{ fontWeight: 700, color: 'var(--accent-dark)', marginBottom: 8 }}>{docNo(selected, selected.idx, year)}</div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>
+                                    <div style={{ marginTop: 18, paddingTop: 12, borderTop: '1px solid #e5e7eb' }}>
+                                        <div style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: 8 }}>{docNo(selected, selected.idx, year)}</div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 4 }}>
                                             <span>From</span><span>{fmtDate(selected.fromDate)}</span>
                                         </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 4 }}>
                                             <span>To</span><span>{fmtDate(selected.toDate)}</span>
                                         </div>
-                                        <div style={{ fontSize: 12.5, color: 'var(--ink)', marginTop: 10, padding: 10, background: 'var(--accent-soft)', borderRadius: 10 }}>
-                                            🎉 {selected.description || '—'}
+                                        <div style={{ fontSize: 12, color: '#374151', marginTop: 8 }}>
+                                            {selected.description || '—'}
                                         </div>
                                     </div>
                                 )}
