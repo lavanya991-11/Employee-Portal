@@ -211,6 +211,7 @@ function MyLeaves() {
                                 <p style={{ padding: 16, color: '#888' }}>No leave requests yet. Click <b>New</b> to apply.</p>
                             )}
                             {leaves.length > 0 && (
+                                <div style={{ overflowX: 'auto' }}>
                                 <table className="erp-table">
                                     <thead>
                                         <tr>
@@ -288,6 +289,7 @@ function MyLeaves() {
                                         })}
                                     </tbody>
                                 </table>
+                                </div>
                             )}
                             {!loading && filteredLeaves.length > 0 && (
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px', borderTop: '1px solid var(--line-soft)', flexWrap: 'wrap' }}>
