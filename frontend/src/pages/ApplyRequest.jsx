@@ -7,8 +7,16 @@ import { assetApi } from '../services/api';
 const today = () => new Date().toISOString().slice(0, 10);
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 const STATUS_COLOR = { Pending: '#f59e0b', Approved: '#22c55e', Rejected: '#ef4444' };
+const PAGE_SIZE = 15; // records shown per page in the My Asset Requests list
 
 const emptyRow = () => ({ id: Math.random().toString(36).slice(2), assetCode: '', assetName: '', remarks: '' });
+
+// Previous/Next pager button style (disabled => muted, not clickable).
+const pagerBtn = (disabled) => ({
+    padding: '6px 12px', fontSize: 12, fontWeight: 600, borderRadius: 'var(--radius-control)',
+    border: '1px solid var(--input-border)', background: disabled ? '#f3f4f6' : 'var(--surface)',
+    color: disabled ? '#9ca3af' : 'var(--accent)', cursor: disabled ? 'default' : 'pointer'
+});
 
 function ApplyRequest() {
     const user = useMemo(() => JSON.parse(localStorage.getItem('user') || '{}'), []);
@@ -23,6 +31,7 @@ function ApplyRequest() {
     const [rows, setRows] = useState([emptyRow()]);
     const [sideTab, setSideTab] = useState('actions'); // actions | info | reports | shortcuts
     const [assets, setAssets] = useState([]);
+    const [page, setPage] = useState(1);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [saving, setSaving] = useState(false);
@@ -33,6 +42,7 @@ function ApplyRequest() {
         try {
             const { data } = await assetApi.myAssets();
             setAssets(data.assets || []);
+            setPage(1); // back to first page on (re)load
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to load requests');
         }
@@ -180,24 +190,44 @@ function ApplyRequest() {
                                     My Asset Requests
                                 </div>
                                 {assets.length === 0 && <p style={{ padding: 12, color: '#888' }}>No asset requests yet.</p>}
-                                {assets.length > 0 && (
-                                    <table className="erp-table">
-                                        <thead>
-                                            <tr><th>Doc Date</th><th>Asset Code</th><th>Asset Name</th><th>Remarks</th><th>Status</th></tr>
-                                        </thead>
-                                        <tbody>
-                                            {assets.map((a) => (
-                                                <tr key={a._id}>
-                                                    <td>{fmtDate(a.createdAt)}</td>
-                                                    <td>{a.assetCode}</td>
-                                                    <td>{a.assetName}</td>
-                                                    <td>{a.remarks}</td>
-                                                    <td><span style={{ color: STATUS_COLOR[a.status], fontWeight: 600 }}>{a.status}</span></td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                )}
+                                {assets.length > 0 && (() => {
+                                    const pageCount = Math.max(1, Math.ceil(assets.length / PAGE_SIZE));
+                                    const current = Math.min(page, pageCount);
+                                    const start = (current - 1) * PAGE_SIZE;
+                                    const pageAssets = assets.slice(start, start + PAGE_SIZE);
+                                    return (
+                                        <>
+                                            <table className="erp-table">
+                                                <thead>
+                                                    <tr><th>Doc Date</th><th>Asset Code</th><th>Asset Name</th><th>Remarks</th><th>Status</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    {pageAssets.map((a) => (
+                                                        <tr key={a._id}>
+                                                            <td>{fmtDate(a.createdAt)}</td>
+                                                            <td>{a.assetCode}</td>
+                                                            <td>{a.assetName}</td>
+                                                            <td>{a.remarks}</td>
+                                                            <td><span style={{ color: STATUS_COLOR[a.status], fontWeight: 600 }}>{a.status}</span></td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 12px', borderTop: '1px solid var(--line-soft)' }}>
+                                                <span style={{ fontSize: 12, color: '#6b7280' }}>
+                                                    Showing {start + 1}–{start + pageAssets.length} of {assets.length}
+                                                </span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                    <button type="button" onClick={() => setPage(current - 1)} disabled={current <= 1}
+                                                        style={pagerBtn(current <= 1)}>‹ Previous</button>
+                                                    <span style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>Page {current} of {pageCount}</span>
+                                                    <button type="button" onClick={() => setPage(current + 1)} disabled={current >= pageCount}
+                                                        style={pagerBtn(current >= pageCount)}>Next ›</button>
+                                                </div>
+                                            </div>
+                                        </>
+                                    );
+                                })()}
                             </div>
                         </form>
 
