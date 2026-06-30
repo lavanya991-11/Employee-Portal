@@ -16,6 +16,8 @@ body { overflow-x: hidden; }
     --bg: #f5f7fa;
     --surface: #ffffff;
     --ink: #0f172a;
+    /* Input-field font colour (admin-configurable). Defaults to --ink. */
+    --field-font: var(--ink);
     --muted: #64748b;
     --line: #e5e7eb;
     --line-soft: #eceef1;
@@ -418,7 +420,7 @@ body {
     border-radius: var(--radius-control);
     font-size: 14px;
     font-family: inherit;
-    color: var(--ink);
+    color: var(--field-font);
     background: var(--surface);
     transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -1025,6 +1027,7 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 .erp-field input, .erp-field select {
     border: 1px solid var(--input-border); border-radius: 10px;
     padding: 10px 12px; font-size: 13px; background: white;
+    color: var(--field-font);
     width: 100%; box-sizing: border-box;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -1157,7 +1160,7 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 .erp-search input, .erp-search select {
     padding: 9px 12px; font-size: 13px;
     border: 1px solid var(--input-border); border-radius: var(--radius-control);
-    background: var(--surface); color: var(--ink);
+    background: var(--surface); color: var(--field-font);
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 .erp-search input { flex: 1; min-width: 0; }

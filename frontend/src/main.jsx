@@ -12,6 +12,8 @@ try {
     if (t.secondary) document.documentElement.style.setProperty('--secondary-color', t.secondary);
     const bg = localStorage.getItem('appBg');
     if (bg) document.documentElement.style.setProperty('--app-bg', bg);
+    const ff = localStorage.getItem('fieldFontColor');
+    if (ff) document.documentElement.style.setProperty('--field-font', ff);
 } catch (e) { /* ignore */ }
 
 ReactDOM.createRoot(document.getElementById('root')).render(

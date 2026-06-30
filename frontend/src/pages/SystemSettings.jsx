@@ -5,6 +5,7 @@ import PageHeader from '../components/PageHeader';
 import { imageApi, resolveImageUrl, settingsApi } from '../services/api';
 
 const DEFAULTS = { primary: '#1976d2', secondary: '#dc004e' };
+const DEFAULT_FIELD_FONT = '#0f172a'; // matches --ink (default input font color)
 
 function applyTheme({ primary, secondary }) {
     document.documentElement.style.setProperty('--primary-color', primary);
@@ -23,6 +24,19 @@ export function applyAppBg(color) {
     }
 }
 
+// Apply (or clear) the admin-chosen input field font colour app-wide. This drives
+// --field-font, the text colour every form input/select shares, so the change is
+// consistent across all forms. When cleared it falls back to the default (--ink).
+export function applyFieldFont(color) {
+    if (color) {
+        document.documentElement.style.setProperty('--field-font', color);
+        localStorage.setItem('fieldFontColor', color);
+    } else {
+        document.documentElement.style.removeProperty('--field-font');
+        localStorage.removeItem('fieldFontColor');
+    }
+}
+
 function SystemSettings() {
     const stored = (() => {
         try { return JSON.parse(localStorage.getItem('themeColors') || '{}'); }
@@ -31,6 +45,7 @@ function SystemSettings() {
     const [primary, setPrimary] = useState(stored.primary || DEFAULTS.primary);
     const [secondary, setSecondary] = useState(stored.secondary || DEFAULTS.secondary);
     const [bgColor, setBgColor] = useState(() => localStorage.getItem('appBg') || '#f1f5f9');
+    const [fieldFont, setFieldFont] = useState(() => localStorage.getItem('fieldFontColor') || DEFAULT_FIELD_FONT);
     const [success, setSuccess] = useState('');
     const [logoName, setLogoName] = useState('');
     const [logoData, setLogoData] = useState('');   // base64 of a newly chosen file
@@ -44,11 +59,13 @@ function SystemSettings() {
             const url = data.settings?.companyLogo || '';
             const name = data.settings?.companyName || '';
             const bg = data.settings?.backgroundColor || '';
+            const ff = data.settings?.fieldFontColor || '';
             setLogoUrl(url);
             setCompanyName(name);
             if (url) localStorage.setItem('companyLogo', url); else localStorage.removeItem('companyLogo');
             localStorage.setItem('companyName', name);
             if (bg) { setBgColor(bg); applyAppBg(bg); }
+            if (ff) { setFieldFont(ff); applyFieldFont(ff); }
         }).catch(() => {});
     }, []);
 
@@ -66,11 +83,12 @@ function SystemSettings() {
     const onUpdateTheme = async () => {
         applyTheme({ primary, secondary });
         applyAppBg(bgColor);
+        applyFieldFont(fieldFont);
         try {
-            await settingsApi.update({ backgroundColor: bgColor }); // persist server-side
-            setSuccess('Theme & background updated.');
+            await settingsApi.update({ backgroundColor: bgColor, fieldFontColor: fieldFont }); // persist server-side
+            setSuccess('Theme, background & field font updated.');
         } catch (err) {
-            setSuccess('Theme updated (background could not be saved).');
+            setSuccess('Theme updated (colors could not be saved).');
         }
         setTimeout(() => setSuccess(''), 2500);
     };
@@ -81,7 +99,9 @@ function SystemSettings() {
         applyTheme(DEFAULTS);
         setBgColor('#f1f5f9');
         applyAppBg('');           // back to the default app background
-        try { await settingsApi.update({ backgroundColor: '' }); } catch (e) { /* ignore */ }
+        setFieldFont(DEFAULT_FIELD_FONT);
+        applyFieldFont('');       // back to the default input font color
+        try { await settingsApi.update({ backgroundColor: '', fieldFontColor: '' }); } catch (e) { /* ignore */ }
         setSuccess('Reverted to default theme.');
         setTimeout(() => setSuccess(''), 2500);
     };
@@ -149,7 +169,7 @@ function SystemSettings() {
                             <span style={{ width: 32, height: 32, borderRadius: 8, background: '#dbeafe', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🎨</span>
                             <div>
                                 <h3 style={{ margin: 0, fontSize: 15, color: '#111827' }}>Theme Colors</h3>
-                                <div style={{ fontSize: 12, color: '#6b7280' }}>Customize primary, secondary and background colors</div>
+                                <div style={{ fontSize: 12, color: '#6b7280' }}>Customize primary, secondary, background and field font colors</div>
                             </div>
                         </div>
 
@@ -157,6 +177,7 @@ function SystemSettings() {
                             <ColorField label="Primary Color" value={primary} onChange={setPrimary} />
                             <ColorField label="Secondary Color" value={secondary} onChange={setSecondary} />
                             <ColorField label="Background Color" value={bgColor} onChange={setBgColor} />
+                            <ColorField label="Field Font Color" value={fieldFont} onChange={setFieldFont} />
                         </div>
 
                         <div style={{ marginTop: 18, display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -169,6 +190,7 @@ function SystemSettings() {
                                 <span title="Primary" style={{ width: 20, height: 20, borderRadius: 4, background: primary, border: '1px solid #e5e7eb' }} />
                                 <span title="Secondary" style={{ width: 20, height: 20, borderRadius: 4, background: secondary, border: '1px solid #e5e7eb' }} />
                                 <span title="Background" style={{ width: 20, height: 20, borderRadius: 4, background: bgColor, border: '1px solid #e5e7eb' }} />
+                                <span title="Field Font" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 20, borderRadius: 4, background: '#fff', border: '1px solid #e5e7eb', color: fieldFont, fontSize: 12, fontWeight: 700 }}>Aa</span>
                                 Preview
                             </div>
                         </div>
