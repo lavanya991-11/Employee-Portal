@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ActionButton from '../components/ActionButton';
+import PageHeader from '../components/PageHeader';
 import { loanProductApi } from '../services/api';
 
 const COLUMNS = [
@@ -91,6 +92,7 @@ function LoanProducts() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="Loan Products" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">Loan Products</div>

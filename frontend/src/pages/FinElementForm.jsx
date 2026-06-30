@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ActionButton from '../components/ActionButton';
+import PageHeader from '../components/PageHeader';
 import { finElementApi } from '../services/api';
 
 const ENUMS = {
@@ -171,6 +172,7 @@ function FinElementForm() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="FIN Element" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">

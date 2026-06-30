@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ActionButton from '../components/ActionButton';
+import PageHeader from '../components/PageHeader';
 import { identificationTypeApi } from '../services/api';
 
 const COLUMNS = [
@@ -92,6 +93,7 @@ function IdentificationTypes() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="Identification Types" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">Identification Types</div>

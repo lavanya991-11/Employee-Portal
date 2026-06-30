@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ActionButton from '../components/ActionButton';
+import PageHeader from '../components/PageHeader';
 import { calendarPeriodApi } from '../services/api';
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
@@ -104,6 +105,7 @@ function CalendarPeriods() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="Calendar Periods" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">Calendar Periods</div>

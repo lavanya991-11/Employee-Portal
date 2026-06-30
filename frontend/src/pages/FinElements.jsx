@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ActionButton from '../components/ActionButton';
+import PageHeader from '../components/PageHeader';
 import { finElementApi } from '../services/api';
 
 const FIN_TYPES = ['', 'Earning', 'Deduction', 'PaidLeave', 'OverTime', 'UnPaidLeave', 'EOS'];
@@ -204,6 +205,7 @@ function FinElements() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
+                <PageHeader pageName="FIN Elements" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">FIN Elements <span style={{ fontSize: 12, color: '#6b7280' }}>▼</span></div>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ActionButton from '../components/ActionButton';
+import PageHeader from '../components/PageHeader';
 import { adminApi } from '../services/api';
 import { statusLabel, statusColor } from '../utils/status';
 
@@ -215,6 +216,7 @@ function AdminCollection() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content bg-grey">
+                <PageHeader pageName={config.title} />
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">{config.title}</div>
