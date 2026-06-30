@@ -65,13 +65,7 @@ function SessionGuard({ children }) {
     const location = useLocation();
     const skip = SKIP_PATHS.includes(location.pathname);
     const [remaining, setRemaining] = useState(() => computeRemaining(readDeadline()));
-    const [dismissed, setDismissed] = useState(false); // user closed the warning toast
     const loggedOutRef = useRef(false);
-
-    // Re-arm the warning if the session gets a fresh window (timer back above the threshold).
-    useEffect(() => {
-        if (remaining > WARNING_AT_SECONDS && dismissed) setDismissed(false);
-    }, [remaining, dismissed]);
 
     useEffect(() => {
         if (skip) return;
@@ -97,7 +91,7 @@ function SessionGuard({ children }) {
     return (
         <SessionContext.Provider value={{ remaining }}>
             {children}
-            {!skip && !dismissed && remaining > 0 && remaining <= WARNING_AT_SECONDS && (
+            {!skip && remaining > 0 && remaining <= WARNING_AT_SECONDS && (
                 <div style={{
                     position: 'fixed', bottom: 20, right: 20, zIndex: 9999,
                     background: '#fffbeb', border: '1px solid #fcd34d',
@@ -111,7 +105,7 @@ function SessionGuard({ children }) {
                         background: '#fef3c7', color: '#b45309', fontSize: 18,
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 36px'
                     }}>⏰</span>
-                    <div style={{ flex: 1 }}>
+                    <div>
                         <div style={{ fontWeight: 700, color: '#111827', fontSize: 14 }}>Session Expiring Soon</div>
                         <div style={{ fontSize: 13, color: '#374151', marginTop: 2 }}>
                             You will be logged out in{' '}
@@ -121,16 +115,6 @@ function SessionGuard({ children }) {
                             Save your work before the session ends.
                         </div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={() => setDismissed(true)}
-                        aria-label="Close"
-                        title="Close"
-                        style={{
-                            flex: '0 0 auto', background: 'transparent', border: 'none', cursor: 'pointer',
-                            color: '#9ca3af', fontSize: 18, lineHeight: 1, padding: 2, marginTop: -2
-                        }}
-                    >×</button>
                 </div>
             )}
         </SessionContext.Provider>
