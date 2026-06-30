@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { employeeInfoApi, identificationTypeApi } from '../services/api';
 
@@ -224,8 +225,8 @@ function EmployeeInformation() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{ padding: '6px 10px', fontSize: 12, border: '1px solid #d1d5db', borderRadius: 4, width: 160 }}
                             />
-                            <button type="button" onClick={() => navigate(-1)} className="erp-action-btn">← Back</button>
-                            <button type="button" onClick={refresh} className="erp-action-btn">🔄 Refresh</button>
+                            <ActionButton kind="back" onClick={() => navigate(-1)}>Back</ActionButton>
+                            <ActionButton kind="refresh" onClick={refresh}>Refresh</ActionButton>
                         </div>
                         <h2 style={{ margin: 0 }}>EMPLOYEE INFORMATION</h2>
                     </div>

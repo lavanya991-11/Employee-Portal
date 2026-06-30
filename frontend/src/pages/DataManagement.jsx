@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { dataMgmtApi } from '../services/api';
 
@@ -95,14 +96,12 @@ function DataManagement() {
                             </p>
                         </div>
                         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                            <button type="button" onClick={onSync} disabled={busy} className="erp-action-btn">🔄 Sync Tables</button>
-                            <button
-                                type="button"
+                            <ActionButton kind="refresh" onClick={onSync} disabled={busy}>Sync Tables</ActionButton>
+                            <ActionButton
+                                kind="trash" tint="danger"
                                 onClick={onDeleteSelected}
                                 disabled={busy || selectedKeys.size === 0}
-                                className="erp-action-btn"
-                                style={{ color: selectedKeys.size ? '#b91c1c' : '#9ca3af' }}
-                            >🗑 Delete Selected ({selectedKeys.size})</button>
+                            >Delete Selected ({selectedKeys.size})</ActionButton>
                             <button
                                 type="button"
                                 onClick={onDeleteAll}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import { adminApi } from '../services/api';
 import { statusLabel, statusColor } from '../utils/status';
 
@@ -218,14 +219,14 @@ function AdminCollection() {
                     <div className="erp-titlebar">
                         <div className="erp-title">{config.title}</div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate('/admin')}>↩ Admin Home</button>
-                            <button className="erp-action-btn" onClick={onExport}>📤 Export CSV</button>
-                            <button className="erp-action-btn" onClick={() => {
+                            <ActionButton kind="home" onClick={() => navigate('/admin')}>Admin Home</ActionButton>
+                            <ActionButton kind="export" onClick={onExport}>Export CSV</ActionButton>
+                            <ActionButton kind="refresh" onClick={() => {
                                 setLoading(true);
                                 config.fetcher()
                                     .then(({ data }) => setRows(data[config.rowsKey] || []))
                                     .finally(() => setLoading(false));
-                            }}>🔄 Refresh</button>
+                            }}>Refresh</ActionButton>
                         </div>
                     </div>
 

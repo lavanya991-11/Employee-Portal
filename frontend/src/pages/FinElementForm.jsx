@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import { finElementApi } from '../services/api';
 
 const ENUMS = {
@@ -176,10 +177,10 @@ function FinElementForm() {
                             FIN Element <span className="erp-badge">{isNew ? 'New' : 'Edit'}</span>
                         </div>
                         <div className="erp-titlebar-actions">
-                            <button type="button" className="erp-action-btn" onClick={() => navigate('/fin-elements')}>↩ Back</button>
-                            <button type="button" className="erp-action-btn" onClick={onSubmit} disabled={saving}>
-                                {saving ? 'Saving…' : '📤 Save'}
-                            </button>
+                            <ActionButton kind="back" onClick={() => navigate('/fin-elements')}>Back</ActionButton>
+                            <ActionButton kind="save" onClick={onSubmit} disabled={saving}>
+                                {saving ? 'Saving…' : 'Save'}
+                            </ActionButton>
                         </div>
                     </div>
 

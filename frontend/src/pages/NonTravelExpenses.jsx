@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { employeeInfoApi, expenseApi } from '../services/api';
 
@@ -114,10 +115,10 @@ function NonTravelExpenses() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Expenses <span className="erp-badge">Draft</span></div>
                         <div className="erp-titlebar-actions">
-                            <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
-                            <button type="button" className="erp-action-btn" onClick={onSubmit} disabled={saving}>
-                                {saving ? 'Posting…' : '📤 Post'}
-                            </button>
+                            <ActionButton kind="add" tint="primary" onClick={onNew}>New</ActionButton>
+                            <ActionButton kind="send" onClick={onSubmit} disabled={saving}>
+                                {saving ? 'Posting…' : 'Post'}
+                            </ActionButton>
                         </div>
                     </div>
 

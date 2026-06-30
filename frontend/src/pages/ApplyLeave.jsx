@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { leaveApi, finElementApi } from '../services/api';
 
@@ -369,17 +370,17 @@ function ApplyLeave() {
                 <div className="erp-page">
                     <div className="erp-titlebar" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 12 }}>
                         <div className="erp-titlebar-actions" style={{ justifyContent: 'flex-end' }}>
-                            <button type="button" className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
-                            <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
-                            <button type="button" className="erp-action-btn" onClick={onSaveDraft} disabled={saving}>
-                                {saving ? 'Saving…' : '💾 Save'}
-                            </button>
-                            <button type="button" className="erp-action-btn" onClick={onSubmit} disabled={saving}>
-                                {saving ? 'Posting…' : '📤 Post'}
-                            </button>
-                            <button type="button" className="erp-action-btn" onClick={() => { onSubmit({ preventDefault: () => {} }); window.print(); }} disabled={saving}>
-                                🖨️ Post & Print
-                            </button>
+                            <ActionButton kind="back" onClick={() => navigate(-1)}>Back</ActionButton>
+                            <ActionButton kind="add" tint="primary" onClick={onNew}>New</ActionButton>
+                            <ActionButton kind="save" onClick={onSaveDraft} disabled={saving}>
+                                {saving ? 'Saving…' : 'Save'}
+                            </ActionButton>
+                            <ActionButton kind="send" onClick={onSubmit} disabled={saving}>
+                                {saving ? 'Posting…' : 'Post'}
+                            </ActionButton>
+                            <ActionButton kind="print" onClick={() => { onSubmit({ preventDefault: () => {} }); window.print(); }} disabled={saving}>
+                                Post &amp; Print
+                            </ActionButton>
                         </div>
                         <div className="erp-title">
                             {editId ? 'Edit Leave' : 'Apply Leave'} <span className="erp-badge">{editId ? 'Editing' : 'Draft'}</span>

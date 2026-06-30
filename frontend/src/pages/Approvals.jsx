@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { leaveApi } from '../services/api';
 
@@ -66,9 +67,9 @@ function Approvals() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Approvals</div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={openAction}>⚙ Actions</button>
-                            <button className="erp-action-btn" onClick={() => navigate(-1)}>↩ Back</button>
-                            <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
+                            <ActionButton kind="sparkles" onClick={openAction}>Actions</ActionButton>
+                            <ActionButton kind="back" onClick={() => navigate(-1)}>Back</ActionButton>
+                            <ActionButton kind="refresh" onClick={load}>Refresh</ActionButton>
                         </div>
                     </div>
 

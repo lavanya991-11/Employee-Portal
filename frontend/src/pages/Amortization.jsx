@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { amortizationApi } from '../services/api';
 
@@ -57,8 +58,8 @@ function Amortization() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Amortization <span style={{ fontSize: 12, color: '#6b7280' }}>(inquiry)</span></div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate('/loan-requests')}>← Loan Requests</button>
-                            <button className="erp-action-btn" onClick={load} disabled={loading}>🔄 Refresh</button>
+                            <ActionButton kind="back" onClick={() => navigate('/loan-requests')}>Loan Requests</ActionButton>
+                            <ActionButton kind="refresh" onClick={load} disabled={loading}>Refresh</ActionButton>
                         </div>
                     </div>
 

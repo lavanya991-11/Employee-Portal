@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { employeeInfoApi, overtimeApi } from '../services/api';
 
@@ -171,13 +172,13 @@ function OvertimeRequest() {
                             <div className="erp-title" style={{ fontSize: 26 }}>{form.transactionNumber}</div>
                         </div>
                         <div className="erp-titlebar-actions">
-                            <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
-                            <button type="button" className="erp-action-btn" onClick={onCalculate}>🧮 Calculate</button>
-                            <button type="button" className="erp-action-btn" onClick={load}>🔄 Refresh</button>
-                            <button type="button" className="erp-action-btn" onClick={onSubmit} disabled={saving}>
-                                {saving ? 'Posting…' : '📤 Post'}
-                            </button>
-                            <button type="button" className="erp-action-btn" onClick={() => window.print()}>🖨️ Print</button>
+                            <ActionButton kind="add" tint="primary" onClick={onNew}>New</ActionButton>
+                            <ActionButton kind="calc" onClick={onCalculate}>Calculate</ActionButton>
+                            <ActionButton kind="refresh" onClick={load}>Refresh</ActionButton>
+                            <ActionButton kind="send" onClick={onSubmit} disabled={saving}>
+                                {saving ? 'Posting…' : 'Post'}
+                            </ActionButton>
+                            <ActionButton kind="print" onClick={() => window.print()}>Print</ActionButton>
                         </div>
                     </div>
 

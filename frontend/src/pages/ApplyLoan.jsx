@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { loanProductApi, loanRequestApi, employeeInfoApi } from '../services/api';
 import { statusLabel, statusColor } from '../utils/status';
@@ -81,11 +82,11 @@ function ApplyLoan() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Apply Loan <span className="erp-badge">Draft</span></div>
                         <div className="erp-titlebar-actions">
-                            <button type="button" className="erp-action-btn" onClick={() => navigate('/loan-requests')}>← Back</button>
-                            <button type="button" className="erp-action-btn" onClick={onNew}>📄 New</button>
-                            <button type="button" className="erp-action-btn" onClick={onPost} disabled={saving}>
-                                {saving ? 'Posting…' : '📤 Post'}
-                            </button>
+                            <ActionButton kind="back" onClick={() => navigate('/loan-requests')}>Back</ActionButton>
+                            <ActionButton kind="add" tint="primary" onClick={onNew}>New</ActionButton>
+                            <ActionButton kind="send" onClick={onPost} disabled={saving}>
+                                {saving ? 'Posting…' : 'Post'}
+                            </ActionButton>
                         </div>
                     </div>
 

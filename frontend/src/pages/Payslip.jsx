@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { authApi, employeeInfoApi, calendarApi, calendarPeriodApi, payslipApi } from '../services/api';
 
@@ -266,11 +267,11 @@ function Payslip() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Payslip</div>
                         <div className="erp-titlebar-actions">
-                            <button type="button" className="erp-action-btn" onClick={onPreview}>👁️ Preview</button>
-                            <button type="button" className="erp-action-btn" onClick={onPrint}>🖨️ Print</button>
-                            <button type="button" className="erp-action-btn" onClick={onExport}>📤 Export</button>
-                            <button type="button" className="erp-action-btn" onClick={onEmail}>📧 EMail</button>
-                            <button type="button" className="erp-action-btn" onClick={() => setShowFilter(true)}>🔎 Filter</button>
+                            <ActionButton kind="eye" onClick={onPreview}>Preview</ActionButton>
+                            <ActionButton kind="print" onClick={onPrint}>Print</ActionButton>
+                            <ActionButton kind="export" onClick={onExport}>Export</ActionButton>
+                            <ActionButton kind="mail" onClick={onEmail}>EMail</ActionButton>
+                            <ActionButton kind="filter" onClick={() => setShowFilter(true)}>Filter</ActionButton>
                         </div>
                     </div>
 

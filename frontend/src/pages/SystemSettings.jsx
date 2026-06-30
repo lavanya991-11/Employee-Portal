@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { imageApi, resolveImageUrl, settingsApi } from '../services/api';
 
@@ -139,7 +140,7 @@ function SystemSettings() {
                                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                                 🎨 Update Theme
                             </button>
-                            <button type="button" className="erp-action-btn" onClick={onReset}>Reset</button>
+                            <ActionButton kind="refresh" onClick={onReset}>Reset</ActionButton>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginLeft: 'auto', fontSize: 12, color: '#6b7280' }}>
                                 <span style={{ width: 20, height: 20, borderRadius: 4, background: primary, border: '1px solid #e5e7eb' }} />
                                 <span style={{ width: 20, height: 20, borderRadius: 4, background: secondary, border: '1px solid #e5e7eb' }} />
