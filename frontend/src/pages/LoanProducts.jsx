@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import { loanProductApi } from '../services/api';
 
 const COLUMNS = [
@@ -94,13 +95,13 @@ function LoanProducts() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Loan Products</div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate('/admin')}>↵ Admin Home</button>
-                            <button className="erp-action-btn" onClick={onSync} disabled={syncing}>
-                                {syncing ? 'Syncing…' : '📡 Sync Loan Products'}
-                            </button>
-                            <button className="erp-action-btn" onClick={onDeleteSelected} disabled={!selected || syncing}>🗑️ Delete</button>
-                            <button className="erp-action-btn" onClick={onDeleteAll} disabled={items.length === 0 || syncing} style={{ color: '#b91c1c' }}>🗑 Delete All</button>
-                            <button className="erp-action-btn" onClick={load} disabled={loading || syncing}>🔄 Refresh</button>
+                            <ActionButton kind="home" onClick={() => navigate('/admin')}>Admin Home</ActionButton>
+                            <ActionButton kind="scan" onClick={onSync} disabled={syncing}>
+                                {syncing ? 'Syncing…' : 'Sync Loan Products'}
+                            </ActionButton>
+                            <ActionButton kind="trash" onClick={onDeleteSelected} disabled={!selected || syncing}>Delete</ActionButton>
+                            <ActionButton kind="trash" tint="danger" onClick={onDeleteAll} disabled={items.length === 0 || syncing}>Delete All</ActionButton>
+                            <ActionButton kind="refresh" onClick={load} disabled={loading || syncing}>Refresh</ActionButton>
                         </div>
                     </div>
 

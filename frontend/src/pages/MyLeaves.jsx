@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { leaveApi } from '../services/api';
 
@@ -160,18 +161,17 @@ function MyLeaves() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                             <div className="erp-title">Leave Request</div>
                             <div className="erp-titlebar-actions">
-                                <button className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
-                                <button className="erp-action-btn" onClick={() => navigate('/leaves/apply')}>📄 New</button>
-                                <button className="erp-action-btn" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>✏️ Edit</button>
-                                <button
-                                    className="erp-action-btn"
+                                <ActionButton kind="back" onClick={() => navigate(-1)}>Back</ActionButton>
+                                <ActionButton kind="add" tint="primary" onClick={() => navigate('/leaves/apply')}>New</ActionButton>
+                                <ActionButton kind="edit" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>Edit</ActionButton>
+                                <ActionButton
+                                    kind="trash" tint="danger"
                                     onClick={onDelete}
                                     disabled={!selected || selected.isPosted || selected.status !== 'Pending'}
-                                    style={{ color: (selected && !selected.isPosted && selected.status === 'Pending') ? '#b91c1c' : undefined }}
                                     title={(selected && !selected.isPosted && selected.status === 'Pending') ? 'Delete this draft' : 'Only draft (unposted, pending) leaves can be deleted'}
-                                >🗑 Delete</button>
-                                <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
-                                <button className="erp-action-btn" onClick={onRegenerate}>⚙️ Regenerate</button>
+                                >Delete</ActionButton>
+                                <ActionButton kind="refresh" onClick={load}>Refresh</ActionButton>
+                                <ActionButton kind="sparkles" onClick={onRegenerate}>Regenerate</ActionButton>
                             </div>
                         </div>
                     </div>

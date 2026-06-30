@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { holidayApi } from '../services/api';
 
@@ -106,11 +107,11 @@ function Holidays() {
                                         <option key={y} value={y}>{y}</option>
                                     ))}
                                 </select>
-                                <button className="erp-action-btn" onClick={() => navigate(-1)}>← Back</button>
-                                <button className="erp-action-btn" onClick={() => importFromBC(year)} disabled={loading}>
-                                    {loading ? 'Importing…' : '📡 Import'}
-                                </button>
-                                <button className="erp-action-btn" onClick={() => importFromBC(year)}>🔄 Refresh</button>
+                                <ActionButton kind="back" onClick={() => navigate(-1)}>Back</ActionButton>
+                                <ActionButton kind="scan" onClick={() => importFromBC(year)} disabled={loading}>
+                                    {loading ? 'Importing…' : 'Import'}
+                                </ActionButton>
+                                <ActionButton kind="refresh" onClick={() => importFromBC(year)}>Refresh</ActionButton>
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import { finElementApi } from '../services/api';
 
 const FIN_TYPES = ['', 'Earning', 'Deduction', 'PaidLeave', 'OverTime', 'UnPaidLeave', 'EOS'];
@@ -207,9 +208,9 @@ function FinElements() {
                     <div className="erp-titlebar">
                         <div className="erp-title">FIN Elements <span style={{ fontSize: 12, color: '#6b7280' }}>▼</span></div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate('/admin')}>↵ Admin Home</button>
-                            <button className="erp-action-btn" onClick={onScanFromBC}>📡 Scan from BC</button>
-                            <button className="erp-action-btn" onClick={() => selected && onDelete(selected._id)} disabled={!selected}>🗑️ Delete</button>
+                            <ActionButton kind="home" onClick={() => navigate('/admin')}>Admin Home</ActionButton>
+                            <ActionButton kind="scan" onClick={onScanFromBC}>Scan from BC</ActionButton>
+                            <ActionButton kind="trash" tint="danger" onClick={() => selected && onDelete(selected._id)} disabled={!selected}>Delete</ActionButton>
                         </div>
                     </div>
 

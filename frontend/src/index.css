@@ -905,6 +905,11 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 .erp-action-btn:hover { background: #f8fafc; border-color: #cbd5e1; box-shadow: 0 6px 14px rgba(16,24,40,.1); transform: translateY(-1px); }
 .erp-action-btn:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(16,24,40,.06); }
 .erp-action-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; transform: none; }
+/* Semantic tints (match reference: blue New, red Delete) */
+.erp-action-btn.eab-primary { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+.erp-action-btn.eab-primary:hover { background: #dbeafe; border-color: #93c5fd; }
+.erp-action-btn.eab-danger { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+.erp-action-btn.eab-danger:hover { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
 
 .erp-body { display: flex; gap: 20px; align-items: flex-start; }
 .erp-form { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; }

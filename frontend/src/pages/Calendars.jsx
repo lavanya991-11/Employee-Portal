@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import { calendarApi } from '../services/api';
 
 const COLUMNS = [
@@ -97,13 +98,13 @@ function Calendars() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Calendars</div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate('/admin')}>↵ Admin Home</button>
-                            <button className="erp-action-btn" onClick={onScanCalendars} disabled={scanning}>
-                                {scanning ? 'Scanning…' : '📡 Scan Calendars'}
-                            </button>
-                            <button className="erp-action-btn" onClick={onDeleteSelected} disabled={!selected || scanning}>🗑️ Delete</button>
-                            <button className="erp-action-btn" onClick={onDeleteAll} disabled={items.length === 0 || scanning} style={{ color: '#b91c1c' }}>🗑 Delete All</button>
-                            <button className="erp-action-btn" onClick={load} disabled={loading || scanning}>🔄 Refresh</button>
+                            <ActionButton kind="home" onClick={() => navigate('/admin')}>Admin Home</ActionButton>
+                            <ActionButton kind="scan" onClick={onScanCalendars} disabled={scanning}>
+                                {scanning ? 'Scanning…' : 'Scan Calendars'}
+                            </ActionButton>
+                            <ActionButton kind="trash" onClick={onDeleteSelected} disabled={!selected || scanning}>Delete</ActionButton>
+                            <ActionButton kind="trash" tint="danger" onClick={onDeleteAll} disabled={items.length === 0 || scanning}>Delete All</ActionButton>
+                            <ActionButton kind="refresh" onClick={load} disabled={loading || scanning}>Refresh</ActionButton>
                         </div>
                     </div>
 

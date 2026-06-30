@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { expenseApi } from '../services/api';
 
@@ -65,10 +66,10 @@ function ExpensesList() {
                     <div className="erp-titlebar">
                         <div className="erp-title">{title} <span style={{ fontSize: 12, color: '#6b7280' }}>▼</span></div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate(formPath)}>📄 New</button>
-                            <button className="erp-action-btn" onClick={() => selected && navigate(formPath)}>✎ Edit</button>
-                            <button className="erp-action-btn" onClick={load}>🔄 Refresh</button>
-                            <button className="erp-action-btn" onClick={() => { setSuccess('Regenerated.'); load(); }}>♻️ Regenerate</button>
+                            <ActionButton kind="add" tint="primary" onClick={() => navigate(formPath)}>New</ActionButton>
+                            <ActionButton kind="edit" onClick={() => selected && navigate(formPath)}>Edit</ActionButton>
+                            <ActionButton kind="refresh" onClick={load}>Refresh</ActionButton>
+                            <ActionButton kind="sparkles" onClick={() => { setSuccess('Regenerated.'); load(); }}>Regenerate</ActionButton>
                         </div>
                     </div>
 

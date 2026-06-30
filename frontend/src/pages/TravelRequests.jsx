@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { travelRequestApi } from '../services/api';
 import { statusLabel, statusColor } from '../utils/status';
@@ -81,9 +82,9 @@ function TravelRequests() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Travel Expenses</div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate('/travels/apply')}>➕ Apply Travel</button>
-                            <button className="erp-action-btn" onClick={(e) => { e.stopPropagation(); onView(); }} disabled={!selected}>👁️ View</button>
-                            <button className="erp-action-btn" onClick={load} disabled={loading}>🔄 Refresh</button>
+                            <ActionButton kind="add" tint="primary" onClick={() => navigate('/travels/apply')}>Apply Travel</ActionButton>
+                            <ActionButton kind="eye" onClick={(e) => { e.stopPropagation(); onView(); }} disabled={!selected}>View</ActionButton>
+                            <ActionButton kind="refresh" onClick={load} disabled={loading}>Refresh</ActionButton>
                         </div>
                     </div>
 

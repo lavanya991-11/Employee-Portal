@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import ActionButton from '../components/ActionButton';
 import PageHeader from '../components/PageHeader';
 import { adminApi } from '../services/api';
 
@@ -42,8 +43,8 @@ function EmployeeCredentials() {
                     <div className="erp-titlebar">
                         <div className="erp-title">Employees</div>
                         <div className="erp-titlebar-actions">
-                            <button className="erp-action-btn" onClick={() => navigate('/dashboard')}>↵ Dashboard</button>
-                            <button className="erp-action-btn" onClick={load} disabled={loading}>🔄 Refresh</button>
+                            <ActionButton kind="home" onClick={() => navigate('/dashboard')}>Dashboard</ActionButton>
+                            <ActionButton kind="refresh" onClick={load} disabled={loading}>Refresh</ActionButton>
                         </div>
                     </div>
 
