@@ -5,6 +5,7 @@ import PageHeader from '../components/PageHeader';
 import { imageApi, resolveImageUrl, settingsApi } from '../services/api';
 
 const DEFAULTS = { primary: '#1976d2', secondary: '#dc004e' };
+const DEFAULT_FIELD_COLOR = '#e2e8f0'; // matches --input-border default
 
 function applyTheme({ primary, secondary }) {
     document.documentElement.style.setProperty('--primary-color', primary);
@@ -23,6 +24,19 @@ export function applyAppBg(color) {
     }
 }
 
+// Apply (or clear) the admin-chosen input field colour app-wide. This drives
+// --input-border, the border colour every input/select/textarea shares, so the
+// change is consistent across all forms while text stays dark on a white fill.
+export function applyFieldColor(color) {
+    if (color) {
+        document.documentElement.style.setProperty('--input-border', color);
+        localStorage.setItem('fieldColor', color);
+    } else {
+        document.documentElement.style.removeProperty('--input-border');
+        localStorage.removeItem('fieldColor');
+    }
+}
+
 function SystemSettings() {
     const stored = (() => {
         try { return JSON.parse(localStorage.getItem('themeColors') || '{}'); }
@@ -31,6 +45,7 @@ function SystemSettings() {
     const [primary, setPrimary] = useState(stored.primary || DEFAULTS.primary);
     const [secondary, setSecondary] = useState(stored.secondary || DEFAULTS.secondary);
     const [bgColor, setBgColor] = useState(() => localStorage.getItem('appBg') || '#f1f5f9');
+    const [fieldColor, setFieldColor] = useState(() => localStorage.getItem('fieldColor') || DEFAULT_FIELD_COLOR);
     const [success, setSuccess] = useState('');
     const [logoName, setLogoName] = useState('');
     const [logoData, setLogoData] = useState('');   // base64 of a newly chosen file
@@ -44,11 +59,13 @@ function SystemSettings() {
             const url = data.settings?.companyLogo || '';
             const name = data.settings?.companyName || '';
             const bg = data.settings?.backgroundColor || '';
+            const fc = data.settings?.fieldColor || '';
             setLogoUrl(url);
             setCompanyName(name);
             if (url) localStorage.setItem('companyLogo', url); else localStorage.removeItem('companyLogo');
             localStorage.setItem('companyName', name);
             if (bg) { setBgColor(bg); applyAppBg(bg); }
+            if (fc) { setFieldColor(fc); applyFieldColor(fc); }
         }).catch(() => {});
     }, []);
 
@@ -66,11 +83,12 @@ function SystemSettings() {
     const onUpdateTheme = async () => {
         applyTheme({ primary, secondary });
         applyAppBg(bgColor);
+        applyFieldColor(fieldColor);
         try {
-            await settingsApi.update({ backgroundColor: bgColor }); // persist server-side
-            setSuccess('Theme & background updated.');
+            await settingsApi.update({ backgroundColor: bgColor, fieldColor }); // persist server-side
+            setSuccess('Theme, background & field colors updated.');
         } catch (err) {
-            setSuccess('Theme updated (background could not be saved).');
+            setSuccess('Theme updated (colors could not be saved).');
         }
         setTimeout(() => setSuccess(''), 2500);
     };
@@ -81,7 +99,9 @@ function SystemSettings() {
         applyTheme(DEFAULTS);
         setBgColor('#f1f5f9');
         applyAppBg('');           // back to the default app background
-        try { await settingsApi.update({ backgroundColor: '' }); } catch (e) { /* ignore */ }
+        setFieldColor(DEFAULT_FIELD_COLOR);
+        applyFieldColor('');      // back to the default input field color
+        try { await settingsApi.update({ backgroundColor: '', fieldColor: '' }); } catch (e) { /* ignore */ }
         setSuccess('Reverted to default theme.');
         setTimeout(() => setSuccess(''), 2500);
     };
@@ -149,7 +169,7 @@ function SystemSettings() {
                             <span style={{ width: 32, height: 32, borderRadius: 8, background: '#dbeafe', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🎨</span>
                             <div>
                                 <h3 style={{ margin: 0, fontSize: 15, color: '#111827' }}>Theme Colors</h3>
-                                <div style={{ fontSize: 12, color: '#6b7280' }}>Customize primary, secondary and background colors</div>
+                                <div style={{ fontSize: 12, color: '#6b7280' }}>Customize primary, secondary, background and field colors</div>
                             </div>
                         </div>
 
@@ -157,6 +177,7 @@ function SystemSettings() {
                             <ColorField label="Primary Color" value={primary} onChange={setPrimary} />
                             <ColorField label="Secondary Color" value={secondary} onChange={setSecondary} />
                             <ColorField label="Background Color" value={bgColor} onChange={setBgColor} />
+                            <ColorField label="Field Color" value={fieldColor} onChange={setFieldColor} />
                         </div>
 
                         <div style={{ marginTop: 18, display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -169,6 +190,7 @@ function SystemSettings() {
                                 <span title="Primary" style={{ width: 20, height: 20, borderRadius: 4, background: primary, border: '1px solid #e5e7eb' }} />
                                 <span title="Secondary" style={{ width: 20, height: 20, borderRadius: 4, background: secondary, border: '1px solid #e5e7eb' }} />
                                 <span title="Background" style={{ width: 20, height: 20, borderRadius: 4, background: bgColor, border: '1px solid #e5e7eb' }} />
+                                <span title="Field" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 20, borderRadius: 4, background: '#fff', border: `2px solid ${fieldColor}` }} />
                                 Preview
                             </div>
                         </div>

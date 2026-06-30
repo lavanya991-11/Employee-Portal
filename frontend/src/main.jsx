@@ -12,6 +12,8 @@ try {
     if (t.secondary) document.documentElement.style.setProperty('--secondary-color', t.secondary);
     const bg = localStorage.getItem('appBg');
     if (bg) document.documentElement.style.setProperty('--app-bg', bg);
+    const fc = localStorage.getItem('fieldColor');
+    if (fc) document.documentElement.style.setProperty('--input-border', fc);
 } catch (e) { /* ignore */ }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
