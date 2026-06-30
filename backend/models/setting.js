@@ -5,8 +5,7 @@ const mongoose = require('mongoose');
 const settingSchema = new mongoose.Schema({
     companyName: { type: String, default: '' },
     companyLogo: { type: String, default: '' }, // /api/images/<id>
-    backgroundColor: { type: String, default: '' }, // app background color (hex); empty = default
-    fieldColor: { type: String, default: '' } // input field border color (hex); empty = default
+    backgroundColor: { type: String, default: '' } // app background color (hex); empty = default
 }, { timestamps: true });
 
 module.exports = mongoose.model('Setting', settingSchema);

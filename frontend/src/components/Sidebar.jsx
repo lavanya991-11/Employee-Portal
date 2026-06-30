@@ -61,15 +61,6 @@ function Sidebar() {
                 document.documentElement.style.removeProperty('--app-bg');
                 localStorage.removeItem('appBg');
             }
-            // Apply the admin-configured input field colour app-wide.
-            const fc = s.fieldColor || '';
-            if (fc) {
-                document.documentElement.style.setProperty('--input-border', fc);
-                localStorage.setItem('fieldColor', fc);
-            } else {
-                document.documentElement.style.removeProperty('--input-border');
-                localStorage.removeItem('fieldColor');
-            }
         }).catch(() => {});
     }, []);
 
