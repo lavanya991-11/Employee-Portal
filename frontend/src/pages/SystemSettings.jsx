@@ -107,7 +107,7 @@ function SystemSettings() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content">
+            <main className="main-content bg-grey">
                 <PageHeader pageName="System Settings" />
                 <div className="erp-page" style={{ maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
                     <div style={{ padding: 20 }}>

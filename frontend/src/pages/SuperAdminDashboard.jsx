@@ -89,7 +89,7 @@ function SuperAdminDashboard() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content">
+            <main className="main-content bg-grey">
                 {/* Header */}
                 <div className="dashboard-header">
                     <div className="avatar" style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-dark))' }}>

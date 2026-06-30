@@ -230,6 +230,8 @@ body {
 .sidebar-logout .nav-item-icon { color: inherit; }
 
 .main-content { flex: 1; padding: 24px; overflow-x: hidden; }
+/* Admin pages: flat light-grey background instead of the blue gradient */
+.main-content.bg-grey { background: #f1f5f9; }
 
 /* === Dashboard header === */
 .dashboard-header {

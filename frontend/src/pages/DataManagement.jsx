@@ -82,7 +82,7 @@ function DataManagement() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content">
+            <main className="main-content bg-grey">
                 <PageHeader pageName="Data Management" />
                 <div className="erp-page" style={{ padding: 20 }}>
                     {/* Header row */}

@@ -183,7 +183,7 @@ function AdminCollection() {
         return (
             <div className="app-layout">
                 <Sidebar />
-                <main className="main-content">
+                <main className="main-content bg-grey">
                     <p style={{ padding: 20 }}>Unknown collection: <b>{collection}</b></p>
                 </main>
             </div>
@@ -214,7 +214,7 @@ function AdminCollection() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content">
+            <main className="main-content bg-grey">
                 <div className="erp-page">
                     <div className="erp-titlebar">
                         <div className="erp-title">{config.title}</div>
