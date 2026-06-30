@@ -21,6 +21,21 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 const docNo = (l) =>
     `AYL-${new Date(l.createdAt || Date.now()).getFullYear()}/${(l._id || '').slice(-3).toUpperCase()}`;
 
+const PAGE_SIZE = 20; // max leave records shown per page
+
+// Pager button styles — numbered pages + prev/next chevrons.
+const pagerNum = (active) => ({
+    minWidth: 32, height: 32, padding: '0 8px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+    border: active ? '1px solid var(--accent)' : '1px solid var(--input-border)',
+    background: active ? 'var(--accent)' : 'var(--surface)',
+    color: active ? '#fff' : '#374151', cursor: active ? 'default' : 'pointer'
+});
+const pagerArrow = (disabled) => ({
+    width: 32, height: 32, borderRadius: 8, fontSize: 16, lineHeight: 1,
+    border: '1px solid var(--input-border)', background: 'var(--surface)',
+    color: disabled ? '#cbd5e1' : '#64748b', cursor: disabled ? 'default' : 'pointer'
+});
+
 function MyLeaves() {
     const navigate = useNavigate();
     const userRole = JSON.parse(localStorage.getItem('user') || '{}').role;
@@ -32,6 +47,7 @@ function MyLeaves() {
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [page, setPage] = useState(1);
     const tableRef = useRef(null);
 
     // Note: selection is kept while scrolling — it only changes when you click a
@@ -92,6 +108,7 @@ function MyLeaves() {
             const { data } = await (isManager ? leaveApi.allLeaves() : leaveApi.myLeaves());
             const list = data.leaves || [];
             setLeaves(list);
+            setPage(1);
             return list;
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to load leaves');
@@ -113,6 +130,15 @@ function MyLeaves() {
             return hay.includes(q);
         });
     }, [leaves, searchQuery]);
+
+    // Pagination — show at most PAGE_SIZE rows per page of the filtered list.
+    const pageCount = Math.max(1, Math.ceil(filteredLeaves.length / PAGE_SIZE));
+    const currentPage = Math.min(page, pageCount);
+    const pageStart = (currentPage - 1) * PAGE_SIZE;
+    const pageLeaves = filteredLeaves.slice(pageStart, pageStart + PAGE_SIZE);
+
+    // Reset to the first page whenever the search query changes.
+    useEffect(() => { setPage(1); }, [searchQuery]);
 
     const stats = useMemo(() => {
         const total = leaves.length;
@@ -205,7 +231,7 @@ function MyLeaves() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {filteredLeaves.map((l) => {
+                                        {pageLeaves.map((l) => {
                                             const isSel = selected?._id === l._id;
                                             return (
                                                 <tr
@@ -262,6 +288,22 @@ function MyLeaves() {
                                         })}
                                     </tbody>
                                 </table>
+                            )}
+                            {!loading && filteredLeaves.length > 0 && (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px', borderTop: '1px solid var(--line-soft)', flexWrap: 'wrap' }}>
+                                    <span style={{ fontSize: 13, color: '#6b7280' }}>
+                                        Showing <b style={{ color: '#374151' }}>{pageStart + 1}–{pageStart + pageLeaves.length}</b> of <b style={{ color: '#374151' }}>{filteredLeaves.length}</b>
+                                    </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage <= 1}
+                                            aria-label="Previous page" style={pagerArrow(currentPage <= 1)}>‹</button>
+                                        {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+                                            <button type="button" key={n} onClick={() => setPage(n)} style={pagerNum(n === currentPage)}>{n}</button>
+                                        ))}
+                                        <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage >= pageCount}
+                                            aria-label="Next page" style={pagerArrow(currentPage >= pageCount)}>›</button>
+                                    </div>
+                                </div>
                             )}
                         </div>
 
