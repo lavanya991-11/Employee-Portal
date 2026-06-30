@@ -32,7 +32,7 @@ body { overflow-x: hidden; }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background: #f5f7fa;
+    background: linear-gradient(135deg, #eef2fb 0%, #e7edf9 100%) fixed;
     color: #333;
     font-size: 14px;
     -webkit-font-smoothing: antialiased;
