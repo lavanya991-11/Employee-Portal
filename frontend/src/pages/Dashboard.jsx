@@ -48,6 +48,39 @@ const QL_ICONS = {
     holidays: qlSvg(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /><path fill="currentColor" stroke="none" d="M12 12 12.9 14.7 15.8 14.8 13.5 16.5 14.4 19.2 12 17.6 9.6 19.2 10.5 16.5 8.2 14.8 11.1 14.7Z" /></>)
 };
 
+// Clean line icons for the admin "All Collections" cards (rendered white on a
+// gradient tile). Keyed by the collection key in ADMIN_TILES.
+const collIc = (paths) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{paths}</svg>
+);
+const COLL_ICONS = {
+    users: collIc(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>),
+    employees: collIc(<><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M2 13h20" /></>),
+    leaves: collIc(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /></>),
+    loans: collIc(<><rect x="2" y="6" width="20" height="12" rx="2" /><circle cx="12" cy="12" r="2.5" /><path d="M6 12h.01M18 12h.01" /></>),
+    loanRequests: collIc(<><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20M6 15h4" /></>),
+    expenses: collIc(<><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1Z" /><path d="M8 8h8M8 12h8" /></>),
+    travels: collIc(<><path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a1 1 0 0 0-.9 1.7l5.1 3-2 2-2.5-.5a1 1 0 0 0-.9 1.7L6 18l1.9 2.6a1 1 0 0 0 1.7-.9L9.1 17l2-2 3 5.1a1 1 0 0 0 1.7-.1Z" /></>),
+    overtimes: collIc(<><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 2" /><path d="M5 3 2.5 5.5M22 5.5 19.5 3" /></>),
+    assets: collIc(<><path d="M21 8 12 3 3 8v8l9 5 9-5Z" /><path d="m3 8 9 5 9-5M12 13v8" /></>),
+    finElements: collIc(<><circle cx="12" cy="12" r="3" /><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" /></>),
+    calendars: collIc(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /></>),
+    calendarPeriods: collIc(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4M8 14h.01M12 14h.01M16 14h.01" /></>),
+    identificationTypes: collIc(<><rect x="2" y="5" width="20" height="14" rx="2" /><circle cx="9" cy="12" r="2.5" /><path d="M14 10h4M14 14h4M5 16.5a3.5 3.5 0 0 1 7 0" /></>),
+    loanProducts: collIc(<><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" /><path d="M3 10h18M16 14h2" /></>),
+    credentials: collIc(<><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="2" /><path d="M5.5 16a3.5 3.5 0 0 1 7 0M15 9h3M15 13h3" /></>)
+};
+
+// Darken a hex colour (for the icon tile's gradient end-stop).
+const darken = (hex, amt = 0.2) => {
+    const n = parseInt(hex.slice(1), 16);
+    const r = Math.round(((n >> 16) & 255) * (1 - amt));
+    const g = Math.round(((n >> 8) & 255) * (1 - amt));
+    const b = Math.round((n & 255) * (1 - amt));
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+};
+
 function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
@@ -312,30 +345,34 @@ function Dashboard() {
                                 >🔄 Refresh</button>
                             </div>
                         </div>
-                        <div style={{ padding: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+                        <div style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14 }}>
                             {ADMIN_TILES.map((t) => {
                                 const total = adminStats.totals?.[t.key] ?? 0;
                                 const pending = adminStats.pending?.[t.key];
                                 return (
                                     <Link to={t.path} key={t.key} style={{
                                         display: 'block', textDecoration: 'none',
-                                        border: '1px solid #e5e7eb', borderTop: `3px solid ${t.color}`,
-                                        borderRadius: 8, padding: 12, background: 'white'
-                                    }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                        border: '1px solid var(--line-soft)', borderTop: `3px solid ${t.color}`,
+                                        borderRadius: 14, padding: 16, background: 'var(--surface)',
+                                        boxShadow: 'var(--shadow-sm)', transition: 'box-shadow 0.15s, transform 0.15s'
+                                    }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; e.currentTarget.style.transform = 'none'; }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                             <div style={{
-                                                width: 36, height: 36, borderRadius: 8, background: t.color, color: 'white',
-                                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 18
-                                            }}>{t.icon}</div>
-                                            <div>
-                                                <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{t.title.toUpperCase()}</div>
-                                                <div style={{ fontSize: 22, fontWeight: 700, color: '#111827', lineHeight: 1.1 }}>{total}</div>
-                                                {pending !== undefined && (
-                                                    <div style={{ fontSize: 11, color: '#a16207', marginTop: 2 }}>
-                                                        {pending} pending
-                                                    </div>
-                                                )}
+                                                width: 44, height: 44, borderRadius: 12, color: '#fff', flexShrink: 0,
+                                                background: `linear-gradient(135deg, ${t.color}, ${darken(t.color)})`,
+                                                boxShadow: `0 4px 10px ${t.color}40`,
+                                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+                                            }}>{COLL_ICONS[t.key] || <span style={{ fontSize: 18 }}>{t.icon}</span>}</div>
+                                            <div style={{ minWidth: 0 }}>
+                                                <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 700, letterSpacing: '.3px' }}>{t.title.toUpperCase()}</div>
+                                                <div style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', lineHeight: 1.1 }}>{total}</div>
                                             </div>
+                                        </div>
+                                        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#6b7280' }}>
+                                            <span style={{ width: 7, height: 7, borderRadius: '50%', background: t.color, flexShrink: 0 }} />
+                                            {pending !== undefined ? `${pending} pending` : 'Active'}
                                         </div>
                                     </Link>
                                 );
