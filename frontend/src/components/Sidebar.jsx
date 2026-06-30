@@ -52,6 +52,15 @@ function Sidebar() {
             setCompanyName(s.companyName || '');
             localStorage.setItem('companyLogo', s.companyLogo || '');
             localStorage.setItem('companyName', s.companyName || '');
+            // Apply the admin-configured app background colour app-wide.
+            const bg = s.backgroundColor || '';
+            if (bg) {
+                document.documentElement.style.setProperty('--app-bg', bg);
+                localStorage.setItem('appBg', bg);
+            } else {
+                document.documentElement.style.removeProperty('--app-bg');
+                localStorage.removeItem('appBg');
+            }
         }).catch(() => {});
     }, []);
 

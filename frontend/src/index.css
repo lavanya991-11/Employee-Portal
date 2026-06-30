@@ -28,11 +28,13 @@ body { overflow-x: hidden; }
     /* Shadow */
     --shadow-sm: 0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
     --shadow-md: 0 4px 14px rgba(16,24,40,.08);
+    /* App background (admin-configurable; default = soft login gradient) */
+    --app-bg: linear-gradient(135deg, #eef2fb 0%, #e7edf9 100%);
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background: linear-gradient(135deg, #eef2fb 0%, #e7edf9 100%) fixed;
+    background: var(--app-bg) fixed;
     color: #333;
     font-size: 14px;
     -webkit-font-smoothing: antialiased;
