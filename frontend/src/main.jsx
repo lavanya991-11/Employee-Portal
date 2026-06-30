@@ -14,6 +14,8 @@ try {
     if (bg) document.documentElement.style.setProperty('--app-bg', bg);
     const ff = localStorage.getItem('fieldFontColor');
     if (ff) document.documentElement.style.setProperty('--field-font', ff);
+    const fc = localStorage.getItem('fieldCaptionColor');
+    if (fc) document.documentElement.style.setProperty('--field-caption', fc);
 } catch (e) { /* ignore */ }
 
 ReactDOM.createRoot(document.getElementById('root')).render(

@@ -70,6 +70,15 @@ function Sidebar() {
                 document.documentElement.style.removeProperty('--field-font');
                 localStorage.removeItem('fieldFontColor');
             }
+            // Apply the admin-configured field caption (label) colour app-wide.
+            const fc = s.fieldCaptionColor || '';
+            if (fc) {
+                document.documentElement.style.setProperty('--field-caption', fc);
+                localStorage.setItem('fieldCaptionColor', fc);
+            } else {
+                document.documentElement.style.removeProperty('--field-caption');
+                localStorage.removeItem('fieldCaptionColor');
+            }
         }).catch(() => {});
     }, []);
 
