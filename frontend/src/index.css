@@ -208,7 +208,7 @@ body {
 .nav-sub-group { display: flex; flex-direction: column; gap: 2px; margin: 2px 0 4px; }
 .nav-subitem {
     display: flex; margin: 0 12px 0 22px; padding: 8px 14px 8px 30px;
-    color: #64748b; text-decoration: none; font-size: 13px; border-radius: 8px;
+    color: #475569; text-decoration: none; font-size: 13px; border-radius: 8px;
     border-left: 2px solid var(--line); transition: background 0.15s, color 0.15s;
 }
 .nav-subitem:hover { background: var(--accent-soft); color: var(--accent-dark); }
