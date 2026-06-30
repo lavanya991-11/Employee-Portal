@@ -5,7 +5,6 @@ import PageHeader from '../components/PageHeader';
 import { imageApi, resolveImageUrl, settingsApi } from '../services/api';
 
 const DEFAULTS = { primary: '#1976d2', secondary: '#dc004e' };
-const DEFAULT_FIELD_FONT = '#0f172a'; // matches --ink (default input font color)
 const DEFAULT_FIELD_CAPTION = '#475569'; // default field caption (label) color
 
 function applyTheme({ primary, secondary }) {
@@ -22,19 +21,6 @@ export function applyAppBg(color) {
     } else {
         document.documentElement.style.removeProperty('--app-bg');
         localStorage.removeItem('appBg');
-    }
-}
-
-// Apply (or clear) the admin-chosen input field font colour app-wide. This drives
-// --field-font, the text colour every form input/select shares, so the change is
-// consistent across all forms. When cleared it falls back to the default (--ink).
-export function applyFieldFont(color) {
-    if (color) {
-        document.documentElement.style.setProperty('--field-font', color);
-        localStorage.setItem('fieldFontColor', color);
-    } else {
-        document.documentElement.style.removeProperty('--field-font');
-        localStorage.removeItem('fieldFontColor');
     }
 }
 
@@ -59,7 +45,6 @@ function SystemSettings() {
     const [primary, setPrimary] = useState(stored.primary || DEFAULTS.primary);
     const [secondary, setSecondary] = useState(stored.secondary || DEFAULTS.secondary);
     const [bgColor, setBgColor] = useState(() => localStorage.getItem('appBg') || '#f1f5f9');
-    const [fieldFont, setFieldFont] = useState(() => localStorage.getItem('fieldFontColor') || DEFAULT_FIELD_FONT);
     const [fieldCaption, setFieldCaption] = useState(() => localStorage.getItem('fieldCaptionColor') || DEFAULT_FIELD_CAPTION);
     const [success, setSuccess] = useState('');
     const [logoName, setLogoName] = useState('');
@@ -74,14 +59,12 @@ function SystemSettings() {
             const url = data.settings?.companyLogo || '';
             const name = data.settings?.companyName || '';
             const bg = data.settings?.backgroundColor || '';
-            const ff = data.settings?.fieldFontColor || '';
             const fc = data.settings?.fieldCaptionColor || '';
             setLogoUrl(url);
             setCompanyName(name);
             if (url) localStorage.setItem('companyLogo', url); else localStorage.removeItem('companyLogo');
             localStorage.setItem('companyName', name);
             if (bg) { setBgColor(bg); applyAppBg(bg); }
-            if (ff) { setFieldFont(ff); applyFieldFont(ff); }
             if (fc) { setFieldCaption(fc); applyFieldCaption(fc); }
         }).catch(() => {});
     }, []);
@@ -100,11 +83,10 @@ function SystemSettings() {
     const onUpdateTheme = async () => {
         applyTheme({ primary, secondary });
         applyAppBg(bgColor);
-        applyFieldFont(fieldFont);
         applyFieldCaption(fieldCaption);
         try {
-            await settingsApi.update({ backgroundColor: bgColor, fieldFontColor: fieldFont, fieldCaptionColor: fieldCaption }); // persist server-side
-            setSuccess('Theme, background, field font & caption updated.');
+            await settingsApi.update({ backgroundColor: bgColor, fieldCaptionColor: fieldCaption }); // persist server-side
+            setSuccess('Theme, background & caption updated.');
         } catch (err) {
             setSuccess('Theme updated (colors could not be saved).');
         }
@@ -117,11 +99,9 @@ function SystemSettings() {
         applyTheme(DEFAULTS);
         setBgColor('#f1f5f9');
         applyAppBg('');           // back to the default app background
-        setFieldFont(DEFAULT_FIELD_FONT);
-        applyFieldFont('');       // back to the default input font color
         setFieldCaption(DEFAULT_FIELD_CAPTION);
         applyFieldCaption('');    // back to the default caption color
-        try { await settingsApi.update({ backgroundColor: '', fieldFontColor: '', fieldCaptionColor: '' }); } catch (e) { /* ignore */ }
+        try { await settingsApi.update({ backgroundColor: '', fieldCaptionColor: '' }); } catch (e) { /* ignore */ }
         setSuccess('Reverted to default theme.');
         setTimeout(() => setSuccess(''), 2500);
     };
@@ -189,7 +169,7 @@ function SystemSettings() {
                             <span style={{ width: 32, height: 32, borderRadius: 8, background: '#dbeafe', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🎨</span>
                             <div>
                                 <h3 style={{ margin: 0, fontSize: 15, color: '#111827' }}>Theme Colors</h3>
-                                <div style={{ fontSize: 12, color: '#6b7280' }}>Customize primary, secondary, background, field font and caption colors</div>
+                                <div style={{ fontSize: 12, color: '#6b7280' }}>Customize primary, secondary, background and field caption colors</div>
                             </div>
                         </div>
 
@@ -197,7 +177,6 @@ function SystemSettings() {
                             <ColorField label="Primary Color" value={primary} onChange={setPrimary} />
                             <ColorField label="Secondary Color" value={secondary} onChange={setSecondary} />
                             <ColorField label="Background Color" value={bgColor} onChange={setBgColor} />
-                            <ColorField label="Field Font Color" value={fieldFont} onChange={setFieldFont} />
                             <ColorField label="Field Caption Font Color" value={fieldCaption} onChange={setFieldCaption} />
                         </div>
 
@@ -211,7 +190,6 @@ function SystemSettings() {
                                 <span title="Primary" style={{ width: 20, height: 20, borderRadius: 4, background: primary, border: '1px solid #e5e7eb' }} />
                                 <span title="Secondary" style={{ width: 20, height: 20, borderRadius: 4, background: secondary, border: '1px solid #e5e7eb' }} />
                                 <span title="Background" style={{ width: 20, height: 20, borderRadius: 4, background: bgColor, border: '1px solid #e5e7eb' }} />
-                                <span title="Field Font" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 20, borderRadius: 4, background: '#fff', border: '1px solid #e5e7eb', color: fieldFont, fontSize: 12, fontWeight: 700 }}>Aa</span>
                                 <span title="Field Caption" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: 20, padding: '0 5px', borderRadius: 4, background: '#fff', border: '1px solid #e5e7eb', color: fieldCaption, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.3px' }}>Label</span>
                                 Preview
                             </div>

@@ -11,7 +11,7 @@ const getOrCreate = async () => {
 exports.get = async (req, res) => {
     try {
         const s = await getOrCreate();
-        res.json({ success: true, settings: { companyName: s.companyName, companyLogo: s.companyLogo, backgroundColor: s.backgroundColor, fieldFontColor: s.fieldFontColor, fieldCaptionColor: s.fieldCaptionColor } });
+        res.json({ success: true, settings: { companyName: s.companyName, companyLogo: s.companyLogo, backgroundColor: s.backgroundColor, fieldCaptionColor: s.fieldCaptionColor } });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error', error: err.message });
     }
@@ -21,14 +21,13 @@ exports.get = async (req, res) => {
 exports.update = async (req, res) => {
     try {
         const s = await getOrCreate();
-        const { companyName, companyLogo, backgroundColor, fieldFontColor, fieldCaptionColor } = req.body;
+        const { companyName, companyLogo, backgroundColor, fieldCaptionColor } = req.body;
         if (companyName !== undefined) s.companyName = companyName;
         if (companyLogo !== undefined) s.companyLogo = companyLogo;
         if (backgroundColor !== undefined) s.backgroundColor = backgroundColor;
-        if (fieldFontColor !== undefined) s.fieldFontColor = fieldFontColor;
         if (fieldCaptionColor !== undefined) s.fieldCaptionColor = fieldCaptionColor;
         await s.save();
-        res.json({ success: true, message: 'Settings updated', settings: { companyName: s.companyName, companyLogo: s.companyLogo, backgroundColor: s.backgroundColor, fieldFontColor: s.fieldFontColor, fieldCaptionColor: s.fieldCaptionColor } });
+        res.json({ success: true, message: 'Settings updated', settings: { companyName: s.companyName, companyLogo: s.companyLogo, backgroundColor: s.backgroundColor, fieldCaptionColor: s.fieldCaptionColor } });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error', error: err.message });
     }
