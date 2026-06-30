@@ -1,34 +1,20 @@
-const mongoose = require('mongoose');
-
-// A travel/earning request submitted through the portal to BC's
-// SubmitEarningRequest action. requestNo + status + totalAmount come back from
-// BC; documentNo is our local auto number.
-const travelLineSchema = new mongoose.Schema({
-    earningPayCode: { type: Number, default: 0 },
-    earningPayCodeDesc: { type: String, default: '' },
-    amount: { type: Number, default: 0 },
-    unitCount: { type: Number, default: 1 },
-    earningDate: { type: String, default: '' }
-}, { _id: false });
-
-const travelAttachmentSchema = new mongoose.Schema({
-    fileName: { type: String, default: '' },
-    mimeType: { type: String, default: '' }
-}, { _id: false });
-
-const travelRequestSchema = new mongoose.Schema({
-    employee: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    documentNo: { type: String, default: '' },
-    transactionNo: { type: String, default: '', maxlength: 20 },
-    employeeCode: { type: String, default: '' },
-    comments: { type: String, default: '' },
-    lines: { type: [travelLineSchema], default: [] },
-    attachments: { type: [travelAttachmentSchema], default: [] },
-    totalAmount: { type: Number, default: 0 },
-    requestNo: { type: String, default: '' },
-    status: { type: String, default: '' },
-    approvedBy: { type: String, default: '' },
-    approvedDate: { type: Date }
-}, { timestamps: true });
-
-module.exports = mongoose.model('TravelRequest', travelRequestSchema);
+const { defineModel } = require('./_sql');
+module.exports = defineModel({
+    name: 'TravelRequest', table: 'TravelRequests',
+    refs: { employee: { col: 'employeeId', ref: 'Users' } },
+    children: {
+        lines: {
+            table: 'TravelRequestLines', fk: 'travelRequestId', orderCol: '[lineNo]',
+            map: (it, n) => ({
+                lineNo: n, earningPayCode: it.earningPayCode || 0, earningPayCodeDesc: it.earningPayCodeDesc || '',
+                amount: it.amount || 0, unitCount: it.unitCount != null ? it.unitCount : 1, earningDate: it.earningDate || ''
+            }),
+            unmap: (r) => ({ earningPayCode: r.earningPayCode, earningPayCodeDesc: r.earningPayCodeDesc, amount: r.amount, unitCount: r.unitCount, earningDate: r.earningDate })
+        },
+        attachments: {
+            table: 'TravelRequestAttachments', fk: 'travelRequestId', orderCol: 'id',
+            map: (it) => ({ fileName: it.fileName || '', mimeType: it.mimeType || '' }),
+            unmap: (r) => ({ fileName: r.fileName, mimeType: r.mimeType })
+        }
+    }
+});

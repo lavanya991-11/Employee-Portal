@@ -1,24 +1,18 @@
 const FinElement = require('../models/finElement');
 const { getAllFinMasters, bcConfigured } = require('../services/bcClient');
 
-const MODEL_FIELDS = Object.keys(FinElement.schema.paths).filter(
-    (k) => !['_id', '__v', 'createdAt', 'updatedAt'].includes(k)
-);
+// Field list comes from the SQL table columns (cached after first use).
+let MODEL_FIELDS = null;
+const modelFields = async () => {
+    if (!MODEL_FIELDS) MODEL_FIELDS = await FinElement.fieldNames();
+    return MODEL_FIELDS;
+};
 
-const ENUM_FIELDS = MODEL_FIELDS.filter(
-    (k) => FinElement.schema.paths[k].instance === 'String' && FinElement.schema.paths[k].enumValues?.length > 0
-);
-
-const mapBcToModel = (bc) => {
+const mapBcToModel = async (bc) => {
     const out = {};
-    for (const k of MODEL_FIELDS) {
+    for (const k of await modelFields()) {
         const v = bc[k];
         if (v === undefined || v === null) continue;
-        // Skip enum fields with values not in the allowed list (BC sometimes returns "" or different spellings).
-        if (ENUM_FIELDS.includes(k)) {
-            const allowed = FinElement.schema.paths[k].enumValues;
-            if (!allowed.includes(v)) continue;
-        }
         out[k] = v;
     }
     if (bc.systemId) out.bcSystemId = bc.systemId;
@@ -94,7 +88,7 @@ exports.scanFromBc = async (req, res) => {
         const errors = [];
         for (const row of rows) {
             if (row.finId == null) { skipped++; if (errors.length < 5) errors.push({ finId: null, reason: 'missing finId' }); continue; }
-            const payload = mapBcToModel(row);
+            const payload = await mapBcToModel(row);
             try {
                 await FinElement.findOneAndUpdate(
                     { finId: row.finId },

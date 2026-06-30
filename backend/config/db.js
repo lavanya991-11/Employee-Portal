@@ -1,39 +1,21 @@
-if (!global.crypto) {
-    global.crypto = require('crypto').webcrypto;
-}
-
-const dns = require('dns');
-dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
-
-const mongoose = require('mongoose');
-
-mongoose.set('bufferTimeoutMS', 30000);
+// Database bootstrap — now Microsoft SQL Server (was MongoDB).
+// Keeps the connectDB() export so server.js / app.js need no changes.
+const { getPool } = require('./mssql');
 
 const connectDB = async () => {
-    console.log("Connecting to MongoDB...");
-
-    if (!process.env.MONGO_URI) {
-        console.error("MONGO_URI is NOT set. Add it in the host's Environment settings.");
+    console.log('Connecting to SQL Server...');
+    if (!process.env.MSSQL_SERVER) {
+        console.error('MSSQL_SERVER is NOT set. Add the MSSQL_* values in the environment settings.');
         return;
     }
-
     for (let attempt = 1; attempt <= 5; attempt++) {
         try {
-            await mongoose.connect(process.env.MONGO_URI, {
-                family: 4,
-                serverSelectionTimeoutMS: 20000,
-                socketTimeoutMS: 45000
-            });
-            console.log("MongoDB Connected");
+            await getPool();
             return;
         } catch (err) {
-            console.error(`MongoDB connect attempt ${attempt} failed: ${err.message}`);
-            if (attempt < 5) {
-                await new Promise((r) => setTimeout(r, 5000));
-            } else {
-                console.error("MongoDB connection failed after 5 attempts.");
-                console.error("Fix: Atlas > Network Access > Add 0.0.0.0/0");
-            }
+            console.error(`SQL Server connect attempt ${attempt} failed: ${err.message}`);
+            if (attempt < 5) await new Promise((r) => setTimeout(r, 5000));
+            else console.error('SQL Server connection failed after 5 attempts.');
         }
     }
 };
