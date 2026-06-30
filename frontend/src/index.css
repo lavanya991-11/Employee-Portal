@@ -41,6 +41,13 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Form controls don't inherit the body font by default — force them to use
+   Inter too, so headers, sidebar, list pages, cards, buttons and inputs all
+   share one consistent font across the whole app. */
+button, input, select, textarea, optgroup {
+    font-family: inherit;
+}
+
 /* === Auth pages === */
 .auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .auth-card { background: var(--surface); padding: 40px; border-radius: var(--radius-card); box-shadow: 0 20px 60px rgba(30,58,138,.12); width: 100%; max-width: 420px; }
