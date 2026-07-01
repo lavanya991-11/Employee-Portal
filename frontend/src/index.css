@@ -68,7 +68,9 @@ button, input, select, textarea, optgroup {
     position: relative; overflow: hidden;
     display: flex; flex-direction: column;
     padding: 44px 52px;
-    background: linear-gradient(160deg, #eef3fc 0%, #dbe6fb 55%, #cddcf8 100%);
+    background:
+        linear-gradient(100deg, #eef3fc 0%, rgba(238,243,252,0.95) 32%, rgba(238,243,252,0.55) 60%, rgba(238,243,252,0.12) 100%),
+        url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
 }
 .login-left-brand { display: flex; align-items: center; gap: 12px; }
 .login-left-brand .lb-icon { width: 40px; height: 40px; color: #2563eb; flex-shrink: 0; }

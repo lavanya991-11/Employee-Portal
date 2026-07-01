@@ -96,8 +96,6 @@ function Login() {
         }
     };
 
-    const onMicrosoft = () => setError('Microsoft sign-in is not configured. Please sign in with your email and password.');
-
     return (
         <div className="login-screen">
             <div className="login-box">
@@ -166,10 +164,10 @@ function Login() {
                         {mode === 'login' ? (
                             <form onSubmit={handleLogin}>
                                 <div className="login-field">
-                                    <label>User ID / Email</label>
+                                    <label>Email</label>
                                     <div className="login-input-wrap">
-                                        <span className="login-ic-left"><PersonIcon /></span>
-                                        <input type="text" placeholder="Enter your user ID or email"
+                                        <span className="login-ic-left"><MailIcon /></span>
+                                        <input type="email" placeholder="Enter your email"
                                             value={email} onChange={(e) => setEmail(e.target.value)} required />
                                     </div>
                                 </div>
@@ -192,11 +190,6 @@ function Login() {
                                 <button type="submit" className="login-btn" disabled={loading}
                                     style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                                     {loading ? 'Signing in...' : <>Sign In <ArrowIcon /></>}
-                                </button>
-
-                                <div className="login-divider">or sign in with</div>
-                                <button type="button" className="login-ms-btn" onClick={onMicrosoft}>
-                                    <MsLogo /> Sign in with Microsoft
                                 </button>
 
                                 <p className="login-help">
