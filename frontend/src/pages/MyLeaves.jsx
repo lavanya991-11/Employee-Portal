@@ -192,8 +192,12 @@ function MyLeaves() {
             <main className="main-content">
                 <PageHeader pageName="Leave Request" />
                 <div className="erp-page" ref={tableRef}>
-                    <div className="erp-titlebar" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
-                        <div style={{ position: 'relative', width: '100%' }}>
+                    <div className="erp-titlebar" style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                        <div style={{ flexShrink: 0 }}>
+                            <div className="erp-title">Leave Request</div>
+                            <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>Manage and track employee leave requests</div>
+                        </div>
+                        <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
                             <span style={{
                                 position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
                                 color: '#9ca3af', fontSize: 14, pointerEvents: 'none'
@@ -212,9 +216,7 @@ function MyLeaves() {
                                 }}
                             />
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                            <div className="erp-title">Leave Request</div>
-                            <div className="erp-titlebar-actions">
+                        <div className="erp-titlebar-actions">
                                 <ActionButton kind="back" onClick={() => navigate(-1)}>Back</ActionButton>
                                 <ActionButton kind="add" tint="primary" onClick={() => navigate('/leaves/apply')}>New</ActionButton>
                                 <ActionButton kind="edit" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>Edit</ActionButton>
@@ -227,7 +229,6 @@ function MyLeaves() {
                                 <ActionButton kind="refresh" onClick={load}>Refresh</ActionButton>
                                 <ActionButton kind="sparkles" onClick={onRegenerate}>Regenerate</ActionButton>
                             </div>
-                        </div>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 16 }}>
