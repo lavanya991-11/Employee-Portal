@@ -275,6 +275,10 @@ function MyLeaves() {
 
                     <div className="erp-body">
                         <div className="erp-list-card">
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '14px 16px', borderBottom: '1px solid var(--line-soft)' }}>
+                                <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--ink)' }}>Leave Request List</span>
+                                <span style={{ fontSize: 12, color: '#6b7280' }}>{filteredLeaves.length} record(s)</span>
+                            </div>
                             {error && <div className="error">{error}</div>}
                             {message && <div className="success">{message}</div>}
                             {loading && <p style={{ padding: 16 }}>Loading…</p>}
