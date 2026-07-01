@@ -92,7 +92,7 @@ function IdentificationTypes() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content">
+            <main className="main-content bg-grey">
                 <PageHeader pageName="Identification Types" />
                 <div className="erp-page">
                     <div className="erp-titlebar">

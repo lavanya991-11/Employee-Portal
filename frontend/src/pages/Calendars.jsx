@@ -94,7 +94,7 @@ function Calendars() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content">
+            <main className="main-content bg-grey">
                 <PageHeader pageName="Calendars" />
                 <div className="erp-page">
                     <div className="erp-titlebar">

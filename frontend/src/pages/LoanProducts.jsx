@@ -91,7 +91,7 @@ function LoanProducts() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content">
+            <main className="main-content bg-grey">
                 <PageHeader pageName="Loan Products" />
                 <div className="erp-page">
                     <div className="erp-titlebar">

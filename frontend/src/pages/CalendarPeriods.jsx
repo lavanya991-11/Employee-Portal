@@ -104,7 +104,7 @@ function CalendarPeriods() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content">
+            <main className="main-content bg-grey">
                 <PageHeader pageName="Calendar Periods" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
