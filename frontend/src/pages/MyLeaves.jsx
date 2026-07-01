@@ -179,12 +179,6 @@ function MyLeaves() {
     }, [leaves]);
 
     // Document Status as modern KPI cards (shown under the header).
-    const sc = Object.fromEntries(stats.items.map((s) => [s.key, s]));
-    const statusCards = [
-        { label: 'Approved', count: sc.Approved?.count || 0, color: '#16a34a', icon: STAT_ICONS.approved, sub: 'Request has been approved' },
-        { label: 'Unapproved', count: sc.Pending?.count || 0, color: '#ea8a0b', icon: STAT_ICONS.pending, sub: 'Pending for approval' },
-        { label: 'Rejected', count: sc.Rejected?.count || 0, color: '#ef4444', icon: STAT_ICONS.rejected, sub: 'Request has been rejected' }
-    ];
 
     return (
         <div className="app-layout">
@@ -249,26 +243,6 @@ function MyLeaves() {
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14, marginBottom: 16 }}>
-                        {statusCards.map((c) => (
-                            <div key={c.label} style={{
-                                display: 'flex', alignItems: 'center', gap: 12,
-                                background: `${c.color}14`, border: `1px solid ${c.color}33`,
-                                borderRadius: 14, padding: '14px 16px'
-                            }}>
-                                <span style={{
-                                    width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                                    background: `${c.color}26`, color: c.color,
-                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
-                                }}>{c.icon}</span>
-                                <div style={{ minWidth: 0, flex: 1 }}>
-                                    <div style={{ fontSize: 15, fontWeight: 700, color: c.color }}>{c.label}</div>
-                                    <div style={{ fontSize: 12.5, color: '#6b7280', marginTop: 2 }}>{c.sub}</div>
-                                </div>
-                                <div style={{ fontSize: 22, fontWeight: 800, color: c.color, flexShrink: 0 }}>{c.count}</div>
-                            </div>
-                        ))}
-                    </div>
 
                     <div className="erp-body">
                         <div className="erp-list-card">
