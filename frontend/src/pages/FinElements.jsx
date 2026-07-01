@@ -204,7 +204,7 @@ function FinElements() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content bg-grey">
+            <main className="main-content">
                 <PageHeader pageName="FIN Elements" />
                 <div className="erp-page">
                     <div className="erp-titlebar">

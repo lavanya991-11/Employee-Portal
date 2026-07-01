@@ -166,12 +166,12 @@ function FinElementForm() {
         }
     };
 
-    if (loading) return <div className="app-layout"><Sidebar /><main className="main-content bg-grey"><p style={{ padding: 20 }}>Loading…</p></main></div>;
+    if (loading) return <div className="app-layout"><Sidebar /><main className="main-content"><p style={{ padding: 20 }}>Loading…</p></main></div>;
 
     return (
         <div className="app-layout">
             <Sidebar />
-            <main className="main-content bg-grey">
+            <main className="main-content">
                 <PageHeader pageName="FIN Element" />
                 <div className="erp-page">
                     <div className="erp-titlebar">
