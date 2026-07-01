@@ -1012,6 +1012,25 @@ h2 { color: #111827; margin-bottom: 14px; font-size: 18px; }
 .emp-helpdesk-btn:hover { opacity: 0.9; }
 
 .erp-section { background: var(--surface); border-radius: 16px; overflow: hidden; border: 1px solid var(--line-soft); box-shadow: var(--shadow-sm); }
+
+/* Merge stacked form sections into a single card: the form becomes the card and
+   inner sections lose their individual card look, separated only by a divider. */
+.erp-form.erp-merged {
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.erp-form.erp-merged .erp-section {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    border-bottom: 1px solid var(--line-soft);
+}
+.erp-form.erp-merged .erp-section:last-child { border-bottom: none; }
 .erp-section-header {
     background: transparent; color: var(--ink);
     padding: 16px 20px 13px; font-size: 15px; font-weight: 700;

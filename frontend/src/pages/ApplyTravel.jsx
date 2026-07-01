@@ -140,7 +140,7 @@ function ApplyTravel() {
                     </div>
 
                     <div className="erp-body">
-                        <form className="erp-form" onSubmit={onPost}>
+                        <form className="erp-form erp-merged" onSubmit={onPost}>
                             {error && <div className="error">{error}</div>}
                             {success && <div className="success">{success}</div>}
 
