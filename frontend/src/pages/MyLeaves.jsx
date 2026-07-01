@@ -36,6 +36,25 @@ const pagerArrow = (disabled) => ({
     color: disabled ? '#cbd5e1' : '#64748b', cursor: disabled ? 'default' : 'pointer'
 });
 
+// Line icons + gradient helper for the Document Status KPI cards.
+const sIc = (paths) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{paths}</svg>
+);
+const STAT_ICONS = {
+    total: sIc(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M3 10h18M8 2v4M16 2v4" /></>),
+    approved: sIc(<><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><path d="m9 11 3 3L22 4" /></>),
+    pending: sIc(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>),
+    rejected: sIc(<><circle cx="12" cy="12" r="9" /><path d="m15 9-6 6M9 9l6 6" /></>)
+};
+const darken = (hex, amt = 0.2) => {
+    const n = parseInt(hex.slice(1), 16);
+    const r = Math.round(((n >> 16) & 255) * (1 - amt));
+    const g = Math.round(((n >> 8) & 255) * (1 - amt));
+    const b = Math.round((n & 255) * (1 - amt));
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+};
+
 function MyLeaves() {
     const navigate = useNavigate();
     const userRole = JSON.parse(localStorage.getItem('user') || '{}').role;
@@ -158,6 +177,15 @@ function MyLeaves() {
         };
     }, [leaves]);
 
+    // Document Status as modern KPI cards (shown under the header).
+    const sc = Object.fromEntries(stats.items.map((s) => [s.key, s]));
+    const statusCards = [
+        { label: 'Total Leaves', count: stats.total, color: '#2563eb', icon: STAT_ICONS.total, sub: 'All requests' },
+        { label: 'Approved', count: sc.Approved?.count || 0, color: '#22c55e', icon: STAT_ICONS.approved, sub: `${sc.Approved?.pct || 0}% of total` },
+        { label: 'UnApproved', count: sc.Pending?.count || 0, color: '#f59e0b', icon: STAT_ICONS.pending, sub: `${sc.Pending?.pct || 0}% of total` },
+        { label: 'Rejected', count: sc.Rejected?.count || 0, color: '#ef4444', icon: STAT_ICONS.rejected, sub: `${sc.Rejected?.pct || 0}% of total` }
+    ];
+
     return (
         <div className="app-layout">
             <Sidebar />
@@ -200,6 +228,32 @@ function MyLeaves() {
                                 <ActionButton kind="sparkles" onClick={onRegenerate}>Regenerate</ActionButton>
                             </div>
                         </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 16 }}>
+                        {statusCards.map((c) => (
+                            <div key={c.label} style={{
+                                border: '1px solid var(--line-soft)', borderTop: `3px solid ${c.color}`,
+                                borderRadius: 14, padding: 16, background: 'var(--surface)', boxShadow: 'var(--shadow-sm)'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <div style={{
+                                        width: 44, height: 44, borderRadius: 12, color: '#fff', flexShrink: 0,
+                                        background: `linear-gradient(135deg, ${c.color}, ${darken(c.color)})`,
+                                        boxShadow: `0 4px 10px ${c.color}40`,
+                                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>{c.icon}</div>
+                                    <div style={{ minWidth: 0 }}>
+                                        <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 700, letterSpacing: '.3px' }}>{c.label.toUpperCase()}</div>
+                                        <div style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', lineHeight: 1.1 }}>{c.count}</div>
+                                    </div>
+                                </div>
+                                <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#6b7280' }}>
+                                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: c.color, flexShrink: 0 }} />
+                                    {c.sub}
+                                </div>
+                            </div>
+                        ))}
                     </div>
 
                     <div className="erp-body">
@@ -308,37 +362,6 @@ function MyLeaves() {
                                 </div>
                             )}
                         </div>
-
-                        <aside className="erp-actions-panel">
-                            <div className="erp-actions-header">
-                                <span>Document Status</span>
-                                <span style={{ color: '#1e3a8a', fontWeight: 700 }}>{stats.total}</span>
-                            </div>
-                            <div style={{ padding: 14 }}>
-                                {stats.items.map((s) => (
-                                    <div key={s.key} style={{ marginBottom: 14 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#374151', marginBottom: 4 }}>
-                                            <span>{s.label} <span style={{ color: '#9ca3af' }}>{s.pct}%</span></span>
-                                            <span style={{ fontWeight: 600 }}>{s.count}</span>
-                                        </div>
-                                        <div style={{ height: 4, background: '#e5e7eb', borderRadius: 2, overflow: 'hidden' }}>
-                                            <div style={{ height: '100%', width: `${s.pct}%`, background: s.color }} />
-                                        </div>
-                                    </div>
-                                ))}
-                                {selected && (
-                                    <div style={{ marginTop: 18, paddingTop: 12, borderTop: '1px solid #e5e7eb' }}>
-                                        <div style={{ fontWeight: 600, color: '#1e3a8a', marginBottom: 8 }}>{docNo(selected)}</div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280', marginBottom: 4 }}>
-                                            <span>Bill Amount</span><span>0.000</span>
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6b7280' }}>
-                                            <span>Adjusted Amount</span><span>0.000</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </aside>
                     </div>
                 </div>
 
