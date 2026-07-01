@@ -19,17 +19,19 @@ const BrandIcon = () => (
         <circle cx="22" cy="28" r="7.5" fill="#3b82f6" /><path d="M7 53c0-8.3 6.7-12.5 15-12.5S37 44.7 37 53Z" fill="#3b82f6" />
     </svg>
 );
-// Teal faceted diamond gem (Business Central logo style).
+// Teal isometric 3D cube gem (Business Central logo style).
 const BcGem = () => (
     <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
-        <polygon points="17,13 31,13 31,21 17,21" fill="#67e8f9" />
-        <polygon points="17,13 17,21 9,21" fill="#22d3ee" />
-        <polygon points="31,13 39,21 31,21" fill="#0891b2" />
-        <polygon points="9,21 17,21 24,40" fill="#0e7490" />
-        <polygon points="17,21 24,21 24,40" fill="#06b6d4" />
-        <polygon points="24,21 31,21 24,40" fill="#0891b2" />
-        <polygon points="31,21 39,21 24,40" fill="#155e75" />
-        <polygon points="17,13 24,13 20.5,17" fill="#a5f3fc" opacity="0.9" />
+        <defs>
+            <linearGradient id="bcTop" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#a5f3fc" />
+                <stop offset="100%" stopColor="#22d3ee" />
+            </linearGradient>
+        </defs>
+        <polygon points="24,7 39,15.5 24,24 9,15.5" fill="url(#bcTop)" />
+        <polygon points="9,15.5 24,24 24,41 9,32.5" fill="#0891b2" />
+        <polygon points="39,15.5 24,24 24,41 39,32.5" fill="#0e7490" />
+        <polygon points="24,7 31,11 24,15 17,11" fill="#ecfeff" opacity="0.75" />
     </svg>
 );
 
