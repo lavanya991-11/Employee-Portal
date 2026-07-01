@@ -179,6 +179,13 @@ function MyLeaves() {
     }, [leaves]);
 
     // Document Status as modern KPI cards (shown under the header).
+    const sc = Object.fromEntries(stats.items.map((s) => [s.key, s]));
+    const statusCards = [
+        { label: 'Total Requests', count: stats.total, color: '#2563eb', icon: STAT_ICONS.total, sub: 'All requests' },
+        { label: 'Approved', count: sc.Approved?.count || 0, color: '#22c55e', icon: STAT_ICONS.approved, sub: `${sc.Approved?.pct || 0}% of total` },
+        { label: 'Unapproved', count: sc.Pending?.count || 0, color: '#f59e0b', icon: STAT_ICONS.pending, sub: `${sc.Pending?.pct || 0}% of total` },
+        { label: 'Rejected', count: sc.Rejected?.count || 0, color: '#ef4444', icon: STAT_ICONS.rejected, sub: `${sc.Rejected?.pct || 0}% of total` }
+    ];
 
     return (
         <div className="app-layout">
@@ -243,6 +250,28 @@ function MyLeaves() {
                         </div>
                     </div>
 
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 16 }}>
+                        {statusCards.map((c) => (
+                            <div key={c.label} style={{
+                                border: '1px solid var(--line-soft)', borderRadius: 14, padding: 16,
+                                background: 'var(--surface)', boxShadow: 'var(--shadow-sm)'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <div style={{
+                                        width: 44, height: 44, borderRadius: 12, color: '#fff', flexShrink: 0,
+                                        background: `linear-gradient(135deg, ${c.color}, ${darken(c.color)})`,
+                                        boxShadow: `0 4px 10px ${c.color}40`,
+                                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>{c.icon}</div>
+                                    <div style={{ minWidth: 0 }}>
+                                        <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 700, letterSpacing: '.3px' }}>{c.label.toUpperCase()}</div>
+                                        <div style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', lineHeight: 1.1 }}>{c.count}</div>
+                                    </div>
+                                </div>
+                                <div style={{ marginTop: 10, fontSize: 12, color: '#6b7280' }}>{c.sub}</div>
+                            </div>
+                        ))}
+                    </div>
 
                     <div className="erp-body">
                         <div className="erp-list-card">
