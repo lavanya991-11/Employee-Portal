@@ -88,7 +88,7 @@ button, input, select, textarea, optgroup {
 .login-feature .lf-title { font-size: 14px; font-weight: 700; color: #0f172a; }
 .login-feature .lf-sub { font-size: 12.5px; color: #64748b; margin-top: 1px; }
 .login-bc-card { margin-top: auto; display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.72); border: 1px solid #cdd9f2; border-radius: 14px; padding: 13px 16px; }
-.login-bc-card .bc-diamond { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #22d3ee, #2563eb); flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; color: #fff; }
+.login-bc-card .bc-diamond { width: 44px; height: 44px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
 .login-bc-card .bc-label { font-size: 11px; color: #64748b; }
 .login-bc-card .bc-name { font-size: 13.5px; font-weight: 700; color: #0f172a; }
 

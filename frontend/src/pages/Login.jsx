@@ -19,8 +19,18 @@ const BrandIcon = () => (
         <circle cx="22" cy="28" r="7.5" fill="#3b82f6" /><path d="M7 53c0-8.3 6.7-12.5 15-12.5S37 44.7 37 53Z" fill="#3b82f6" />
     </svg>
 );
-const MsLogo = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24"><rect x="1" y="1" width="10" height="10" fill="#f25022" /><rect x="13" y="1" width="10" height="10" fill="#7fba00" /><rect x="1" y="13" width="10" height="10" fill="#00a4ef" /><rect x="13" y="13" width="10" height="10" fill="#ffb900" /></svg>
+// Teal faceted diamond gem (Business Central logo style).
+const BcGem = () => (
+    <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+        <polygon points="17,13 31,13 31,21 17,21" fill="#67e8f9" />
+        <polygon points="17,13 17,21 9,21" fill="#22d3ee" />
+        <polygon points="31,13 39,21 31,21" fill="#0891b2" />
+        <polygon points="9,21 17,21 24,40" fill="#0e7490" />
+        <polygon points="17,21 24,21 24,40" fill="#06b6d4" />
+        <polygon points="24,21 31,21 24,40" fill="#0891b2" />
+        <polygon points="31,21 39,21 24,40" fill="#155e75" />
+        <polygon points="17,13 24,13 20.5,17" fill="#a5f3fc" opacity="0.9" />
+    </svg>
 );
 
 const FEATURES = [
@@ -130,7 +140,7 @@ function Login() {
                     </div>
 
                     <div className="login-bc-card">
-                        <span className="bc-diamond">{ic(<><path d="M12 2 22 12 12 22 2 12Z" /></>, 20)}</span>
+                        <span className="bc-diamond"><BcGem /></span>
                         <div>
                             <div className="bc-label">Connected with</div>
                             <div className="bc-name">Microsoft Dynamics 365</div>
