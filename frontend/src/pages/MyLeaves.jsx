@@ -67,6 +67,7 @@ function MyLeaves() {
     const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(1);
+    const [menuOpen, setMenuOpen] = useState(false); // "more actions" dropdown
     const tableRef = useRef(null);
 
     // Note: selection is kept while scrolling — it only changes when you click a
@@ -217,18 +218,36 @@ function MyLeaves() {
                             />
                         </div>
                         <div className="erp-titlebar-actions">
-                                <ActionButton kind="back" onClick={() => navigate(-1)}>Back</ActionButton>
-                                <ActionButton kind="plus" tint="solid" onClick={() => navigate('/leaves/apply')}>New Request</ActionButton>
-                                <ActionButton kind="edit" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>Edit</ActionButton>
-                                <ActionButton
-                                    kind="trash" tint="danger"
-                                    onClick={onDelete}
-                                    disabled={!selected || selected.isPosted || selected.status !== 'Pending'}
-                                    title={(selected && !selected.isPosted && selected.status === 'Pending') ? 'Delete this draft' : 'Only draft (unposted, pending) leaves can be deleted'}
-                                >Delete</ActionButton>
-                                <ActionButton kind="refresh" onClick={load}>Refresh</ActionButton>
-                                <ActionButton kind="sparkles" onClick={onRegenerate}>Regenerate</ActionButton>
+                            <ActionButton kind="back" onClick={() => navigate(-1)}>Back</ActionButton>
+                            <ActionButton kind="plus" tint="solid" onClick={() => navigate('/leaves/apply')}>New Request</ActionButton>
+                            <div style={{ position: 'relative' }}>
+                                <button type="button" className="erp-action-btn" title="More actions"
+                                    onClick={() => setMenuOpen((v) => !v)} style={{ padding: '9px 11px' }}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569"
+                                        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
+                                        <circle cx="9" cy="7" r="2.2" fill="#fff" /><circle cx="15" cy="12" r="2.2" fill="#fff" /><circle cx="9" cy="17" r="2.2" fill="#fff" />
+                                    </svg>
+                                </button>
+                                {menuOpen && (
+                                    <>
+                                        <div onClick={() => setMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+                                        <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 41, background: '#fff', border: '1px solid var(--line-soft)', borderRadius: 12, boxShadow: 'var(--shadow-md)', minWidth: 190, padding: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                            <ActionButton kind="edit" disabled={!selected || selected.isPosted || selected.status !== 'Pending'}
+                                                onClick={() => { setMenuOpen(false); onEdit(); }}
+                                                style={{ width: '100%', justifyContent: 'flex-start', border: 'none', boxShadow: 'none' }}>Edit</ActionButton>
+                                            <ActionButton kind="trash" tint="danger" disabled={!selected || selected.isPosted || selected.status !== 'Pending'}
+                                                onClick={() => { setMenuOpen(false); onDelete(); }}
+                                                style={{ width: '100%', justifyContent: 'flex-start', border: 'none', boxShadow: 'none' }}>Delete</ActionButton>
+                                            <ActionButton kind="refresh" onClick={() => { setMenuOpen(false); load(); }}
+                                                style={{ width: '100%', justifyContent: 'flex-start', border: 'none', boxShadow: 'none' }}>Refresh</ActionButton>
+                                            <ActionButton kind="sparkles" onClick={() => { setMenuOpen(false); onRegenerate(); }}
+                                                style={{ width: '100%', justifyContent: 'flex-start', border: 'none', boxShadow: 'none' }}>Regenerate</ActionButton>
+                                        </div>
+                                    </>
+                                )}
                             </div>
+                        </div>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 16 }}>
