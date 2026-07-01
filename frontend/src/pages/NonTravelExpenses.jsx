@@ -270,38 +270,6 @@ function NonTravelExpenses() {
                                 )}
                             </div>
                         </form>
-
-                        <aside className="erp-actions-panel">
-                            <div className="erp-actions-header"><span>{{ actions: 'Actions', info: 'Info', reports: 'Reports', shortcuts: 'Shortcuts' }[sideTab]}</span></div>
-                            {sideTab === 'actions' && (
-                                <ul className="erp-actions-list">
-                                    <li onClick={() => window.print()}>🖨️ Print</li>
-                                    <li onClick={addItem}>➕ Add Item</li>
-                                    <li onClick={load}>🔄 Refresh</li>
-                                </ul>
-                            )}
-                            {sideTab === 'info' && (
-                                <div style={{ padding: 14, fontSize: 13, color: 'var(--muted)', lineHeight: 1.55 }}>
-                                    Add expense items and submit to post to Business Central. The <b>Actions</b> tab has Print, Add Item and Refresh.
-                                </div>
-                            )}
-                            {sideTab === 'reports' && (
-                                <div style={{ padding: 14, fontSize: 13, color: 'var(--muted)' }}>Reports for this document will appear here.</div>
-                            )}
-                            {sideTab === 'shortcuts' && (
-                                <ul className="erp-actions-list">
-                                    <li>⌨️ Ctrl + S — Save</li>
-                                    <li>🖨️ Ctrl + P — Print</li>
-                                    <li>⎋ Esc — Close</li>
-                                </ul>
-                            )}
-                            <div className="erp-side-tabs">
-                                <span className={sideTab === 'actions' ? 'active' : ''} onClick={() => setSideTab('actions')}>Actions</span>
-                                <span className={sideTab === 'info' ? 'active' : ''} onClick={() => setSideTab('info')}>Info</span>
-                                <span className={sideTab === 'reports' ? 'active' : ''} onClick={() => setSideTab('reports')}>Reports</span>
-                                <span className={sideTab === 'shortcuts' ? 'active' : ''} onClick={() => setSideTab('shortcuts')}>Shortcuts</span>
-                            </div>
-                        </aside>
                     </div>
                 </div>
             </main>
