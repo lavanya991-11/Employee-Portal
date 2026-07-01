@@ -218,7 +218,7 @@ function MyLeaves() {
                         </div>
                         <div className="erp-titlebar-actions">
                                 <ActionButton kind="back" onClick={() => navigate(-1)}>Back</ActionButton>
-                                <ActionButton kind="add" tint="primary" onClick={() => navigate('/leaves/apply')}>New</ActionButton>
+                                <ActionButton kind="plus" tint="solid" onClick={() => navigate('/leaves/apply')}>New Request</ActionButton>
                                 <ActionButton kind="edit" onClick={onEdit} disabled={!selected || selected.isPosted || selected.status !== 'Pending'}>Edit</ActionButton>
                                 <ActionButton
                                     kind="trash" tint="danger"

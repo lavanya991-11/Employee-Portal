@@ -8,9 +8,10 @@ const mk = (p) => (
 );
 
 const ICONS = {
-    back: mk(<><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></>),
+    back: mk(<path d="m15 18-6-6 6-6" />),
     home: mk(<><path d="m3 9 9-7 9 7" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></>),
     add: mk(<><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M12 8v8M8 12h8" /></>),
+    plus: mk(<><path d="M12 5v14M5 12h14" /></>),
     edit: mk(<><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></>),
     trash: mk(<><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M10 11v6M14 11v6" /></>),
     refresh: mk(<><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v5h-5" /></>),
@@ -27,16 +28,19 @@ const ICONS = {
 };
 
 const COLORS = {
-    back: '#2563eb', home: '#2563eb', add: '#2563eb', edit: '#f59e0b', trash: '#ef4444',
+    back: '#2563eb', home: '#2563eb', add: '#2563eb', plus: '#2563eb', edit: '#f59e0b', trash: '#ef4444',
     refresh: '#16a34a', scan: '#2563eb', sparkles: '#7c3aed', save: '#2563eb', send: '#2563eb',
     print: '#475569', export: '#0ea5e9', filter: '#475569', eye: '#475569', mail: '#0ea5e9', calc: '#7c3aed'
 };
 
 export default function ActionButton({ kind, tint, children, ...props }) {
-    const variant = (tint === 'danger' || kind === 'trash') ? ' eab-danger' : tint === 'primary' ? ' eab-primary' : '';
+    const variant = tint === 'solid' ? ' eab-solid'
+        : (tint === 'danger' || kind === 'trash') ? ' eab-danger'
+        : tint === 'primary' ? ' eab-primary' : '';
+    const iconColor = tint === 'solid' ? '#fff' : (COLORS[kind] || '#334155');
     return (
         <button type="button" className={`erp-action-btn${variant}`} {...props}>
-            {kind && <span style={{ color: COLORS[kind] || '#334155', display: 'inline-flex' }}>{ICONS[kind]}</span>}
+            {kind && <span style={{ color: iconColor, display: 'inline-flex' }}>{ICONS[kind]}</span>}
             {children}
         </button>
     );
