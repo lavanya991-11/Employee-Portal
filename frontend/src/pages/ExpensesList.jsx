@@ -9,7 +9,7 @@ const STATUS_LABEL = { Pending: 'UnApproved', Approved: 'Posted', Rejected: 'Rej
 const STATUS_COLOR = { Pending: '#f59e0b', Approved: '#22c55e', Rejected: '#ef4444' };
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 const docNo = (e) =>
-    `EXP-${new Date(e.createdAt || Date.now()).getFullYear()}/${(e._id || '').slice(-3).toUpperCase()}`;
+    `EXP-${new Date(e.createdAt || Date.now()).getFullYear()}/${String(e._id || '').slice(-3).toUpperCase()}`;
 
 const PAGE_SIZE = 10;
 

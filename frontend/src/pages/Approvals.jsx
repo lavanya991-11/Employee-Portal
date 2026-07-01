@@ -7,7 +7,7 @@ import { leaveApi } from '../services/api';
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
 const docNo = (l) =>
-    `AYL-${new Date(l.createdAt || Date.now()).getFullYear()}/${(l._id || '').slice(-3).toUpperCase()}`;
+    `AYL-${new Date(l.createdAt || Date.now()).getFullYear()}/${String(l._id || '').slice(-3).toUpperCase()}`;
 
 function Approvals() {
     const navigate = useNavigate();
