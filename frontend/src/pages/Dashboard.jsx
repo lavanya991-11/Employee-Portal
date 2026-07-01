@@ -353,7 +353,8 @@ function Dashboard() {
                                     <Link to={t.path} key={t.key} style={{
                                         display: 'block', textDecoration: 'none',
                                         border: '1px solid var(--line-soft)', borderTop: `3px solid ${t.color}`,
-                                        borderRadius: 14, padding: 16, background: 'var(--surface)',
+                                        borderRadius: 14, padding: 16,
+                                        background: `linear-gradient(135deg, ${t.color}1f, ${t.color}0a)`,
                                         boxShadow: 'var(--shadow-sm)', transition: 'box-shadow 0.15s, transform 0.15s'
                                     }}
                                         onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
