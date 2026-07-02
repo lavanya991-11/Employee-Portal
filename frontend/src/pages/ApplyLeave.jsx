@@ -7,6 +7,8 @@ import { leaveApi, finElementApi } from '../services/api';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '';
+// Show leave day counts/balances with 2 decimals (e.g. 12.00, 9.50) so half-days aren't hidden.
+const dec2 = (n) => (Number(n) || 0).toFixed(2);
 
 function ApplyLeave() {
     const navigate = useNavigate();
@@ -415,11 +417,11 @@ function ApplyLeave() {
                                     </div>
                                     <div className="erp-field">
                                         <label>Assigned Leaves</label>
-                                        <input value={form.assignedLeaves} readOnly className="erp-readonly" />
+                                        <input value={dec2(form.assignedLeaves)} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Available Leaves</label>
-                                        <input value={form.availableLeaves} readOnly className="erp-readonly" />
+                                        <input value={dec2(form.availableLeaves)} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Leave From Date *</label>
@@ -439,11 +441,11 @@ function ApplyLeave() {
                                     </div>
                                     <div className="erp-field">
                                         <label>No Of Days *</label>
-                                        <input type="number" name="noOfDays" value={form.noOfDays} readOnly className="erp-readonly" />
+                                        <input name="noOfDays" value={dec2(form.noOfDays)} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Balance Leaves</label>
-                                        <input type="number" name="balanceLeaves" value={form.balanceLeaves} readOnly className="erp-readonly" />
+                                        <input name="balanceLeaves" value={dec2(form.balanceLeaves)} readOnly className="erp-readonly" />
                                     </div>
                                     <div className="erp-field">
                                         <label>Pay Type</label>
