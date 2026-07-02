@@ -387,7 +387,7 @@ function Dashboard() {
                         label="Present Days" value={metrics.presentDays} sub="This Month (working days)" delta={`${metrics.usedThisMonth} leave day(s) this month`} />
                     <StatCard icon={KPI_ICONS.leave} iconBg="#dcfce7" iconColor="#15803d"
                         label="Leave Balance"
-                        value={bcLeaveBalance != null ? bcLeaveBalance : metrics.leaveBalance}
+                        value={bcLeaveBalance != null ? Number(bcLeaveBalance).toFixed(2) : metrics.leaveBalance}
                         sub="Days Left"
                         delta={bcLeaveBalance != null ? 'From Business Central' : `${metrics.usedThisYear} of ${ANNUAL_LEAVE_ALLOWANCE} used this year`} />
                     <StatCard icon={KPI_ICONS.hours} iconBg="#fed7aa" iconColor="#c2410c"
